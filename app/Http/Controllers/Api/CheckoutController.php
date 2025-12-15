@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use Illuminate\Support\Str;
 use App\Models\Setting;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\NewUserCredentials;
+use Illuminate\Support\Facades\Hash;
 
 class CheckoutController extends Controller
 {
@@ -92,20 +95,25 @@ class CheckoutController extends Controller
 
             // Auto-create or attach user when guest provides email
             $userId = auth()->id();
+            $newUserPassword = null;
+            $isNewUser = false;
+
             if (!$userId && $request->email) {
                 $existing = User::where('email', $request->email)->first();
                 if ($existing) {
                     $userId = $existing->id;
                 } else {
-                    $password = Str::random(12);
+                    // Generate random password for new user
+                    $newUserPassword = Str::random(12);
                     $newUser = User::create([
                         'name' => $request->name,
                         'mobile' => $request->mobile,
                         'email' => $request->email,
-                        'password' => $password,
-                        'is_verified' => false,
+                        'password' => Hash::make($newUserPassword),
+                        'is_verified' => true,
                     ]);
                     $userId = $newUser->id;
+                    $isNewUser = true;
                 }
             }
 
@@ -143,6 +151,23 @@ class CheckoutController extends Controller
             }
 
             DB::commit();
+
+            // Send email to new user with credentials
+            if ($isNewUser && $newUserPassword && $request->email) {
+                try {
+                    Mail::to($request->email)->send(
+                        new NewUserCredentials(
+                            $request->name,
+                            $request->email,
+                            $newUserPassword,
+                            $order->order_number
+                        )
+                    );
+                } catch (\Exception $e) {
+                    // Log email error but don't fail the order
+                    \Log::error('Failed to send new user credentials email: ' . $e->getMessage());
+                }
+            }
 
             $order->load('items.product');
 

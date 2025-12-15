@@ -74,6 +74,20 @@ class ProductController extends Controller
             }
         }
 
+        // Create product attributes
+        if ($request->has('attributes')) {
+            foreach ($request->attributes as $attr) {
+                if (!empty($attr['name']) && !empty($attr['value'])) {
+                    $product->attributes()->create([
+                        'attribute_name' => $attr['name'],
+                        'attribute_value' => $attr['value'],
+                        'price_adjustment' => $attr['price_adjustment'] ?? 0,
+                        'stock_adjustment' => $attr['stock_adjustment'] ?? 0,
+                    ]);
+                }
+            }
+        }
+
         return redirect()->route('admin.products.index')->with('success', 'Product created successfully');
     }
 
@@ -140,6 +154,20 @@ class ProductController extends Controller
                     'image_path' => $image->store('products/gallery', 'public'),
                     'sort_order' => $product->images()->count() + $index,
                 ]);
+            }
+        }
+
+        // Add new product attributes
+        if ($request->has('new_attributes')) {
+            foreach ($request->new_attributes as $attr) {
+                if (!empty($attr['name']) && !empty($attr['value'])) {
+                    $product->attributes()->create([
+                        'attribute_name' => $attr['name'],
+                        'attribute_value' => $attr['value'],
+                        'price_adjustment' => $attr['price_adjustment'] ?? 0,
+                        'stock_adjustment' => $attr['stock_adjustment'] ?? 0,
+                    ]);
+                }
             }
         }
 

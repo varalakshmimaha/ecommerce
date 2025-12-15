@@ -54,8 +54,8 @@
                 <input type="file" name="image" accept="image/*" required class="input-field">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Link</label>
-                <input type="url" name="link" class="input-field">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Link (URL or path like /products)</label>
+                <input type="text" name="link" class="input-field" placeholder="/products or https://example.com">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Sort Order</label>
@@ -78,6 +78,7 @@
         </div>
         <form id="editBannerForm" method="POST" enctype="multipart/form-data">
             @csrf
+            <input type="hidden" name="is_active" value="0" id="edit_is_active_hidden">
             <div class="grid grid-cols-1 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
@@ -90,10 +91,11 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Image (leave blank to keep)</label>
                     <input type="file" name="image" id="edit_image" accept="image/*" class="input-field">
+                    <p class="text-xs text-gray-500 mt-1">Select a new image to replace the existing one</p>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Link</label>
-                    <input type="url" name="link" id="edit_link" class="input-field">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Link (URL or path like /products)</label>
+                    <input type="text" name="link" id="edit_link" class="input-field" placeholder="/products or https://example.com">
                 </div>
                 <div class="flex items-center space-x-4">
                     <div>
@@ -101,7 +103,7 @@
                         <input type="number" name="sort_order" id="edit_sort_order" class="input-field w-32">
                     </div>
                     <div class="flex items-center">
-                        <input type="checkbox" name="is_active" id="edit_is_active" class="mr-2">
+                        <input type="checkbox" name="is_active" id="edit_is_active" value="1" class="mr-2">
                         <label for="edit_is_active" class="text-sm">Active</label>
                     </div>
                 </div>
@@ -144,9 +146,13 @@
         }
     });
 
-    // enhance form to send as POST (route expects POST)
+    // Handle form submission
     document.getElementById('editBannerForm').addEventListener('submit', function(e){
-        // allow normal submit; Laravel will handle CSRF
+        // Update hidden is_active field based on checkbox state
+        const checkbox = document.getElementById('edit_is_active');
+        document.getElementById('edit_is_active_hidden').value = checkbox.checked ? '1' : '0';
+
+        // Allow normal form submit - browser will handle multipart/form-data correctly
     });
 </script>
 @endsection

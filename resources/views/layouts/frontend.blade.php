@@ -67,9 +67,42 @@
                 <!-- Right Actions -->
                 <div class="flex items-center space-x-4">
                     <form action="{{ route('products.index') }}" method="GET" class="hidden lg:block">
-                        <input type="text" name="search" placeholder="Search products..." value="{{ request('search') }}" 
+                        <input type="text" name="search" placeholder="Search products..." value="{{ request('search') }}"
                             class="input-field w-64">
                     </form>
+
+                    <!-- User Account -->
+                    <div class="user-account-section">
+                        <!-- Show when user is logged out -->
+                        <div class="guest-links flex items-center space-x-3">
+                            <a href="{{ route('user.login') }}" class="text-gray-700 hover:text-primary-600 transition-colors font-medium text-sm">
+                                Login
+                            </a>
+                            <span class="text-gray-400">|</span>
+                            <a href="{{ route('user.register') }}" class="text-gray-700 hover:text-primary-600 transition-colors font-medium text-sm">
+                                Register
+                            </a>
+                        </div>
+
+                        <!-- Show when user is logged in -->
+                        <div class="logged-in-links hidden relative">
+                            <button id="user-menu-btn" class="flex items-center space-x-2 text-gray-700 hover:text-primary-600 transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                                <span class="user-name font-medium text-sm"></span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+                            <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                                <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</a>
+                                <a href="{{ route('track.order') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Track Order</a>
+                                <button onclick="logout()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <a href="{{ route('cart') }}" class="relative">
                         <svg class="w-6 h-6 text-gray-700 hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
@@ -82,13 +115,38 @@
             <!-- Mobile Menu -->
             <div id="mobile-menu" class="hidden md:hidden pb-4 border-t border-gray-200 mt-2">
                 <nav class="flex flex-col space-y-3 pt-4">
+                    <!-- Mobile User Account -->
+                    <div class="mobile-user-account border-b border-gray-200 pb-3">
+                        <!-- Show when logged out -->
+                        <div class="mobile-guest-links flex items-center space-x-4">
+                            <a href="{{ route('user.login') }}" class="text-primary-600 hover:text-primary-700 font-medium py-2">
+                                Login
+                            </a>
+                            <a href="{{ route('user.register') }}" class="text-primary-600 hover:text-primary-700 font-medium py-2">
+                                Register
+                            </a>
+                        </div>
+                        <!-- Show when logged in -->
+                        <div class="mobile-logged-in-links hidden">
+                            <div class="flex items-center space-x-2 py-2">
+                                <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                                <span class="mobile-user-name font-medium text-gray-700"></span>
+                            </div>
+                            <a href="{{ route('user.dashboard') }}" class="block text-gray-700 hover:text-primary-600 py-2 pl-8">Dashboard</a>
+                            <a href="{{ route('track.order') }}" class="block text-gray-700 hover:text-primary-600 py-2 pl-8">Track Order</a>
+                            <button onclick="logout()" class="block text-left text-gray-700 hover:text-primary-600 py-2 pl-8">Logout</button>
+                        </div>
+                    </div>
+
                     <a href="{{ route('home') }}" class="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2">Home</a>
                     <a href="{{ route('products.index') }}" class="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2">Products</a>
                     @foreach(\App\Models\Page::where('show_in_navbar', true)->where('is_active', true)->orderBy('sort_order')->get() as $mobileNavPage)
                         <a href="{{ route('page.show', $mobileNavPage) }}" class="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2">{{ $mobileNavPage->title }}</a>
                     @endforeach
                     <form action="{{ route('products.index') }}" method="GET" class="pt-2">
-                        <input type="text" name="search" placeholder="Search products..." value="{{ request('search') }}" 
+                        <input type="text" name="search" placeholder="Search products..." value="{{ request('search') }}"
                             class="input-field">
                     </form>
                 </nav>
@@ -226,7 +284,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
             const mobileMenu = document.getElementById('mobile-menu');
-            
+
             if (mobileMenuToggle && mobileMenu) {
                 mobileMenuToggle.addEventListener('click', function() {
                     mobileMenu.classList.toggle('hidden');
@@ -239,7 +297,104 @@
                     }
                 });
             }
+
+            // Update user account section based on auth status
+            updateUserAccountSection();
+
+            // User dropdown menu toggle
+            const userMenuBtn = document.getElementById('user-menu-btn');
+            const userDropdown = document.getElementById('user-dropdown');
+
+            if (userMenuBtn && userDropdown) {
+                userMenuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('hidden');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function() {
+                    userDropdown.classList.add('hidden');
+                });
+            }
         });
+
+        // Update user account section based on localStorage auth
+        function updateUserAccountSection() {
+            const token = localStorage.getItem('auth_token');
+            const user = localStorage.getItem('user');
+
+            // Desktop
+            const guestLinks = document.querySelector('.guest-links');
+            const loggedInLinks = document.querySelector('.logged-in-links');
+
+            // Mobile
+            const mobileGuestLinks = document.querySelector('.mobile-guest-links');
+            const mobileLoggedInLinks = document.querySelector('.mobile-logged-in-links');
+
+            if (token && user) {
+                // User is logged in
+                const userData = JSON.parse(user);
+
+                // Desktop
+                if (guestLinks) guestLinks.classList.add('hidden');
+                if (loggedInLinks) {
+                    loggedInLinks.classList.remove('hidden');
+                    const userName = loggedInLinks.querySelector('.user-name');
+                    if (userName) userName.textContent = userData.name || 'Account';
+                }
+
+                // Mobile
+                if (mobileGuestLinks) mobileGuestLinks.classList.add('hidden');
+                if (mobileLoggedInLinks) {
+                    mobileLoggedInLinks.classList.remove('hidden');
+                    const mobileUserName = mobileLoggedInLinks.querySelector('.mobile-user-name');
+                    if (mobileUserName) mobileUserName.textContent = userData.name || 'Account';
+                }
+            } else {
+                // User is logged out
+                // Desktop
+                if (guestLinks) guestLinks.classList.remove('hidden');
+                if (loggedInLinks) loggedInLinks.classList.add('hidden');
+
+                // Mobile
+                if (mobileGuestLinks) mobileGuestLinks.classList.remove('hidden');
+                if (mobileLoggedInLinks) mobileLoggedInLinks.classList.add('hidden');
+            }
+        }
+
+        // Logout function
+        function logout() {
+            const token = localStorage.getItem('auth_token');
+
+            if (token) {
+                // Call logout API
+                fetch(`${API_BASE}/logout`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                }).then(() => {
+                    // Clear localStorage
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user');
+
+                    // Redirect to home
+                    window.location.href = '/';
+                }).catch(err => {
+                    console.error('Logout error:', err);
+                    // Clear localStorage anyway
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user');
+                    window.location.href = '/';
+                });
+            } else {
+                // Just clear and redirect
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user');
+                window.location.href = '/';
+            }
+        }
 
         // Helper to show modal messages (supports type: 'success'|'error'|'info')
         function showModal(title, message, type = 'info') {

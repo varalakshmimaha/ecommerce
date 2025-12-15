@@ -3,11 +3,11 @@
 @section('title', 'Edit Page')
 
 @section('content')
-<div class="max-w-4xl overflow-x-auto">
-    <div class="bg-white rounded-lg shadow-md p-6">
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-lg shadow-md p-6 overflow-hidden">
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Edit Page</h2>
 
-        <form action="{{ route('admin.pages.update', $page) }}" method="POST" class="space-y-6">
+        <form action="{{ route('admin.pages.update', $page) }}" method="POST" id="pageForm" class="space-y-6">
             @csrf
             @method('PUT')
 
@@ -21,7 +21,7 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Content *</label>
-                <textarea name="content" id="editor" required class="input-field">{{ old('content', $page->content) }}</textarea>
+                <textarea name="content" id="editor" required class="input-field" rows="10">{{ old('content', $page->content) }}</textarea>
                 @error('content')
                     <span class="text-red-600 text-sm">{{ $message }}</span>
                 @enderror
@@ -38,14 +38,16 @@
 
                 <div class="flex items-end">
                     <label class="flex items-center space-x-2">
-                        <input type="checkbox" name="show_in_navbar" {{ old('show_in_navbar', $page->show_in_navbar) ? 'checked' : '' }} class="w-4 h-4">
+                        <input type="hidden" name="show_in_navbar" value="0">
+                        <input type="checkbox" name="show_in_navbar" value="1" {{ old('show_in_navbar', $page->show_in_navbar) ? 'checked' : '' }} class="w-4 h-4">
                         <span class="text-sm font-medium text-gray-700">Show in Navbar</span>
                     </label>
                 </div>
 
                 <div class="flex items-end">
                     <label class="flex items-center space-x-2">
-                        <input type="checkbox" name="show_in_footer" {{ old('show_in_footer', $page->show_in_footer) ? 'checked' : '' }} class="w-4 h-4">
+                        <input type="hidden" name="show_in_footer" value="0">
+                        <input type="checkbox" name="show_in_footer" value="1" {{ old('show_in_footer', $page->show_in_footer) ? 'checked' : '' }} class="w-4 h-4">
                         <span class="text-sm font-medium text-gray-700">Show in Footer</span>
                     </label>
                 </div>
@@ -53,7 +55,8 @@
 
             <div class="flex items-end">
                 <label class="flex items-center space-x-2">
-                    <input type="checkbox" name="is_active" {{ old('is_active', $page->is_active) ? 'checked' : '' }} class="w-4 h-4">
+                    <input type="hidden" name="is_active" value="0">
+                    <input type="checkbox" name="is_active" value="1" {{ old('is_active', $page->is_active) ? 'checked' : '' }} class="w-4 h-4">
                     <span class="text-sm font-medium text-gray-700">Active</span>
                 </label>
             </div>
@@ -68,9 +71,18 @@
 
 <script src="https://cdn.ckeditor.com/ckeditor5/38.0.0/classic/ckeditor.js"></script>
 <script>
+    let editorInstance;
     ClassicEditor
         .create(document.getElementById('editor'), {
             toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', '|', 'undo', 'redo']
+        })
+        .then(editor => {
+            editorInstance = editor;
+
+            // Sync editor data before form submit
+            document.getElementById('pageForm').addEventListener('submit', function(e) {
+                document.getElementById('editor').value = editor.getData();
+            });
         })
         .catch(error => {
             console.error(error);

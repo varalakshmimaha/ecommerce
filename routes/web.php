@@ -125,6 +125,11 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     // Shipping
     Route::get('/shipping', [\App\Http\Controllers\Admin\ShippingController::class, 'index'])->name('shipping.index');
     Route::post('/shipping', [\App\Http\Controllers\Admin\ShippingController::class, 'update'])->name('shipping.update');
+
+    // Queries
+    Route::get('/queries', [\App\Http\Controllers\Admin\QueryController::class, 'index'])->name('queries.index');
+    Route::post('/queries/{query}/respond', [\App\Http\Controllers\Admin\QueryController::class, 'respond'])->name('queries.respond');
+    Route::post('/queries/{query}/status', [\App\Http\Controllers\Admin\QueryController::class, 'updateStatus'])->name('queries.update-status');
 });
 
 // Public dynamic pages

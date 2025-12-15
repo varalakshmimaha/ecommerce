@@ -32,7 +32,20 @@ Route::post('/checkout/place-order', [CheckoutController::class, 'placeOrder']);
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Profile Management
+    Route::get('/user/profile', [UserController::class, 'profile']);
+    Route::put('/user/profile', [UserController::class, 'updateProfile']);
+    Route::put('/user/password', [UserController::class, 'changePassword']);
+
+    // Orders
     Route::get('/user/orders', [UserController::class, 'orders']);
+    Route::get('/user/orders/{orderNumber}', [UserController::class, 'orderDetails']);
+    Route::get('/user/orders/{orderNumber}/invoice', [UserController::class, 'downloadInvoice']);
+
+    // Queries
+    Route::get('/user/queries', [\App\Http\Controllers\Api\QueryController::class, 'index']);
+    Route::post('/user/queries', [\App\Http\Controllers\Api\QueryController::class, 'store']);
 });
 
 // Public order tracking

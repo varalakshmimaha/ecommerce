@@ -122,7 +122,39 @@
                 <span class="text-sm text-gray-700">Top Rated</span>
             </label>
         </div>
-        
+
+        <div class="border-t pt-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Product Attributes (Color, Size, etc.)</h3>
+            <div id="attributes-container" class="space-y-4">
+                <div class="attribute-row grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Attribute Type</label>
+                        <select name="attributes[0][name]" class="input-field">
+                            <option value="">Select Type</option>
+                            <option value="color">Color</option>
+                            <option value="size">Size</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Value</label>
+                        <input type="text" name="attributes[0][value]" class="input-field" placeholder="e.g., Red, XL, etc.">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Price Adjustment (₹)</label>
+                        <input type="number" step="0.01" name="attributes[0][price_adjustment]" value="0" class="input-field">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Stock Adjustment</label>
+                        <input type="number" name="attributes[0][stock_adjustment]" value="0" class="input-field">
+                    </div>
+                </div>
+            </div>
+            <button type="button" onclick="addAttributeRow()" class="mt-4 text-primary-600 hover:text-primary-700 font-medium">
+                + Add Another Attribute
+            </button>
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Meta Title</label>
@@ -148,6 +180,41 @@
 <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
 <script>
     CKEDITOR.replace('full_description');
+
+    let attributeIndex = 1;
+    function addAttributeRow() {
+        const container = document.getElementById('attributes-container');
+        const newRow = document.createElement('div');
+        newRow.className = 'attribute-row grid grid-cols-1 md:grid-cols-5 gap-4 p-4 bg-gray-50 rounded-lg';
+        newRow.innerHTML = `
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Attribute Type</label>
+                <select name="attributes[${attributeIndex}][name]" class="input-field">
+                    <option value="">Select Type</option>
+                    <option value="color">Color</option>
+                    <option value="size">Size</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Value</label>
+                <input type="text" name="attributes[${attributeIndex}][value]" class="input-field" placeholder="e.g., Red, XL, etc.">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Price Adjustment (₹)</label>
+                <input type="number" step="0.01" name="attributes[${attributeIndex}][price_adjustment]" value="0" class="input-field">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Stock Adjustment</label>
+                <input type="number" name="attributes[${attributeIndex}][stock_adjustment]" value="0" class="input-field">
+            </div>
+            <div class="flex items-end">
+                <button type="button" onclick="this.closest('.attribute-row').remove()" class="text-red-600 hover:text-red-700 font-medium">Remove</button>
+            </div>
+        `;
+        container.appendChild(newRow);
+        attributeIndex++;
+    }
 </script>
 @endsection
 

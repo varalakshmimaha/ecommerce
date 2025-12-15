@@ -21,7 +21,7 @@ class BannerController extends Controller
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'link' => 'nullable|url|max:255',
+            'link' => 'nullable|string|max:255',
             'sort_order' => 'nullable|integer',
         ]);
 
@@ -39,17 +39,23 @@ class BannerController extends Controller
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'link' => 'nullable|url|max:255',
+            'link' => 'nullable|string|max:255',
             'sort_order' => 'nullable|integer',
-            'is_active' => 'boolean',
+            'is_active' => 'nullable|boolean',
         ]);
 
+        // Handle image upload
         if ($request->hasFile('image')) {
+            // Delete old image if exists
             if ($banner->image) {
                 Storage::disk('public')->delete($banner->image);
             }
+            // Upload new image
             $validated['image'] = $request->file('image')->store('banners', 'public');
         }
+
+        // Ensure is_active is properly set (form sends '0' or '1' as string)
+        $validated['is_active'] = $request->input('is_active', 0) == '1';
 
         $banner->update($validated);
         return redirect()->back()->with('success', 'Banner updated successfully');

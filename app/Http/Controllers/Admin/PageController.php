@@ -25,16 +25,16 @@ class PageController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'show_in_navbar' => 'boolean',
-            'show_in_footer' => 'boolean',
+            'show_in_navbar' => 'nullable',
+            'show_in_footer' => 'nullable',
             'sort_order' => 'nullable|integer',
-            'is_active' => 'boolean',
+            'is_active' => 'nullable',
         ]);
 
         $validated['slug'] = Str::slug($validated['title']);
-        $validated['show_in_navbar'] = $request->has('show_in_navbar');
-        $validated['show_in_footer'] = $request->has('show_in_footer');
-        $validated['is_active'] = $request->has('is_active');
+        $validated['show_in_navbar'] = $request->input('show_in_navbar') == '1';
+        $validated['show_in_footer'] = $request->input('show_in_footer') == '1';
+        $validated['is_active'] = $request->input('is_active', '0') == '1';
 
         Page::create($validated);
         return redirect()->route('admin.pages.index')->with('success', 'Page created successfully');
@@ -50,16 +50,16 @@ class PageController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'show_in_navbar' => 'boolean',
-            'show_in_footer' => 'boolean',
+            'show_in_navbar' => 'nullable',
+            'show_in_footer' => 'nullable',
             'sort_order' => 'nullable|integer',
-            'is_active' => 'boolean',
+            'is_active' => 'nullable',
         ]);
 
         $validated['slug'] = Str::slug($validated['title']);
-        $validated['show_in_navbar'] = $request->has('show_in_navbar');
-        $validated['show_in_footer'] = $request->has('show_in_footer');
-        $validated['is_active'] = $request->has('is_active');
+        $validated['show_in_navbar'] = $request->input('show_in_navbar') == '1';
+        $validated['show_in_footer'] = $request->input('show_in_footer') == '1';
+        $validated['is_active'] = $request->input('is_active', '0') == '1';
 
         $page->update($validated);
         return redirect()->route('admin.pages.index')->with('success', 'Page updated successfully');

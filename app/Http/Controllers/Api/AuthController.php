@@ -24,24 +24,23 @@ class AuthController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $otp = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
-
+        // Email verification disabled - user is auto-verified
         $user = User::create([
             'mobile' => $request->mobile,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'name' => $request->name,
-            'otp' => $otp,
-            'otp_expires_at' => now()->addMinutes(10),
-            'is_verified' => false,
+            'is_verified' => true, // Auto-verify on registration
+            'otp' => null,
+            'otp_expires_at' => null,
         ]);
 
-        // In production, send OTP via SMS
-        // For now, return OTP in response (remove in production)
+        // Auto-login user after registration
+        $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Registration successful. Please verify OTP.',
-            'otp' => $otp, // Remove in production
+            'message' => 'Registration successful. You are now logged in.',
+            'token' => $token,
             'user' => $user,
         ], 201);
     }
@@ -103,9 +102,10 @@ class AuthController extends Controller
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
 
-        if (!$user->is_verified) {
-            return response()->json(['error' => 'Please verify your account first'], 401);
-        }
+        // Email verification disabled - skip verification check
+        // if (!$user->is_verified) {
+        //     return response()->json(['error' => 'Please verify your account first'], 401);
+        // }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 

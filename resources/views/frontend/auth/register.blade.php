@@ -41,15 +41,34 @@ document.getElementById('register-form').addEventListener('submit', function(e){
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     }).then(res => res.json()).then(data => {
-            if (data.user) {
-            if (window.showModal) showModal('Success', 'Registration successful. Please verify OTP sent.', 'success');
-            else alert('Registration successful.');
-            // Optionally navigate to OTP verify page
-            } else if (data.errors) {
+        if (data.token && data.user) {
+            // Auto-login after registration
+            localStorage.setItem('auth_token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+
+            if (window.showModal) showModal('Success', 'Registration successful! You are now logged in.', 'success');
+            else alert('Registration successful! You are now logged in.');
+
+            // Update cart count if function exists
+            if (window.updateCartCount) window.updateCartCount();
+
+            // Redirect to dashboard or home
+            setTimeout(() => {
+                window.location.href = '/dashboard';
+            }, 1000);
+        } else if (data.errors) {
             const errs = Object.values(data.errors).flat().join('\n');
-            if (window.showModal) showModal('Error', errs, 'error'); else alert(errs);
+            if (window.showModal) showModal('Error', errs, 'error');
+            else alert(errs);
+        } else if (data.error) {
+            if (window.showModal) showModal('Error', data.error, 'error');
+            else alert(data.error);
         }
-    }).catch(err => { console.error(err); if (window.showModal) showModal('Error','Failed to register', 'error'); else alert('Failed to register'); });
+    }).catch(err => {
+        console.error(err);
+        if (window.showModal) showModal('Error','Failed to register', 'error');
+        else alert('Failed to register');
+    });
 });
 </script>
 @endsection
