@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    * {
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    body {
+        font-family: 'Poppins', sans-serif;
+    }
+}
+
+@layer components {
+    .admin-sidebar {
+        @apply bg-gradient-to-b from-primary-800 to-primary-900 text-white min-h-screen;
+    }
+
+    @media (max-width: 768px) {
+        .admin-sidebar {
+            @apply fixed left-0 top-0 w-64 z-40 h-full shadow-xl;
+        }
+    }
+    
+    .admin-card {
+        @apply bg-white rounded-lg shadow-md p-4 md:p-6 transition-all duration-300 hover:shadow-lg;
+    }
+    
+    .admin-table {
+        @apply min-w-full divide-y divide-gray-200;
+    }
+    
+    .admin-table thead {
+        @apply bg-gray-50;
+    }
+    
+    .admin-table th {
+        @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+    }
+    
+    .admin-table td {
+        @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900;
+    }
+    
+    .admin-table tbody tr {
+        @apply hover:bg-gray-50 transition-colors duration-200;
+    }
+    
+    .input-field {
+        @apply w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300 bg-white text-gray-900 placeholder-gray-400;
+    }
+    
+    .input-field:focus {
+        @apply shadow-lg;
+    }
+    
+    select.input-field {
+        @apply cursor-pointer;
+    }
+    
+    textarea.input-field {
+        @apply resize-y;
+    }
+
+    /* Button Styles */
+    .btn {
+        @apply px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-300 font-medium;
+    }
+
+    .btn-primary {
+        @apply px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors duration-300 font-medium;
+    }
+
+    .btn-red {
+        @apply px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-300 font-medium;
+    }
+
+    .btn-green {
+        @apply px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-300 font-medium;
+    }
+
+    /* Modal Styles */
+    .modal {
+        @apply fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50;
+    }
+
+    .modal {
+        display: flex;
+    }
+
+    .modal.hidden {
+        display: none;
+    }
+
+    .modal-content {
+        @apply bg-white rounded-lg shadow-xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto;
+    }
+}
+

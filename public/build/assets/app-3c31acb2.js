@@ -1,0 +1,1 @@
+import{m as n}from"./module.esm-cf6647c1.js";window.Alpine=n;n.start();document.addEventListener("DOMContentLoaded",function(){const o=new IntersectionObserver(e=>{e.forEach(t=>{t.isIntersecting&&t.target.classList.add("animate-fade-in")})});document.querySelectorAll(".fade-in-on-scroll").forEach(e=>{o.observe(e)})});
