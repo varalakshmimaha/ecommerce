@@ -108,14 +108,11 @@ class ProductController extends Controller
         ]);
     }
 
-    public function showCategory(Category $category)
+    public function showCategory($id)
     {
-        $category->load('subCategories');
+        $category = Category::with('subCategories')->findOrFail($id);
 
-        return response()->json([
-            'success' => true,
-            'data' => $category
-        ]);
+        return response()->json($category);
     }
 
     public function brands()

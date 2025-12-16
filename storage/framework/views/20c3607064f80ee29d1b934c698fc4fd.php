@@ -3,7 +3,7 @@
 <?php $__env->startSection('content'); ?>
 <div class="flex justify-between items-center mb-6">
     <h2 class="text-2xl font-bold text-gray-900">Products</h2>
-    <a href="<?php echo e(route('admin.products.create')); ?>" class="btn-primary">
+    <a href="<?php echo e(route('admin.products.create')); ?>" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">
         <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>
@@ -43,7 +43,7 @@
                     </td>
                     <td>
                         <div class="flex space-x-2">
-                            <a href="<?php echo e(route('admin.products.edit', $product)); ?>" class="text-primary-600 hover:text-primary-800">Edit</a>
+                            <a href="<?php echo e(route('admin.products.edit', $product)); ?>" class="text-[#D4AF37] hover:text-primary-800">Edit</a>
                             <form action="<?php echo e(route('admin.products.destroy', $product)); ?>" method="POST" class="inline" onsubmit="return confirm('Are you sure?')">
                                 <?php echo csrf_field(); ?>
                                 <?php echo method_field('DELETE'); ?>

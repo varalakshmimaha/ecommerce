@@ -3,483 +3,341 @@
 @section('title', 'My Dashboard')
 
 @section('content')
-<div class="container mx-auto px-4 py-12">
-    <h1 class="text-3xl font-bold mb-8">My Dashboard</h1>
-
-    <!-- Tabs Navigation -->
-    <div class="mb-6 border-b">
-        <nav class="flex space-x-8">
-            <button onclick="switchTab('profile')" id="tab-profile" class="tab-btn py-4 px-1 border-b-2 border-blue-600 font-medium text-blue-600">
-                Profile
-            </button>
-            <button onclick="switchTab('orders')" id="tab-orders" class="tab-btn py-4 px-1 border-b-2 border-transparent font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                My Orders
-            </button>
-            <button onclick="switchTab('queries')" id="tab-queries" class="tab-btn py-4 px-1 border-b-2 border-transparent font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                My Queries
-            </button>
-        </nav>
-    </div>
-
-    <!-- Profile Tab -->
-    <div id="content-profile" class="tab-content">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Update Profile -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <h2 class="text-xl font-semibold mb-4">Update Profile</h2>
-                <form id="profile-form" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Name</label>
-                        <input type="text" id="profile-name" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                        <input type="email" id="profile-email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Mobile</label>
-                        <input type="text" id="profile-mobile" name="mobile" readonly class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed">
-                    </div>
-                    <div id="profile-message" class="hidden"></div>
-                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
-                        Update Profile
-                    </button>
-                </form>
-            </div>
-
-            <!-- Change Password -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <h2 class="text-xl font-semibold mb-4">Change Password</h2>
-                <form id="password-form" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
-                        <input type="password" id="current-password" name="current_password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
-                        <input type="password" id="new-password" name="new_password" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
-                        <input type="password" id="confirm-password" name="new_password_confirmation" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    </div>
-                    <div id="password-message" class="hidden"></div>
-                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
-                        Change Password
-                    </button>
-                </form>
-            </div>
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+    <div class="container mx-auto px-4 py-12">
+        <!-- Welcome Header -->
+        <div class="mb-8 animate-slide-down">
+            <h1 class="text-4xl font-bold text-[#1A1A1A] mb-2">Welcome back, <span class="text-[#D4AF37]">{{ $user->name ?? 'User' }}</span></h1>
+            <p class="text-[#6B6B6B]">Manage your profile, orders, and queries from your dashboard</p>
         </div>
-    </div>
 
-    <!-- Orders Tab -->
-    <div id="content-orders" class="tab-content hidden">
-        <div id="orders-list" class="space-y-4">
-            <p class="text-gray-500">Loading your orders...</p>
+        <!-- Tabs Navigation -->
+        <div class="mb-8 overflow-x-auto">
+            <nav class="flex space-x-2 bg-white p-2 rounded-xl shadow-md min-w-max border border-gray-100">
+                <button onclick="switchTab('profile')" id="tab-profile" class="tab-btn px-6 py-3 rounded-lg font-semibold transition-all duration-300 bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white shadow-md">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        Profile
+                    </span>
+                </button>
+                <button onclick="switchTab('orders')" id="tab-orders" class="tab-btn px-6 py-3 rounded-lg font-semibold transition-all duration-300 text-[#6B6B6B] hover:text-[#D4AF37] hover:bg-gray-50">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                        </svg>
+                        My Orders
+                    </span>
+                </button>
+                <button onclick="switchTab('queries')" id="tab-queries" class="tab-btn px-6 py-3 rounded-lg font-semibold transition-all duration-300 text-[#6B6B6B] hover:text-[#D4AF37] hover:bg-gray-50">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                        </svg>
+                        My Queries
+                    </span>
+                </button>
+            </nav>
         </div>
-    </div>
 
-    <!-- Queries Tab -->
-    <div id="content-queries" class="tab-content hidden">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Create Query Form -->
-            <div class="lg:col-span-1">
-                <div class="bg-white rounded-lg shadow p-6 sticky top-4">
-                    <h2 class="text-xl font-semibold mb-4">Create New Query</h2>
-                    <form id="query-form" class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
-                            <input type="text" id="query-subject" name="subject" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        <!-- Profile Tab -->
+        <div id="content-profile" class="tab-content animate-fade-in">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Update Profile -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 transform transition-all duration-300 hover:shadow-xl border border-gray-100">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="p-3 bg-gradient-to-br from-[#D4AF37] to-[#B8962E] rounded-lg">
+                            <svg class="w-6 h-6 text-[#1A1A1A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Order Number (Optional)</label>
-                            <input type="text" id="query-order" name="order_number" placeholder="e.g., ORD-12345" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <h2 class="text-2xl font-bold text-[#1A1A1A]">Update Profile</h2>
+                    </div>
+
+                    @if(session('success'))
+                        <div class="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg mb-4 animate-slide-down">
+                            {{ session('success') }}
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
-                            <textarea id="query-message" name="message" required rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                    @endif
+
+                    @if($errors->any())
+                        <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-4 animate-slide-down">
+                            <ul class="list-disc list-inside">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
                         </div>
-                        <div id="query-message-alert" class="hidden"></div>
-                        <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition">
-                            Submit Query
+                    @endif
+
+                    <form method="POST" action="{{ route('user.dashboard.profile.update') }}" class="space-y-5">
+                        @csrf
+                        <div class="space-y-2">
+                            <label class="block text-sm font-semibold text-[#1A1A1A]">Name</label>
+                            <input type="text" name="name" value="{{ old('name', $user->name) }}"
+                                class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#6B6B6B] focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all duration-300">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-semibold text-[#1A1A1A]">Email</label>
+                            <input type="email" name="email" value="{{ old('email', $user->email) }}"
+                                class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#6B6B6B] focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all duration-300">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-semibold text-[#1A1A1A]">Mobile</label>
+                            <input type="text" value="{{ $user->mobile }}" readonly
+                                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-[#6B6B6B] cursor-not-allowed">
+                        </div>
+                        <button type="submit" class="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-[#1A1A1A] py-3 rounded-lg font-bold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">
+                            Update Profile
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Change Password -->
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 transform transition-all duration-300 hover:shadow-xl ">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="p-3 bg-gradient-to-br from-[#D4AF37] to-[#B8962E] rounded-lg">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-[#1A1A1A]">Change Password</h2>
+                    </div>
+                    <form method="POST" action="{{ route('user.dashboard.password.update') }}" class="space-y-6">
+                        @csrf
+                        <div class="space-y-2">
+                            <label class="block text-sm font-semibold text-[#1A1A1A]">Current Password</label>
+                            <input type="password" name="current_password" required class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#6B6B6B] focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all duration-300">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-semibold text-[#1A1A1A]">New Password</label>
+                            <input type="password" name="new_password" required class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#6B6B6B] focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all duration-300">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-semibold text-[#1A1A1A]">Confirm New Password</label>
+                            <input type="password" name="new_password_confirmation" required class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#6B6B6B] focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all duration-300">
+                        </div>
+                        <button type="submit" class="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white py-3 rounded-lg font-bold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">
+                            Change Password
                         </button>
                     </form>
                 </div>
             </div>
+        </div>
 
-            <!-- Queries List -->
-            <div class="lg:col-span-2">
-                <h2 class="text-xl font-semibold mb-4">My Queries</h2>
-                <div id="queries-list" class="space-y-4">
-                    <p class="text-gray-500">Loading your queries...</p>
+        <!-- Orders Tab -->
+        <div id="content-orders" class="tab-content hidden">
+            <div class="grid gap-6">
+                @forelse($user->orders ?? [] as $order)
+                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 transform transition-all duration-300 hover:shadow-xl  animate-slide-up">
+                        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="p-2 bg-gradient-to-br from-[#D4AF37] to-[#B8962E] rounded-lg">
+                                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                        </svg>
+                                    </div>
+                                    <h3 class="text-xl font-bold text-[#1A1A1A]">Order #{{ $order->order_number }}</h3>
+                                </div>
+                                <p class="text-sm text-[#6B6B6B]">{{ $order->created_at->format('M d, Y h:i A') }}</p>
+                            </div>
+                            <div class="text-left lg:text-right">
+                                <p class="text-3xl font-bold text-[#D4AF37]">₹{{ number_format($order->total_amount, 2) }}</p>
+                                <span class="inline-block px-4 py-1 text-sm rounded-full mt-2 {{ $order->order_status === 'delivered' ? 'bg-green-50 text-green-600 border border-green-200' : ($order->order_status === 'cancelled' ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-yellow-50 text-yellow-600 border border-yellow-200') }}">
+                                    {{ ucfirst($order->order_status) }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3 pt-4 border-t border-gray-100">
+                            <a href="{{ route('user.dashboard.invoice', $order->order_number) }}" target="_blank" class="flex items-center gap-2 bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 transform hover:shadow-xl">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                </svg>
+                                Download Invoice
+                            </a>
+                        </div>
+                    </div>
+                @empty
+                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-12 text-center animate-fade-in">
+                        <svg class="w-16 h-16 mx-auto mb-4 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                        </svg>
+                        <p class="text-[#6B6B6B] text-lg">You have no orders yet.</p>
+                        <a href="{{ route('products.index') }}" class="inline-block mt-4 bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 transform hover:shadow-xl">
+                            Start Shopping
+                        </a>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+        <!-- Queries Tab -->
+        <div id="content-queries" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Create Query Form -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sticky top-4 animate-slide-right">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-2 bg-gradient-to-br from-[#D4AF37] to-[#B8962E] rounded-lg">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                            </div>
+                            <h2 class="text-xl font-bold text-[#1A1A1A]">Create New Query</h2>
+                        </div>
+                        <form method="POST" action="{{ route('user.dashboard.queries.create') }}" class="space-y-4">
+                            @csrf
+                            <div class="space-y-2">
+                                <label class="block text-sm font-semibold text-[#1A1A1A]">Subject</label>
+                                <input type="text" name="subject" required class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#6B6B6B] focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all duration-300">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-sm font-semibold text-[#1A1A1A]">Order Number (Optional)</label>
+                                <input type="text" name="order_number" placeholder="e.g., ORD-12345" class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#6B6B6B] focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all duration-300">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-sm font-semibold text-[#1A1A1A]">Message</label>
+                                <textarea name="message" required rows="4" class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#6B6B6B] focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all duration-300"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white py-2 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">
+                                Submit Query
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Queries List -->
+                <div class="lg:col-span-2">
+                    <h2 class="text-2xl font-bold text-[#1A1A1A] mb-6 flex items-center gap-3">
+                        <div class="p-2 bg-gradient-to-br from-[#D4AF37] to-[#B8962E] rounded-lg">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                            </svg>
+                        </div>
+                        My Queries
+                    </h2>
+                    <div class="space-y-4">
+                        @forelse($user->queries ?? [] as $query)
+                            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 animate-slide-up">
+                                <div class="flex items-start justify-between mb-3">
+                                    <div class="flex-1">
+                                        <h3 class="text-lg font-bold text-[#1A1A1A]">{{ $query->subject }}</h3>
+                                        @if($query->order_number)
+                                            <p class="text-sm text-[#D4AF37]">Order: {{ $query->order_number }}</p>
+                                        @endif
+                                        <p class="text-sm text-[#6B6B6B]">{{ $query->created_at->format('M d, Y h:i A') }}</p>
+                                    </div>
+                                    <span class="inline-block px-3 py-1 text-sm rounded-full {{ $query->status === 'resolved' ? 'bg-green-50 text-green-600 border border-green-200' : 'bg-yellow-50 text-yellow-600 border border-yellow-200' }}">
+                                        {{ ucfirst($query->status) }}
+                                    </span>
+                                </div>
+                                <div class="mb-3">
+                                    <p class="text-[#6B6B6B]">{{ $query->message }}</p>
+                                </div>
+                                @if($query->admin_response)
+                                    <div class="border-t border-gray-100 pt-3 mt-3">
+                                        <p class="text-sm font-semibold text-[#D4AF37] mb-1">Admin Response:</p>
+                                        <p class="text-[#6B6B6B]">{{ $query->admin_response }}</p>
+                                        @if($query->resolved_at)
+                                            <p class="text-xs text-[#6B6B6B]/70 mt-1">Resolved on {{ $query->resolved_at->format('M d, Y h:i A') }}</p>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+                        @empty
+                            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-12 text-center animate-fade-in">
+                                <svg class="w-16 h-16 mx-auto mb-4 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                                </svg>
+                                <p class="text-[#6B6B6B] text-lg">You have no queries yet.</p>
+                            </div>
+                        @endforelse
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Order Details Modal -->
-<div id="order-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-        <div class="p-6">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-2xl font-bold">Order Details</h2>
-                <button onclick="closeOrderModal()" class="text-gray-500 hover:text-gray-700">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-            <div id="order-details-content"></div>
-        </div>
-    </div>
-</div>
-
-<script>
-const API_BASE = '/api';
-const token = localStorage.getItem('auth_token');
-
-if (!token) {
-    window.location.href = '/user/login';
+<style>
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
+@keyframes slide-down {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slide-right {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.6s ease-out;
+}
+
+.animate-slide-down {
+    animation: slide-down 0.6s ease-out;
+}
+
+.animate-slide-up {
+    animation: slide-up 0.6s ease-out;
+}
+
+.animate-slide-right {
+    animation: slide-right 0.6s ease-out;
+}
+</style>
+
+<script>
 // Tab Switching
 function switchTab(tab) {
     // Hide all tabs
     document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
     document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('border-blue-600', 'text-blue-600');
-        btn.classList.add('border-transparent', 'text-gray-500');
+        btn.classList.remove('bg-gradient-to-r', 'from-[#D4AF37]', 'to-[#B8962E]', 'text-white', 'shadow-lg');
+        btn.classList.add('text-[#6B6B6B]');
     });
 
     // Show selected tab
     document.getElementById('content-' + tab).classList.remove('hidden');
     const activeBtn = document.getElementById('tab-' + tab);
-    activeBtn.classList.add('border-blue-600', 'text-blue-600');
-    activeBtn.classList.remove('border-transparent', 'text-gray-500');
-
-    // Load data for specific tabs
-    if (tab === 'orders') {
-        loadOrders();
-    } else if (tab === 'queries') {
-        loadQueries();
-    }
+    activeBtn.classList.add('bg-gradient-to-r', 'from-[#D4AF37]', 'to-[#B8962E]', 'text-white', 'shadow-lg');
+    activeBtn.classList.remove('text-[#6B6B6B]');
 }
-
-// Load Profile
-function loadProfile() {
-    fetch(`${API_BASE}/user/profile`, {
-        headers: { 'Authorization': 'Bearer ' + token }
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            document.getElementById('profile-name').value = data.data.name;
-            document.getElementById('profile-email').value = data.data.email;
-            document.getElementById('profile-mobile').value = data.data.mobile;
-        }
-    })
-    .catch(err => console.error(err));
-}
-
-// Update Profile
-document.getElementById('profile-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const formData = {
-        name: document.getElementById('profile-name').value,
-        email: document.getElementById('profile-email').value
-    };
-
-    fetch(`${API_BASE}/user/profile`, {
-        method: 'PUT',
-        headers: {
-            'Authorization': 'Bearer ' + token,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-    })
-    .then(res => res.json())
-    .then(data => {
-        const msgEl = document.getElementById('profile-message');
-        msgEl.classList.remove('hidden');
-        if (data.success) {
-            msgEl.className = 'p-3 bg-green-100 text-green-700 rounded-lg';
-            msgEl.textContent = data.message;
-        } else {
-            msgEl.className = 'p-3 bg-red-100 text-red-700 rounded-lg';
-            msgEl.textContent = data.message || 'Failed to update profile';
-        }
-    })
-    .catch(err => {
-        const msgEl = document.getElementById('profile-message');
-        msgEl.classList.remove('hidden');
-        msgEl.className = 'p-3 bg-red-100 text-red-700 rounded-lg';
-        msgEl.textContent = 'An error occurred';
-    });
-});
-
-// Change Password
-document.getElementById('password-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const formData = {
-        current_password: document.getElementById('current-password').value,
-        new_password: document.getElementById('new-password').value,
-        new_password_confirmation: document.getElementById('confirm-password').value
-    };
-
-    fetch(`${API_BASE}/user/password`, {
-        method: 'PUT',
-        headers: {
-            'Authorization': 'Bearer ' + token,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-    })
-    .then(res => res.json())
-    .then(data => {
-        const msgEl = document.getElementById('password-message');
-        msgEl.classList.remove('hidden');
-        if (data.success) {
-            msgEl.className = 'p-3 bg-green-100 text-green-700 rounded-lg';
-            msgEl.textContent = data.message;
-            document.getElementById('password-form').reset();
-        } else {
-            msgEl.className = 'p-3 bg-red-100 text-red-700 rounded-lg';
-            msgEl.textContent = data.message || 'Failed to change password';
-        }
-    })
-    .catch(err => {
-        const msgEl = document.getElementById('password-message');
-        msgEl.classList.remove('hidden');
-        msgEl.className = 'p-3 bg-red-100 text-red-700 rounded-lg';
-        msgEl.textContent = 'An error occurred';
-    });
-});
-
-// Load Orders
-function loadOrders() {
-    fetch(`${API_BASE}/user/orders`, {
-        headers: { 'Authorization': 'Bearer ' + token }
-    })
-    .then(res => res.json())
-    .then(data => {
-        const container = document.getElementById('orders-list');
-        if (!data.data || data.data.length === 0) {
-            container.innerHTML = '<div class="bg-white rounded-lg shadow p-6"><p class="text-gray-500">You have no orders yet.</p></div>';
-            return;
-        }
-
-        container.innerHTML = data.data.map(order => `
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h3 class="text-lg font-semibold">Order #${order.order_number}</h3>
-                        <p class="text-sm text-gray-500">${new Date(order.created_at).toLocaleString()}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-xl font-bold">₹${parseFloat(order.total_amount).toFixed(2)}</p>
-                        <span class="inline-block px-3 py-1 text-sm rounded-full ${getStatusColor(order.order_status)}">${order.order_status}</span>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3">
-                    <button onclick="viewOrderDetails('${order.order_number}')" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                        View Details
-                    </button>
-                    <button onclick="downloadInvoice('${order.order_number}')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-                        Download Invoice
-                    </button>
-                </div>
-            </div>
-        `).join('');
-    })
-    .catch(err => {
-        console.error(err);
-        document.getElementById('orders-list').innerHTML = '<div class="bg-white rounded-lg shadow p-6"><p class="text-red-500">Failed to load orders</p></div>';
-    });
-}
-
-function getStatusColor(status) {
-    const colors = {
-        'pending': 'bg-yellow-100 text-yellow-800',
-        'processing': 'bg-blue-100 text-blue-800',
-        'shipped': 'bg-purple-100 text-purple-800',
-        'delivered': 'bg-green-100 text-green-800',
-        'cancelled': 'bg-red-100 text-red-800'
-    };
-    return colors[status.toLowerCase()] || 'bg-gray-100 text-gray-800';
-}
-
-// View Order Details
-function viewOrderDetails(orderNumber) {
-    fetch(`${API_BASE}/user/orders/${orderNumber}`, {
-        headers: { 'Authorization': 'Bearer ' + token }
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            const order = data.data;
-            const content = `
-                <div class="space-y-4">
-                    <div class="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
-                        <div>
-                            <p class="text-sm text-gray-500">Order Number</p>
-                            <p class="font-semibold">${order.order_number}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500">Status</p>
-                            <span class="inline-block px-3 py-1 text-sm rounded-full ${getStatusColor(order.order_status)}">${order.order_status}</span>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500">Order Date</p>
-                            <p class="font-semibold">${new Date(order.created_at).toLocaleDateString()}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-500">Total Amount</p>
-                            <p class="font-semibold">₹${parseFloat(order.total_amount).toFixed(2)}</p>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 class="font-semibold mb-2">Shipping Address</h3>
-                        <div class="p-4 bg-gray-50 rounded-lg">
-                            <p>${order.shipping_address}</p>
-                            <p>${order.shipping_city}, ${order.shipping_state} ${order.shipping_pincode}</p>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 class="font-semibold mb-2">Order Items</h3>
-                        <div class="space-y-2">
-                            ${order.items.map(item => `
-                                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                                    <div class="flex-1">
-                                        <p class="font-medium">${item.product_name}</p>
-                                        <p class="text-sm text-gray-500">Qty: ${item.quantity} × ₹${parseFloat(item.price).toFixed(2)}</p>
-                                    </div>
-                                    <p class="font-semibold">₹${parseFloat(item.subtotal).toFixed(2)}</p>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-
-                    <div class="border-t pt-4">
-                        <div class="flex justify-between items-center">
-                            <span class="text-lg font-semibold">Total</span>
-                            <span class="text-2xl font-bold">₹${parseFloat(order.total_amount).toFixed(2)}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.getElementById('order-details-content').innerHTML = content;
-            document.getElementById('order-modal').classList.remove('hidden');
-        }
-    })
-    .catch(err => console.error(err));
-}
-
-function closeOrderModal() {
-    document.getElementById('order-modal').classList.add('hidden');
-}
-
-// Download Invoice
-function downloadInvoice(orderNumber) {
-    window.open(`${API_BASE}/user/orders/${orderNumber}/invoice?token=${token}`, '_blank');
-}
-
-// Load Queries
-function loadQueries() {
-    fetch(`${API_BASE}/user/queries`, {
-        headers: { 'Authorization': 'Bearer ' + token }
-    })
-    .then(res => res.json())
-    .then(data => {
-        const container = document.getElementById('queries-list');
-        if (!data.data || data.data.length === 0) {
-            container.innerHTML = '<div class="bg-white rounded-lg shadow p-6"><p class="text-gray-500">You have no queries yet.</p></div>';
-            return;
-        }
-
-        container.innerHTML = data.data.map(query => `
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-start justify-between mb-3">
-                    <div class="flex-1">
-                        <h3 class="text-lg font-semibold">${query.subject}</h3>
-                        ${query.order_number ? `<p class="text-sm text-gray-500">Order: ${query.order_number}</p>` : ''}
-                        <p class="text-sm text-gray-500">${new Date(query.created_at).toLocaleString()}</p>
-                    </div>
-                    <span class="inline-block px-3 py-1 text-sm rounded-full ${getQueryStatusColor(query.status)}">${query.status}</span>
-                </div>
-                <div class="mb-3">
-                    <p class="text-gray-700">${query.message}</p>
-                </div>
-                ${query.admin_response ? `
-                    <div class="border-t pt-3 mt-3">
-                        <p class="text-sm font-semibold text-gray-700 mb-1">Admin Response:</p>
-                        <p class="text-gray-600">${query.admin_response}</p>
-                        ${query.resolved_at ? `<p class="text-xs text-gray-500 mt-1">Resolved on ${new Date(query.resolved_at).toLocaleString()}</p>` : ''}
-                    </div>
-                ` : ''}
-            </div>
-        `).join('');
-    })
-    .catch(err => {
-        console.error(err);
-        document.getElementById('queries-list').innerHTML = '<div class="bg-white rounded-lg shadow p-6"><p class="text-red-500">Failed to load queries</p></div>';
-    });
-}
-
-function getQueryStatusColor(status) {
-    const colors = {
-        'open': 'bg-yellow-100 text-yellow-800',
-        'in_progress': 'bg-blue-100 text-blue-800',
-        'resolved': 'bg-green-100 text-green-800',
-        'closed': 'bg-gray-100 text-gray-800'
-    };
-    return colors[status] || 'bg-gray-100 text-gray-800';
-}
-
-// Submit Query
-document.getElementById('query-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const formData = {
-        subject: document.getElementById('query-subject').value,
-        order_number: document.getElementById('query-order').value || null,
-        message: document.getElementById('query-message').value
-    };
-
-    fetch(`${API_BASE}/user/queries`, {
-        method: 'POST',
-        headers: {
-            'Authorization': 'Bearer ' + token,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-    })
-    .then(res => res.json())
-    .then(data => {
-        const msgEl = document.getElementById('query-message-alert');
-        msgEl.classList.remove('hidden');
-        if (data.success) {
-            msgEl.className = 'p-3 bg-green-100 text-green-700 rounded-lg';
-            msgEl.textContent = 'Query submitted successfully!';
-            document.getElementById('query-form').reset();
-            loadQueries();
-        } else {
-            msgEl.className = 'p-3 bg-red-100 text-red-700 rounded-lg';
-            msgEl.textContent = data.message || 'Failed to submit query';
-        }
-    })
-    .catch(err => {
-        const msgEl = document.getElementById('query-message-alert');
-        msgEl.classList.remove('hidden');
-        msgEl.className = 'p-3 bg-red-100 text-red-700 rounded-lg';
-        msgEl.textContent = 'An error occurred';
-    });
-});
-
-// Initialize
-document.addEventListener('DOMContentLoaded', function() {
-    loadProfile();
-});
 </script>
 @endsection

@@ -6,7 +6,7 @@
 <div>
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-900">Product Attributes</h2>
-        <a href="{{ route('admin.product-attributes.create') }}" class="btn-primary">Add Attribute</a>
+        <a href="{{ route('admin.product-attributes.create') }}" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Add Attribute</a>
     </div>
 
     @if(session('success'))
@@ -39,7 +39,7 @@
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-600">{{ $attribute->price_adjustment ?? '0' }}</td>
                         <td class="px-6 py-4 text-right text-sm font-medium">
-                            <a href="{{ route('admin.product-attributes.edit', $attribute) }}" class="text-blue-600 hover:text-blue-900 mr-4">Edit</a>
+                            <a href="{{ route('admin.product-attributes.edit', $attribute) }}" class="text-[#D4AF37] hover:text-blue-900 mr-4">Edit</a>
                             <form action="{{ route('admin.product-attributes.destroy', $attribute) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure?');">
                                 @csrf
                                 @method('DELETE')
@@ -50,7 +50,7 @@
                 @empty
                     <tr>
                         <td colspan="4" class="px-6 py-8 text-center text-gray-500">
-                            No attributes found. <a href="{{ route('admin.product-attributes.create') }}" class="text-blue-600 hover:text-blue-900">Create one</a>
+                            No attributes found. <a href="{{ route('admin.product-attributes.create') }}" class="text-[#D4AF37] hover:text-blue-900">Create one</a>
                         </td>
                     </tr>
                 @endforelse

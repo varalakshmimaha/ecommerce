@@ -8,24 +8,57 @@
     * {
         font-family: 'Poppins', sans-serif;
     }
-    
+
     body {
         @apply antialiased;
         font-family: 'Poppins', sans-serif;
+    }
+
+    /* Global golden hover effects */
+    a:hover {
+        color: #D4AF37;
+    }
+
+    button:not(.no-hover):hover {
+        color: #D4AF37;
+    }
+
+    /* Golden theme for checkboxes and radio buttons */
+    input[type="checkbox"],
+    input[type="radio"] {
+        accent-color: #D4AF37;
+        @apply cursor-pointer;
+    }
+
+    input[type="checkbox"]:focus,
+    input[type="radio"]:focus {
+        @apply ring-2 ring-[#D4AF37] ring-offset-2;
+    }
+
+    /* Golden theme for select elements */
+    select {
+        accent-color: #D4AF37;
+        @apply cursor-pointer;
+    }
+
+    select:focus {
+        @apply ring-2 ring-[#D4AF37] border-[#D4AF37];
     }
 }
 
 @layer components {
     .btn-primary {
-        @apply bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl;
+        background: linear-gradient(to right, #D4AF37, #B8962E);
+        @apply text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl;
     }
-    
+
     .btn-secondary {
-        @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-lg transition-all duration-300;
+        @apply bg-white hover:bg-gray-50 text-[#1A1A1A] hover:text-[#D4AF37] font-semibold py-3 px-6 rounded-lg transition-all duration-300 border border-gray-200;
     }
 
     .btn {
-        @apply bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300;
+        background: linear-gradient(to right, #D4AF37, #B8962E);
+        @apply text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 hover:shadow-lg;
     }
 
     .btn-success {
@@ -35,23 +68,23 @@
     .btn-danger {
         @apply bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300;
     }
-    
+
     .card {
-        @apply bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1;
+        @apply bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100;
     }
-    
+
     .input-field {
-        @apply w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300 bg-white text-gray-900 placeholder-gray-400;
+        @apply w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all duration-300 bg-white text-[#1A1A1A] placeholder-[#6B6B6B];
     }
-    
+
     .input-field:focus {
-        @apply shadow-lg;
+        @apply shadow-md;
     }
-    
+
     select.input-field {
         @apply cursor-pointer;
     }
-    
+
     textarea.input-field {
         @apply resize-y;
     }

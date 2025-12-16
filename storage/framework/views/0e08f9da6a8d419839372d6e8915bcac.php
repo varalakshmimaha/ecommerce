@@ -3,11 +3,11 @@
 <?php $__env->startSection('content'); ?>
 <div class="admin-card">
     <div class="mb-4 flex space-x-4">
-        <a href="<?php echo e(route('admin.orders.index')); ?>" class="px-4 py-2 rounded-lg <?php echo e(!request('status') ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-700'); ?>">All</a>
-        <a href="<?php echo e(route('admin.orders.index', ['status' => 'pending'])); ?>" class="px-4 py-2 rounded-lg <?php echo e(request('status') == 'pending' ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-700'); ?>">Pending</a>
-        <a href="<?php echo e(route('admin.orders.index', ['status' => 'confirmed'])); ?>" class="px-4 py-2 rounded-lg <?php echo e(request('status') == 'confirmed' ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-700'); ?>">Confirmed</a>
-        <a href="<?php echo e(route('admin.orders.index', ['status' => 'shipped'])); ?>" class="px-4 py-2 rounded-lg <?php echo e(request('status') == 'shipped' ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-700'); ?>">Shipped</a>
-        <a href="<?php echo e(route('admin.orders.index', ['status' => 'delivered'])); ?>" class="px-4 py-2 rounded-lg <?php echo e(request('status') == 'delivered' ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-700'); ?>">Delivered</a>
+        <a href="<?php echo e(route('admin.orders.index')); ?>" class="px-4 py-2 rounded-lg <?php echo e(!request('status') ? 'bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white' : 'bg-gray-200 text-gray-700'); ?>">All</a>
+        <a href="<?php echo e(route('admin.orders.index', ['status' => 'pending'])); ?>" class="px-4 py-2 rounded-lg <?php echo e(request('status') == 'pending' ? 'bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white' : 'bg-gray-200 text-gray-700'); ?>">Pending</a>
+        <a href="<?php echo e(route('admin.orders.index', ['status' => 'confirmed'])); ?>" class="px-4 py-2 rounded-lg <?php echo e(request('status') == 'confirmed' ? 'bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white' : 'bg-gray-200 text-gray-700'); ?>">Confirmed</a>
+        <a href="<?php echo e(route('admin.orders.index', ['status' => 'shipped'])); ?>" class="px-4 py-2 rounded-lg <?php echo e(request('status') == 'shipped' ? 'bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white' : 'bg-gray-200 text-gray-700'); ?>">Shipped</a>
+        <a href="<?php echo e(route('admin.orders.index', ['status' => 'delivered'])); ?>" class="px-4 py-2 rounded-lg <?php echo e(request('status') == 'delivered' ? 'bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white' : 'bg-gray-200 text-gray-700'); ?>">Delivered</a>
     </div>
     
     <div class="overflow-x-auto">
@@ -45,7 +45,7 @@
                     </td>
                     <td><?php echo e($order->created_at->format('M d, Y')); ?></td>
                     <td>
-                        <a href="<?php echo e(route('admin.orders.show', $order)); ?>" class="text-primary-600 hover:text-primary-800">View</a>
+                        <a href="<?php echo e(route('admin.orders.show', $order)); ?>" class="text-[#D4AF37] hover:text-primary-800">View</a>
                     </td>
                 </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>

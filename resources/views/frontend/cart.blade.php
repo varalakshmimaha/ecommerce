@@ -11,7 +11,7 @@
     </div>
 
     <div class="mt-6 flex justify-end">
-        <a id="checkout-btn" href="/checkout" class="btn-primary px-6 py-3 hidden">Proceed to Checkout</a>
+        <a id="checkout-btn" href="/checkout" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 px-6 py-3 hidden">Proceed to Checkout</a>
     </div>
 </div>
 
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('cart-container').innerHTML = `
             <div class="text-center py-12">
                 <p class="text-gray-500 mb-4">Your cart is empty.</p>
-                <a href="/products" class="btn-primary">Browse Products</a>
+                <a href="/products" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Browse Products</a>
             </div>
         `;
         document.getElementById('checkout-btn').classList.add('hidden');

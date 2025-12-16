@@ -1,13 +1,20 @@
 <?php $__env->startSection('title', 'Pages'); ?>
 
 <?php $__env->startSection('content'); ?>
-<div class="space-y-6">
+<div class="w-full space-y-6">
     <div class="flex items-center justify-between">
-        <h2 class="text-2xl font-bold text-gray-900">Pages</h2>
-        <a href="<?php echo e(route('admin.pages.create')); ?>" class="btn-primary">Add New Page</a>
+        <h2 class="text-2xl font-bold bg-gradient-to-r from-[#D4AF37] to-[#B8962E] bg-clip-text text-transparent">Pages Management</h2>
+        <a href="<?php echo e(route('admin.pages.create')); ?>" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">
+            <span class="flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Add New Page
+            </span>
+        </a>
     </div>
 
-    <div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
         <table class="admin-table w-full">
             <thead>
                 <tr>
@@ -37,19 +44,21 @@
                             </span>
                         </td>
                         <td>
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium <?php echo e($page->is_active ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'); ?>">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium <?php echo e($page->is_active ? 'bg-gradient-to-r from-green-50 to-green-100 text-green-700 border border-green-200' : 'bg-gradient-to-r from-yellow-50 to-yellow-100 text-yellow-700 border border-yellow-200'); ?>">
                                 <?php echo e($page->is_active ? 'Active' : 'Inactive'); ?>
 
                             </span>
                         </td>
-                        <td class="space-x-2 flex">
-                            <a href="<?php echo e(route('admin.pages.edit', $page)); ?>" class="text-primary-600 hover:text-primary-800 font-medium">Edit</a>
-                            <form action="<?php echo e(route('admin.pages.destroy', $page)); ?>" method="POST" class="inline" onsubmit="return confirm('Are you sure?')">
+                        <td class="space-x-2">
+                            <a href="<?php echo e(route('admin.pages.edit', $page)); ?>" class="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white rounded-lg text-sm font-medium hover:shadow-md transition-all duration-300">
+                                Edit
+                            </a>
+                            <form action="<?php echo e(route('admin.pages.destroy', $page)); ?>" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this page?')">
                                 <?php echo csrf_field(); ?>
                                 <?php echo method_field('DELETE'); ?>
-                                <button type="submit" class="text-red-600 hover:text-red-800 font-medium">Delete</button>
+                                <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 hover:shadow-md transition-all duration-300">Delete</button>
                             </form>
-                            <a href="<?php echo e(route('page.show', $page)); ?>" target="_blank" class="text-gray-600 hover:text-gray-800 font-medium">View</a>
+                            <a href="<?php echo e(route('page.show', $page)); ?>" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 hover:shadow-md transition-all duration-300">View</a>
                         </td>
                     </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>

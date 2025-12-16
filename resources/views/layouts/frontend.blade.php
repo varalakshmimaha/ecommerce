@@ -7,13 +7,13 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
-<body class="bg-gray-50">
+<body class="bg-white">
     <!-- Header -->
-    <header class="bg-white shadow-md sticky top-0 z-50">
-        <div class="container mx-auto px-4">
+    <header class="bg-white shadow-md sticky top-0 z-50 border-b border-gray-100">
+        <div class="container mx-auto px-4 relative">
             <!-- Mobile Menu Toggle -->
             <div class="flex items-center justify-between py-4 md:hidden">
-                <button id="mobile-menu-toggle" class="text-gray-700 hover:text-primary-600 transition-colors">
+                <button id="mobile-menu-toggle" class="text-[#1A1A1A] hover:text-[#D4AF37] transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
@@ -25,129 +25,149 @@
                     @if($logo)
                         <img src="{{ asset('storage/' . $logo) }}" alt="Logo" class="h-10">
                     @else
-                        <span class="text-2xl font-bold text-primary-600">Suvee</span>
+                        <span class="text-2xl font-bold bg-gradient-to-r from-[#D4AF37] to-[#B8962E] bg-clip-text text-transparent">Suvee</span>
                     @endif
                 </a>
-                <a href="{{ route('cart') }}" class="relative">
-                    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="{{ route('cart') }}" class="relative group">
+                    <svg class="w-6 h-6 text-[#1A1A1A] group-hover:text-[#D4AF37] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
                     </svg>
-                    <span class="cart-count absolute -top-2 -right-2 bg-primary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                    <span class="cart-count absolute -top-2 -right-2 bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold shadow-md">0</span>
                 </a>
             </div>
             
             <!-- Desktop & Mobile Layout -->
-            <div class="hidden md:flex items-center justify-between py-4">
+            <div class="hidden md:flex items-center py-4">
                 <!-- Left Navigation -->
                 @php
                     $navPages = \App\Models\Page::where('show_in_navbar', true)->where('is_active', true)->orderBy('sort_order')->get();
                 @endphp
-                <nav class="flex items-center space-x-6">
-                    <a href="{{ route('home') }}" class="text-gray-700 hover:text-primary-600 transition-colors font-medium">Home</a>
-                    <a href="{{ route('products.index') }}" class="text-gray-700 hover:text-primary-600 transition-colors font-medium">Products</a>
+                <nav class="flex items-center space-x-6 flex-1">
+                    <a href="{{ route('home') }}" class="text-[#1A1A1A] hover:text-[#D4AF37] transition-all duration-300 font-medium relative group">
+                        Home
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-[#D4AF37] to-[#B8962E] group-hover:w-full transition-all duration-300"></span>
+                    </a>
+                    <a href="{{ route('products.index') }}" class="text-[#1A1A1A] hover:text-[#D4AF37] transition-all duration-300 font-medium relative group">
+                        Products
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-[#D4AF37] to-[#B8962E] group-hover:w-full transition-all duration-300"></span>
+                    </a>
                     @foreach($navPages as $navPage)
-                        <a href="{{ route('page.show', $navPage) }}" class="text-gray-700 hover:text-primary-600 transition-colors font-medium">{{ $navPage->title }}</a>
+                        <a href="{{ route('page.show', $navPage) }}" class="text-[#1A1A1A] hover:text-[#D4AF37] transition-all duration-300 font-medium relative group">
+                            {{ $navPage->title }}
+                            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-[#D4AF37] to-[#B8962E] group-hover:w-full transition-all duration-300"></span>
+                        </a>
                     @endforeach
                 </nav>
-                
+
                 <!-- Center Logo -->
-                <div class="flex-1 flex justify-center">
+                <div class="absolute left-1/2 transform -translate-x-1/2">
                     <a href="{{ route('home') }}" class="flex items-center">
                         @php
                             $logo = \App\Models\Setting::get('company_logo');
                         @endphp
                         @if($logo)
-                            <img src="{{ asset('storage/' . $logo) }}" alt="Logo" class="h-12">
+                            <img src="{{ asset('storage/' . $logo) }}" alt="Logo" class="h-14">
                         @else
-                            <span class="text-3xl font-bold text-primary-600">Suvee</span>
+                            <span class="text-3xl font-bold bg-gradient-to-r from-[#D4AF37] to-[#B8962E] bg-clip-text text-transparent">Suvee</span>
                         @endif
                     </a>
                 </div>
-                
+
                 <!-- Right Actions -->
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-4 flex-1 justify-end">
                     <form action="{{ route('products.index') }}" method="GET" class="hidden lg:block">
                         <input type="text" name="search" placeholder="Search products..." value="{{ request('search') }}"
-                            class="input-field w-64">
+                            class="w-64 px-4 py-2 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#6B6B6B] focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all duration-300 shadow-sm">
                     </form>
 
                     <!-- User Account -->
                     <div class="user-account-section">
-                        <!-- Show when user is logged out -->
-                        <div class="guest-links flex items-center space-x-3">
-                            <a href="{{ route('user.login') }}" class="text-gray-700 hover:text-primary-600 transition-colors font-medium text-sm">
-                                Login
-                            </a>
-                            <span class="text-gray-400">|</span>
-                            <a href="{{ route('user.register') }}" class="text-gray-700 hover:text-primary-600 transition-colors font-medium text-sm">
-                                Register
-                            </a>
-                        </div>
-
+                        @auth
                         <!-- Show when user is logged in -->
-                        <div class="logged-in-links hidden relative">
-                            <button id="user-menu-btn" class="flex items-center space-x-2 text-gray-700 hover:text-primary-600 transition-colors">
+                        <div class="logged-in-links relative">
+                            <button id="user-menu-btn" class="flex items-center space-x-2 text-[#1A1A1A] hover:text-[#D4AF37] transition-colors px-3 py-2 rounded-lg hover:bg-gray-50">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                 </svg>
-                                <span class="user-name font-medium text-sm"></span>
+                                <span class="font-medium text-sm">{{ Auth::user()->name ?? 'Account' }}</span>
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </button>
-                            <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
-                                <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</a>
-                                <a href="{{ route('track.order') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Track Order</a>
-                                <button onclick="logout()" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</button>
+                            <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-1 z-10 border border-gray-100">
+                                <a href="{{ route('user.dashboard') }}" class="block px-4 py-2 text-sm text-[#1A1A1A] hover:bg-gray-50 hover:text-[#D4AF37] transition-colors">Dashboard</a>
+                                <a href="{{ route('track.order') }}" class="block px-4 py-2 text-sm text-[#1A1A1A] hover:bg-gray-50 hover:text-[#D4AF37] transition-colors">Track Order</a>
+                                <form method="POST" action="{{ route('user.logout') }}">
+                                    @csrf
+                                    <button type="submit" class="w-full text-left px-4 py-2 text-sm text-[#1A1A1A] hover:bg-gray-50 hover:text-[#D4AF37] transition-colors">Logout</button>
+                                </form>
                             </div>
                         </div>
+                        @else
+                        <!-- Show when user is logged out -->
+                        <div class="guest-links flex items-center space-x-3">
+                            <a href="{{ route('user.login') }}" class="text-[#1A1A1A] hover:text-[#D4AF37] transition-colors font-medium text-sm px-3 py-2 rounded-lg hover:bg-gray-50">
+                                Login
+                            </a>
+                            <span class="text-[#D4AF37]">|</span>
+                            <a href="{{ route('user.register') }}" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-4 py-2 rounded-lg font-medium text-sm hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">
+                                Register
+                            </a>
+                        </div>
+                        @endauth
                     </div>
 
-                    <a href="{{ route('cart') }}" class="relative">
-                        <svg class="w-6 h-6 text-gray-700 hover:text-primary-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <a href="{{ route('cart') }}" class="relative group">
+                        <svg class="w-6 h-6 text-[#1A1A1A] group-hover:text-[#D4AF37] transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
                         </svg>
-                        <span class="cart-count absolute -top-2 -right-2 bg-primary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                        <span class="cart-count absolute -top-2 -right-2 bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold shadow-md">0</span>
                     </a>
                 </div>
             </div>
             
             <!-- Mobile Menu -->
-            <div id="mobile-menu" class="hidden md:hidden pb-4 border-t border-gray-200 mt-2">
+            <div id="mobile-menu" class="hidden md:hidden pb-4 border-t border-gray-100 mt-2">
                 <nav class="flex flex-col space-y-3 pt-4">
                     <!-- Mobile User Account -->
-                    <div class="mobile-user-account border-b border-gray-200 pb-3">
+                    <div class="mobile-user-account border-b border-gray-100 pb-3">
+                        @auth
+                        <!-- Show when logged in -->
+                        <div class="mobile-logged-in-links">
+                            <div class="flex items-center space-x-2 py-2">
+                                <svg class="w-6 h-6 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                                <span class="font-medium text-[#1A1A1A]">{{ Auth::user()->name ?? 'Account' }}</span>
+                            </div>
+                            <a href="{{ route('user.dashboard') }}" class="block text-[#1A1A1A] hover:text-[#D4AF37] py-2 pl-8 transition-colors">Dashboard</a>
+                            <a href="{{ route('track.order') }}" class="block text-[#1A1A1A] hover:text-[#D4AF37] py-2 pl-8 transition-colors">Track Order</a>
+                            <form method="POST" action="{{ route('user.logout') }}" class="pl-8">
+                                @csrf
+                                <button type="submit" class="block text-left text-[#1A1A1A] hover:text-[#D4AF37] py-2 transition-colors">Logout</button>
+                            </form>
+                        </div>
+                        @else
                         <!-- Show when logged out -->
                         <div class="mobile-guest-links flex items-center space-x-4">
-                            <a href="{{ route('user.login') }}" class="text-primary-600 hover:text-primary-700 font-medium py-2">
+                            <a href="{{ route('user.login') }}" class="text-[#1A1A1A] hover:text-[#D4AF37] font-medium py-2 transition-colors">
                                 Login
                             </a>
-                            <a href="{{ route('user.register') }}" class="text-primary-600 hover:text-primary-700 font-medium py-2">
+                            <a href="{{ route('user.register') }}" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-4 py-2 rounded-lg font-medium text-sm hover:shadow-lg transition-all">
                                 Register
                             </a>
                         </div>
-                        <!-- Show when logged in -->
-                        <div class="mobile-logged-in-links hidden">
-                            <div class="flex items-center space-x-2 py-2">
-                                <svg class="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                </svg>
-                                <span class="mobile-user-name font-medium text-gray-700"></span>
-                            </div>
-                            <a href="{{ route('user.dashboard') }}" class="block text-gray-700 hover:text-primary-600 py-2 pl-8">Dashboard</a>
-                            <a href="{{ route('track.order') }}" class="block text-gray-700 hover:text-primary-600 py-2 pl-8">Track Order</a>
-                            <button onclick="logout()" class="block text-left text-gray-700 hover:text-primary-600 py-2 pl-8">Logout</button>
-                        </div>
+                        @endauth
                     </div>
 
-                    <a href="{{ route('home') }}" class="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2">Home</a>
-                    <a href="{{ route('products.index') }}" class="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2">Products</a>
+                    <a href="{{ route('home') }}" class="text-[#1A1A1A] hover:text-[#D4AF37] transition-all duration-300 font-medium py-2">Home</a>
+                    <a href="{{ route('products.index') }}" class="text-[#1A1A1A] hover:text-[#D4AF37] transition-all duration-300 font-medium py-2">Products</a>
                     @foreach(\App\Models\Page::where('show_in_navbar', true)->where('is_active', true)->orderBy('sort_order')->get() as $mobileNavPage)
-                        <a href="{{ route('page.show', $mobileNavPage) }}" class="text-gray-700 hover:text-primary-600 transition-colors font-medium py-2">{{ $mobileNavPage->title }}</a>
+                        <a href="{{ route('page.show', $mobileNavPage) }}" class="text-[#1A1A1A] hover:text-[#D4AF37] transition-all duration-300 font-medium py-2">{{ $mobileNavPage->title }}</a>
                     @endforeach
                     <form action="{{ route('products.index') }}" method="GET" class="pt-2">
                         <input type="text" name="search" placeholder="Search products..." value="{{ request('search') }}"
-                            class="input-field">
+                            class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#6B6B6B] focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all duration-300 shadow-sm">
                     </form>
                 </nav>
             </div>
@@ -173,11 +193,11 @@
         $banners = \App\Models\Banner::where('is_active', true)->orderBy('sort_order')->get();
     @endphp
     @if($banners->count() > 0)
-    <div class="bg-primary-600 text-white py-2">
+    <div class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white py-2 shadow-sm">
         <div class="container mx-auto px-4">
             <div class="text-center">
                 @if($banners->first()->title)
-                    <p class="text-sm font-medium">{{ $banners->first()->title }}</p>
+                    <p class="text-sm font-semibold">{{ $banners->first()->title }}</p>
                 @endif
             </div>
         </div>
@@ -190,54 +210,54 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white mt-16">
+    <footer class="bg-gradient-to-b from-white to-gray-50 border-t border-gray-100 text-[#1A1A1A] mt-16">
         <div class="container mx-auto px-4 py-12">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <div>
                     @if($logo)
                         <img src="{{ asset('storage/' . $logo) }}" alt="Logo" class="h-12 mb-4">
                     @else
-                        <h3 class="text-2xl font-bold mb-4">Suvee</h3>
+                        <h3 class="text-2xl font-bold bg-gradient-to-r from-[#D4AF37] to-[#B8962E] bg-clip-text text-transparent mb-4">Suvee</h3>
                     @endif
-                    <p class="text-gray-400 text-sm">{{ \App\Models\Setting::get('company_description', 'Premium e-commerce platform') }}</p>
+                    <p class="text-[#6B6B6B] text-sm leading-relaxed">{{ \App\Models\Setting::get('company_description', 'Premium e-commerce platform') }}</p>
                 </div>
                 @php
                     $footerPages = \App\Models\Page::where('show_in_footer', true)->where('is_active', true)->orderBy('sort_order')->get();
                     $footerSections = \App\Models\FooterSection::with('links')->where('is_active', true)->orderBy('sort_order')->get();
                 @endphp
                 <div>
-                    <h4 class="font-semibold mb-4">Customer Service</h4>
+                    <h4 class="font-semibold mb-4 text-[#D4AF37]">Customer Service</h4>
                     <ul class="space-y-2">
                         @foreach($footerPages as $fpage)
                             <li>
-                                <a href="{{ route('page.show', $fpage) }}" class="text-gray-400 hover:text-white transition-colors text-sm">{{ $fpage->title }}</a>
+                                <a href="{{ route('page.show', $fpage) }}" class="text-[#6B6B6B] hover:text-[#D4AF37] transition-all duration-300 text-sm">{{ $fpage->title }}</a>
                             </li>
                         @endforeach
                     </ul>
                 </div>
                 @foreach($footerSections as $section)
                 <div>
-                    <h4 class="font-semibold mb-4">{{ $section->title }}</h4>
+                    <h4 class="font-semibold mb-4 text-[#D4AF37]">{{ $section->title }}</h4>
                     <ul class="space-y-2">
                         @foreach($section->links->where('is_active', true) as $link)
                         <li>
-                            <a href="{{ $link->url ?? '#' }}" class="text-gray-400 hover:text-white transition-colors text-sm">{{ $link->title }}</a>
+                            <a href="{{ $link->url ?? '#' }}" class="text-[#6B6B6B] hover:text-[#D4AF37] transition-all duration-300 text-sm">{{ $link->title }}</a>
                         </li>
                         @endforeach
                     </ul>
                 </div>
                 @endforeach
                 <div>
-                    <h4 class="font-semibold mb-4">Contact Us</h4>
-                    <ul class="space-y-2 text-sm text-gray-400">
+                    <h4 class="font-semibold mb-4 text-[#D4AF37]">Contact Us</h4>
+                    <ul class="space-y-2 text-sm text-[#6B6B6B]">
                         @if(\App\Models\Setting::get('whatsapp_number'))
-                        <li>WhatsApp: {{ \App\Models\Setting::get('whatsapp_number') }}</li>
+                        <li class="hover:text-[#D4AF37] transition-colors">WhatsApp: {{ \App\Models\Setting::get('whatsapp_number') }}</li>
                         @endif
                         @if(\App\Models\Setting::get('phone_number'))
-                        <li>Phone: {{ \App\Models\Setting::get('phone_number') }}</li>
+                        <li class="hover:text-[#D4AF37] transition-colors">Phone: {{ \App\Models\Setting::get('phone_number') }}</li>
                         @endif
                         @if(\App\Models\Setting::get('email'))
-                        <li>Email: {{ \App\Models\Setting::get('email') }}</li>
+                        <li class="hover:text-[#D4AF37] transition-colors">Email: {{ \App\Models\Setting::get('email') }}</li>
                         @endif
                         @if(\App\Models\Setting::get('address'))
                         <li>{{ \App\Models\Setting::get('address') }}</li>
@@ -245,7 +265,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
+            <div class="border-t border-gray-200 mt-8 pt-8 text-center text-[#6B6B6B] text-sm">
                 <p>&copy; {{ date('Y') }} Suvee. All rights reserved.</p>
             </div>
         </div>
@@ -263,15 +283,19 @@
     @endif
 
     <!-- Global modal for messages -->
-    <div id="appModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-lg shadow-lg max-w-lg w-full animate-fade-in">
-            <div class="p-4">
+    <div id="appModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/20 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full animate-fade-in">
+            <div class="p-6">
                 <div class="flex items-start justify-between">
-                    <div>
-                        <h3 id="appModalTitle" class="text-lg font-bold"></h3>
-                        <p id="appModalBody" class="text-sm text-gray-700 mt-2"></p>
+                    <div class="flex-1">
+                        <h3 id="appModalTitle" class="text-lg font-bold text-[#1A1A1A]"></h3>
+                        <p id="appModalBody" class="text-sm text-[#6B6B6B] mt-2"></p>
                     </div>
-                    <button onclick="closeModal()" class="text-gray-500">Close</button>
+                    <button onclick="closeModal()" class="text-[#6B6B6B] hover:text-[#D4AF37] transition-colors ml-4">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
@@ -298,9 +322,6 @@
                 });
             }
 
-            // Update user account section based on auth status
-            updateUserAccountSection();
-
             // User dropdown menu toggle
             const userMenuBtn = document.getElementById('user-menu-btn');
             const userDropdown = document.getElementById('user-dropdown');
@@ -317,84 +338,6 @@
                 });
             }
         });
-
-        // Update user account section based on localStorage auth
-        function updateUserAccountSection() {
-            const token = localStorage.getItem('auth_token');
-            const user = localStorage.getItem('user');
-
-            // Desktop
-            const guestLinks = document.querySelector('.guest-links');
-            const loggedInLinks = document.querySelector('.logged-in-links');
-
-            // Mobile
-            const mobileGuestLinks = document.querySelector('.mobile-guest-links');
-            const mobileLoggedInLinks = document.querySelector('.mobile-logged-in-links');
-
-            if (token && user) {
-                // User is logged in
-                const userData = JSON.parse(user);
-
-                // Desktop
-                if (guestLinks) guestLinks.classList.add('hidden');
-                if (loggedInLinks) {
-                    loggedInLinks.classList.remove('hidden');
-                    const userName = loggedInLinks.querySelector('.user-name');
-                    if (userName) userName.textContent = userData.name || 'Account';
-                }
-
-                // Mobile
-                if (mobileGuestLinks) mobileGuestLinks.classList.add('hidden');
-                if (mobileLoggedInLinks) {
-                    mobileLoggedInLinks.classList.remove('hidden');
-                    const mobileUserName = mobileLoggedInLinks.querySelector('.mobile-user-name');
-                    if (mobileUserName) mobileUserName.textContent = userData.name || 'Account';
-                }
-            } else {
-                // User is logged out
-                // Desktop
-                if (guestLinks) guestLinks.classList.remove('hidden');
-                if (loggedInLinks) loggedInLinks.classList.add('hidden');
-
-                // Mobile
-                if (mobileGuestLinks) mobileGuestLinks.classList.remove('hidden');
-                if (mobileLoggedInLinks) mobileLoggedInLinks.classList.add('hidden');
-            }
-        }
-
-        // Logout function
-        function logout() {
-            const token = localStorage.getItem('auth_token');
-
-            if (token) {
-                // Call logout API
-                fetch(`${API_BASE}/logout`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
-                }).then(() => {
-                    // Clear localStorage
-                    localStorage.removeItem('auth_token');
-                    localStorage.removeItem('user');
-
-                    // Redirect to home
-                    window.location.href = '/';
-                }).catch(err => {
-                    console.error('Logout error:', err);
-                    // Clear localStorage anyway
-                    localStorage.removeItem('auth_token');
-                    localStorage.removeItem('user');
-                    window.location.href = '/';
-                });
-            } else {
-                // Just clear and redirect
-                localStorage.removeItem('auth_token');
-                localStorage.removeItem('user');
-                window.location.href = '/';
-            }
-        }
 
         // Helper to show modal messages (supports type: 'success'|'error'|'info')
         function showModal(title, message, type = 'info') {

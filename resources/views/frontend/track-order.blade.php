@@ -8,7 +8,7 @@
         <h2 class="text-2xl font-semibold mb-4">Track Your Order</h2>
         <form id="track-form" class="flex space-x-2">
             <input type="text" id="order_number" placeholder="Enter Order Number (e.g. ORD-...)" class="input-field flex-1">
-            <button type="submit" class="btn-primary">Track</button>
+            <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Track</button>
         </form>
 
         <div id="track-result" class="mt-6"></div>

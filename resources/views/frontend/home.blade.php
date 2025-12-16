@@ -23,7 +23,7 @@
                     <p class="text-xl md:text-2xl">{{ $banner->description }}</p>
                     @endif
                     @if($banner->link)
-                    <a href="{{ $banner->link }}" class="btn-primary mt-6 inline-block">Shop Now</a>
+                    <a href="{{ $banner->link }}" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 mt-6 inline-block">Shop Now</a>
                     @endif
                 </div>
             </div>
@@ -41,7 +41,7 @@
 
 <!-- Categories Section -->
 <section class="container mx-auto px-4 py-12">
-    <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Shop by Category</h2>
+    <h2 class="text-3xl font-bold text-[#1A1A1A] mb-8 text-center">Shop by Category</h2>
     <div id="categories" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
         <!-- Categories will be loaded here -->
     </div>
@@ -50,16 +50,16 @@
 <!-- Product Tabs -->
 <section class="container mx-auto px-4 py-12 bg-white">
     <div class="flex flex-wrap justify-center mb-8 border-b border-gray-200">
-        <button class="product-tab px-6 py-3 font-semibold text-gray-700 border-b-2 border-primary-600 active" data-type="featured">Featured</button>
-        <button class="product-tab px-6 py-3 font-semibold text-gray-700 border-b-2 border-transparent" data-type="trending">Trending</button>
-        <button class="product-tab px-6 py-3 font-semibold text-gray-700 border-b-2 border-transparent" data-type="new-arrival">New Arrival</button>
-        <button class="product-tab px-6 py-3 font-semibold text-gray-700 border-b-2 border-transparent" data-type="top-rated">Top Rated</button>
+        <button class="product-tab px-6 py-3 font-semibold text-[#1A1A1A] border-b-2 border-[#D4AF37] active" data-type="featured">Featured</button>
+        <button class="product-tab px-6 py-3 font-semibold text-[#1A1A1A] border-b-2 border-transparent" data-type="trending">Trending</button>
+        <button class="product-tab px-6 py-3 font-semibold text-[#1A1A1A] border-b-2 border-transparent" data-type="new-arrival">New Arrival</button>
+        <button class="product-tab px-6 py-3 font-semibold text-[#1A1A1A] border-b-2 border-transparent" data-type="top-rated">Top Rated</button>
     </div>
     <div id="products-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <!-- Products will be loaded here -->
     </div>
     <div class="text-center mt-8">
-        <a href="{{ route('products.index') }}" class="btn-primary">View All Products</a>
+        <a href="{{ route('products.index') }}" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">View All Products</a>
     </div>
 </section>
 
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
                             ${cat.image ? `<img src="/storage/${cat.image}" alt="${cat.name}" class="w-full h-full object-cover">` : '<div class="text-4xl">📦</div>'}
                         </div>
-                        <h3 class="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">${cat.name}</h3>
+                        <h3 class="font-semibold text-[#1A1A1A] group-hover:text-[#D4AF37] transition-colors">${cat.name}</h3>
                     </div>
                 </a>
             `).join('');
@@ -132,12 +132,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                 ${product.discounted_price ? `<span class="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-sm">Sale</span>` : ''}
                             </div>
                             <div class="p-4">
-                                <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">${product.name}</h3>
+                                <h3 class="font-semibold text-[#1A1A1A] mb-2 line-clamp-2">${product.name}</h3>
                                 <div class="flex items-center space-x-2">
-                                    <span class="text-lg font-bold text-primary-600">₹${parseFloat(product.discounted_price || product.selling_price).toFixed(2)}</span>
+                                    <span class="text-lg font-bold text-[#D4AF37]">₹${parseFloat(product.discounted_price || product.selling_price).toFixed(2)}</span>
                                     ${product.discounted_price ? `<span class="text-sm text-gray-500 line-through">₹${parseFloat(product.selling_price).toFixed(2)}</span>` : ''}
                                 </div>
-                                <button onclick="addToCart(${product.id}, 1); event.preventDefault();" class="btn-primary w-full mt-4">Add to Cart</button>
+                                <button onclick="addToCart(${product.id}, 1); event.preventDefault();" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 w-full mt-4">Add to Cart</button>
                             </div>
                         </a>
                     </div>
@@ -151,10 +151,10 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.product-tab').forEach(tab => {
         tab.addEventListener('click', function() {
             document.querySelectorAll('.product-tab').forEach(t => {
-                t.classList.remove('active', 'border-primary-600');
+                t.classList.remove('active', 'border-[#D4AF37]');
                 t.classList.add('border-transparent');
             });
-            this.classList.add('active', 'border-primary-600');
+            this.classList.add('active', 'border-[#D4AF37]');
             this.classList.remove('border-transparent');
             loadProducts(this.dataset.type);
         });

@@ -125,7 +125,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
                 <textarea name="notes" rows="3" class="input-field">{{ $order->notes }}</textarea>
             </div>
-            <button type="submit" class="btn-primary">Update Status</button>
+            <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Update Status</button>
         </form>
     </div>
     
@@ -141,7 +141,7 @@
                     <option value="rejected">Rejected</option>
                 </select>
             </div>
-            <button type="submit" class="btn-primary">Update Payment Status</button>
+            <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Update Payment Status</button>
         </form>
     </div>
     @endif

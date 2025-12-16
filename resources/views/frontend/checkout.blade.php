@@ -29,7 +29,7 @@
                     </div>
                     <div class="flex justify-between font-bold text-lg border-t pt-2 mt-2">
                         <span>Total:</span>
-                        <span id="total-amount" class="text-primary-600">₹0.00</span>
+                        <span id="total-amount" class="text-[#D4AF37]">₹0.00</span>
                     </div>
                 </div>
             </div>
@@ -107,7 +107,7 @@
                     </div>
                 </div>
                 
-                <button type="submit" class="btn-primary w-full text-lg py-4">Place Order</button>
+                <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 w-full text-lg py-4">Place Order</button>
             </form>
         </div>
     </div>
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="flex-1">
                                 <h4 class="font-semibold text-sm">${product.name}</h4>
                                 <p class="text-sm text-gray-600">Qty: ${item.quantity}</p>
-                                <p class="text-sm font-semibold text-primary-600">₹${parseFloat(price).toFixed(2)}</p>
+                                <p class="text-sm font-semibold text-[#D4AF37]">₹${parseFloat(price).toFixed(2)}</p>
                             </div>
                         </div>
                     `;

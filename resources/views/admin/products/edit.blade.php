@@ -157,7 +157,7 @@
         <div class="border-t pt-6">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-semibold text-gray-900">Product Attributes (Color, Size, etc.)</h3>
-                <a href="{{ route('admin.product-attributes.create') }}?product_id={{ $product->id }}" class="text-sm text-primary-600 hover:text-primary-700">
+                <a href="{{ route('admin.product-attributes.create') }}?product_id={{ $product->id }}" class="text-sm text-[#D4AF37] hover:text-[#D4AF37]">
                     Manage Attributes Separately
                 </a>
             </div>
@@ -208,7 +208,7 @@
                     </div>
                 </div>
             </div>
-            <button type="button" onclick="addAttributeRow()" class="mt-4 text-primary-600 hover:text-primary-700 font-medium">
+            <button type="button" onclick="addAttributeRow()" class="mt-4 text-[#D4AF37] hover:text-[#D4AF37] font-medium">
                 + Add Another Attribute
             </button>
         </div>
@@ -230,7 +230,7 @@
         
         <div class="flex justify-end space-x-4">
             <a href="{{ route('admin.products.index') }}" class="btn-secondary">Cancel</a>
-            <button type="submit" class="btn-primary">Update Product</button>
+            <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Update Product</button>
         </div>
     </form>
 </div>

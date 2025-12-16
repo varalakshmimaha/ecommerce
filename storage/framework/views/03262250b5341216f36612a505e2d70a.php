@@ -11,7 +11,7 @@
                     <p class="text-3xl font-bold text-gray-900 mt-2"><?php echo e($stats['total_orders']); ?></p>
                 </div>
                 <div class="bg-primary-100 rounded-full p-4">
-                    <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-8 h-8 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                     </svg>
                 </div>
@@ -90,7 +90,7 @@
                         </td>
                         <td><?php echo e($order->created_at->format('M d, Y')); ?></td>
                         <td>
-                            <a href="<?php echo e(route('admin.orders.show', $order)); ?>" class="text-primary-600 hover:text-primary-800">View</a>
+                            <a href="<?php echo e(route('admin.orders.show', $order)); ?>" class="text-[#D4AF37] hover:text-primary-800">View</a>
                         </td>
                     </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>

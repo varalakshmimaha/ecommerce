@@ -9,7 +9,7 @@
         <p class="mb-4">Your order number is <strong id="order-number"></strong></p>
         <p class="text-sm text-gray-600 mb-6">We've received your order and will notify you about updates.</p>
         <div>
-            <a href="/track-order" class="btn-primary mr-2">Track Order</a>
+            <a href="/track-order" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 mr-2">Track Order</a>
             <a href="/" class="btn">Continue Shopping</a>
         </div>
     </div>

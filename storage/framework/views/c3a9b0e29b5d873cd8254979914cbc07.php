@@ -24,7 +24,7 @@
                             </div>
                         </div>
                         <div class="flex space-x-2">
-                            <button type="button" onclick="editCategory(<?php echo e($category->id); ?>)" class="text-primary-600 text-sm">Edit</button>
+                            <button type="button" onclick="editCategory(<?php echo e($category->id); ?>)" class="text-[#D4AF37] text-sm">Edit</button>
                             <form action="<?php echo e(route('admin.categories.destroy', $category)); ?>" method="POST" class="inline" onsubmit="return confirm('Are you sure?')">
                                 <?php echo csrf_field(); ?>
                                 <?php echo method_field('DELETE'); ?>
@@ -49,7 +49,7 @@
                                 <span class="font-medium text-gray-700"><?php echo e($subcat->name); ?></span>
                             </div>
                             <div class="flex space-x-1">
-                                <button type="button" onclick="editSubCategory(<?php echo e($category->id); ?>, <?php echo e($subcat->id); ?>)" class="text-primary-600 text-xs">Edit</button>
+                                <button type="button" onclick="editSubCategory(<?php echo e($category->id); ?>, <?php echo e($subcat->id); ?>)" class="text-[#D4AF37] text-xs">Edit</button>
                                 <form action="<?php echo e(route('admin.sub-categories.destroy', $subcat)); ?>" method="POST" class="inline" onsubmit="return confirm('Are you sure?')">
                                     <?php echo csrf_field(); ?>
                                     <?php echo method_field('DELETE'); ?>
@@ -89,7 +89,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
                     <input type="number" name="sort_order" value="0" class="input-field text-sm">
                 </div>
-                <button type="submit" class="btn-primary w-full text-sm py-2">Add Category</button>
+                <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 w-full text-sm py-2">Add Category</button>
             </form>
         </div>
         
@@ -123,7 +123,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">Sort Order</label>
                     <input type="number" name="sort_order" value="0" class="input-field text-sm">
                 </div>
-                <button type="submit" class="btn-primary w-full text-sm py-2">Add Sub-Category</button>
+                <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 w-full text-sm py-2">Add Sub-Category</button>
             </form>
         </div>
     </div>
@@ -165,7 +165,7 @@
                 </div>
                 <div class="pt-4 flex gap-2 justify-end">
                     <button type="button" onclick="closeEditCategory()" class="btn">Cancel</button>
-                    <button type="submit" class="btn-primary">Save Changes</button>
+                    <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Save Changes</button>
                 </div>
             </div>
         </form>
@@ -205,7 +205,7 @@
                 </div>
                 <div class="pt-4 flex gap-2 justify-end">
                     <button type="button" onclick="closeEditSubCategory()" class="btn">Cancel</button>
-                    <button type="submit" class="btn-primary">Save Changes</button>
+                    <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Save Changes</button>
                 </div>
             </div>
         </form>

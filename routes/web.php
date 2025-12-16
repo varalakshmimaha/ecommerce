@@ -8,24 +8,36 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\ProfileController;
 
 // Frontend Routes
 Route::get('/', function () {
     return view('frontend.home');
 })->name('home');
 
-// Frontend auth and dashboard (client-driven auth via API tokens)
-Route::get('/user/register', function () {
-    return view('frontend.auth.register');
-})->name('user.register');
+use App\Http\Controllers\Frontend\Auth\AuthenticatedSessionController as FrontendAuthenticatedSessionController;
+use App\Http\Controllers\Frontend\Auth\RegisterController;
 
-Route::get('/user/login', function () {
-    return view('frontend.auth.login');
-})->name('user.login');
+// Frontend auth and dashboard
+Route::get('/user/register', [RegisterController::class, 'create'])->name('user.register');
+Route::post('/user/register', [RegisterController::class, 'store']);
 
-Route::get('/dashboard', function () {
-    return view('frontend.dashboard');
-})->name('user.dashboard');
+Route::get('/user/login', [FrontendAuthenticatedSessionController::class, 'create'])->name('user.login');
+Route::post('/user/login', [FrontendAuthenticatedSessionController::class, 'store']);
+Route::post('/user/logout', [FrontendAuthenticatedSessionController::class, 'destroy'])->name('user.logout');
+
+use App\Http\Controllers\Frontend\DashboardController;
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('user.dashboard');
+    Route::get('/dashboard/profile', [DashboardController::class, 'profile'])->name('user.dashboard.profile');
+    Route::post('/dashboard/profile', [DashboardController::class, 'updateProfile'])->name('user.dashboard.profile.update');
+    Route::post('/dashboard/password', [DashboardController::class, 'updatePassword'])->name('user.dashboard.password.update');
+    Route::get('/dashboard/orders', [DashboardController::class, 'orders'])->name('user.dashboard.orders');
+    Route::get('/dashboard/queries', [DashboardController::class, 'queries'])->name('user.dashboard.queries');
+    Route::post('/dashboard/queries', [DashboardController::class, 'createQuery'])->name('user.dashboard.queries.create');
+    Route::get('/dashboard/orders/{orderNumber}/invoice', [DashboardController::class, 'downloadInvoice'])->name('user.dashboard.invoice');
+});
 
 Route::get('/products', function () {
     return view('frontend.products.index');
@@ -130,6 +142,11 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::get('/queries', [\App\Http\Controllers\Admin\QueryController::class, 'index'])->name('queries.index');
     Route::post('/queries/{query}/respond', [\App\Http\Controllers\Admin\QueryController::class, 'respond'])->name('queries.respond');
     Route::post('/queries/{query}/status', [\App\Http\Controllers\Admin\QueryController::class, 'updateStatus'])->name('queries.update-status');
+
+    // Profile Management
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
 });
 
 // Public dynamic pages

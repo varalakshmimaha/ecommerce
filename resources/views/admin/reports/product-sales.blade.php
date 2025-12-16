@@ -13,7 +13,7 @@
                 <span class="flex items-center text-gray-500">to</span>
                 <input type="date" name="end_date" value="{{ $endDate }}" class="input-field px-3 py-2 border border-gray-300 rounded">
             </div>
-            <button type="submit" class="btn-primary px-6">Filter</button>
+            <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 px-6">Filter</button>
             <a href="?download=1&start_date={{ $startDate }}&end_date={{ $endDate }}" class="btn px-6 text-center">Download</a>
         </form>
     </div>
@@ -22,7 +22,7 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-lg shadow hover:shadow-lg transition">
             <p class="text-sm text-gray-600 font-medium">Total Items Sold</p>
-            <p class="text-3xl font-bold text-blue-600 mt-2">{{ $items->count() }}</p>
+            <p class="text-3xl font-bold text-[#D4AF37] mt-2">{{ $items->count() }}</p>
         </div>
         <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-lg shadow hover:shadow-lg transition">
             <p class="text-sm text-gray-600 font-medium">Total Revenue</p>

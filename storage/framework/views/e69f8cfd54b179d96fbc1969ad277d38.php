@@ -75,10 +75,10 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="p-4">
                                 <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">${product.name}</h3>
                                 <div class="flex items-center space-x-2">
-                                    <span class="text-lg font-bold text-primary-600">₹${parseFloat(product.discounted_price || product.selling_price).toFixed(2)}</span>
+                                    <span class="text-lg font-bold text-[#D4AF37]">₹${parseFloat(product.discounted_price || product.selling_price).toFixed(2)}</span>
                                     ${product.discounted_price ? `<span class="text-sm text-gray-500 line-through">₹${parseFloat(product.selling_price).toFixed(2)}</span>` : ''}
                                 </div>
-                                <button onclick="addToCart(${product.id}, 1); event.preventDefault();" class="btn-primary w-full mt-4">Add to Cart</button>
+                                <button onclick="addToCart(${product.id}, 1); event.preventDefault();" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 w-full mt-4">Add to Cart</button>
                             </div>
                         </a>
                     </div>
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     for (let i = 1; i <= data.last_page; i++) {
                         if (i === data.current_page) {
-                            paginationHTML += `<button class="px-4 py-2 bg-primary-600 text-white rounded-lg">${i}</button>`;
+                            paginationHTML += `<button class="px-4 py-2 bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white rounded-lg">${i}</button>`;
                         } else {
                             paginationHTML += `<button onclick="changePage(${i})" class="px-4 py-2 border rounded-lg hover:bg-gray-100">${i}</button>`;
                         }

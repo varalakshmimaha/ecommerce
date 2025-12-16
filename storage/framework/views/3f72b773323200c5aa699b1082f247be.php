@@ -148,7 +148,7 @@
                     </div>
                 </div>
             </div>
-            <button type="button" onclick="addAttributeRow()" class="mt-4 text-primary-600 hover:text-primary-700 font-medium">
+            <button type="button" onclick="addAttributeRow()" class="mt-4 text-[#D4AF37] hover:text-[#D4AF37] font-medium">
                 + Add Another Attribute
             </button>
         </div>
@@ -170,7 +170,7 @@
         
         <div class="flex justify-end space-x-4">
             <a href="<?php echo e(route('admin.products.index')); ?>" class="btn-secondary">Cancel</a>
-            <button type="submit" class="btn-primary">Create Product</button>
+            <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Create Product</button>
         </div>
     </form>
 </div>

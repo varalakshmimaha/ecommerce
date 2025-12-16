@@ -20,7 +20,7 @@
                         <p class="text-sm text-gray-500"><?php echo e($banner->is_active ? 'Active' : 'Inactive'); ?></p>
                     </div>
                     <div class="flex space-x-2">
-                        <button onclick="editBanner(<?php echo e($banner->id); ?>)" class="text-primary-600">Edit</button>
+                        <button onclick="editBanner(<?php echo e($banner->id); ?>)" class="text-[#D4AF37]">Edit</button>
                         <form action="<?php echo e(route('admin.banners.destroy', $banner)); ?>" method="POST" class="inline" onsubmit="return confirm('Are you sure?')">
                             <?php echo csrf_field(); ?>
                             <?php echo method_field('DELETE'); ?>
@@ -59,7 +59,7 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Sort Order</label>
                 <input type="number" name="sort_order" value="0" class="input-field">
             </div>
-            <button type="submit" class="btn-primary w-full">Add Banner</button>
+            <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 w-full">Add Banner</button>
         </form>
     </div>
 </div>
@@ -107,7 +107,7 @@
                 </div>
                 <div class="pt-4 flex gap-2 justify-end">
                     <button type="button" onclick="closeEditModal()" class="btn">Cancel</button>
-                    <button type="submit" class="btn-primary">Save Changes</button>
+                    <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Save Changes</button>
                 </div>
             </div>
         </form>
