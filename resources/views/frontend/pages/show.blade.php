@@ -14,7 +14,7 @@
                 <div class="p-8">
                     <div class="prose prose-lg prose-invert max-w-none leading-relaxed">
                         <div class="text-[#6B6B6B] space-y-4">
-                            {!! nl2br(e($page->content)) !!}
+                            {!! $page->content !!}
                         </div>
                     </div>
 

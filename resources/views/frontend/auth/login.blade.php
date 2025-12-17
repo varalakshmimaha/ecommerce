@@ -55,6 +55,19 @@
                         </div>
                     </div>
 
+                    <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input id="remember_me" type="checkbox" class="h-4 w-4 text-[#D4AF37] focus:ring-[#B8962E] border-gray-300 rounded">
+                                <label for="remember_me" class="ml-2 block text-sm text-[#6B6B6B]">Remember me</label>
+                            </div>
+
+                            <div class="text-sm">
+                                <a href="{{ route('password.request') }}" class="font-medium text-[#D4AF37] hover:text-[#B8962E]">
+                                    Forgot your password?
+                                </a>
+                            </div>
+                        </div>
+
                     <button type="submit" class="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white py-3 rounded-lg font-bold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">
                         Login
                     </button>

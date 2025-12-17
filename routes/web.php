@@ -19,6 +19,14 @@ Route::get('/', function () {
 })->name('home');
 
 
+use App\Http\Controllers\Frontend\Auth\ForgotPasswordController;
+use App\Http\Controllers\Frontend\Auth\NewPasswordController;
+
+Route::get('/forgot-password', [ForgotPasswordController::class, 'create'])->middleware('guest')->name('password.request');
+Route::post('/forgot-password', [ForgotPasswordController::class, 'store'])->middleware('guest')->name('password.email');
+Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])->middleware('guest')->name('password.reset');
+Route::post('/reset-password', [NewPasswordController::class, 'store'])->middleware('guest')->name('password.update');
+
 // Frontend auth and dashboard
 Route::get('/user/register', [RegisterController::class, 'create'])->name('user.register');
 Route::post('/user/register', [RegisterController::class, 'store']);
@@ -91,6 +99,7 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
     Route::post('/orders/{order}/payment', [OrderController::class, 'verifyPayment'])->name('orders.verify-payment');
+    Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
     
     // Reports
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');

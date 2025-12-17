@@ -5,7 +5,12 @@
 @section('content')
 <div class="space-y-6">
     <div class="admin-card">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Order #{{ $order->order_number }}</h2>
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-900">Order #{{ $order->order_number }}</h2>
+            <a href="{{ route('admin.orders.invoice', $order) }}" target="_blank" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-all duration-300">
+                View Invoice
+            </a>
+        </div>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
@@ -47,13 +52,6 @@
                 </div>
             </div>
         </div>
-        
-        @if($order->order_status === 'cancelled' && $order->cancellation_remark)
-        <div class="mb-6">
-            <h3 class="font-semibold text-gray-900 mb-4">Cancellation Remark</h3>
-            <p class="text-sm text-gray-600">{{ $order->cancellation_remark }}</p>
-        </div>
-        @endif
         
         @if($order->payment_proof)
         <div class="mb-6">
@@ -112,7 +110,6 @@
         </div>
     </div>
     
-    @if(!in_array($order->order_status, ['cancelled', 'delivered']))
     <div class="admin-card">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Update Order Status</h3>
         <form action="{{ route('admin.orders.update-status', $order) }}" method="POST" class="space-y-4">
@@ -144,7 +141,6 @@
             <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Update Status</button>
         </form>
     </div>
-    @endif
     
     @if($order->payment_status === 'pending')
     <div class="admin-card">

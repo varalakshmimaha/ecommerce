@@ -110,13 +110,13 @@
                         <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Product</th>
-                                <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">GST</th>
                                 <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Qty</th>
                                 <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">Price</th>
                                 @if($order->items->where('discount', '>', 0)->count() > 0)
                                 <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">Discount</th>
                                 @endif
                                 <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">Subtotal</th>
+                                <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">GST</th>
                                 <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">Total</th>
                             </tr>
                         </thead>
@@ -136,14 +136,6 @@
                                             <p class="text-sm text-gray-500">{{ $item->variant_details }}</p>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 text-center">
-                                        @if($item->gst_percentage)
-                                            <span class="text-sm text-gray-700">{{ $item->gst_percentage }}%</span>
-                                            <span class="block text-xs text-[#D4AF37] font-medium">₹{{ number_format($gstAmount, 2) }}</span>
-                                        @else
-                                            <span class="text-sm text-gray-400">-</span>
-                                        @endif
-                                    </td>
                                     <td class="px-6 py-4 text-center text-gray-800 font-medium">{{ $item->quantity }}</td>
                                     <td class="px-6 py-4 text-right text-gray-800">₹{{ number_format($item->price, 2) }}</td>
                                     @if($order->items->where('discount', '>', 0)->count() > 0)
@@ -156,6 +148,14 @@
                                     </td>
                                     @endif
                                     <td class="px-6 py-4 text-right text-gray-800 font-medium">₹{{ number_format($item->subtotal, 2) }}</td>
+                                    <td class="px-6 py-4 text-center">
+                                        @if($item->gst_percentage)
+                                            <span class="text-sm text-gray-700">{{ $item->gst_percentage }}%</span>
+                                            <span class="block text-xs text-[#D4AF37] font-medium">₹{{ number_format($gstAmount, 2) }}</span>
+                                        @else
+                                            <span class="text-sm text-gray-400">-</span>
+                                        @endif
+                                    </td>
                                     <td class="px-6 py-4 text-right font-semibold text-[#D4AF37]">₹{{ number_format($item->subtotal + $gstAmount, 2) }}</td>
                                 </tr>
                             @endforeach

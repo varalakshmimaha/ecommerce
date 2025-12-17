@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice - {{ $order->order_number }}</title>
+    <title>Invoice - <?php echo e($order->order_number); ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @media print {
@@ -23,11 +23,11 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold text-white">INVOICE</h1>
-                    <p class="text-white/90 mt-1">{{ config('app.name', 'Suvee') }}</p>
+                    <p class="text-white/90 mt-1"><?php echo e(config('app.name', 'Suvee')); ?></p>
                 </div>
                 <div class="text-right">
-                    <p class="text-2xl font-bold text-white">#{{ $order->order_number }}</p>
-                    <p class="text-sm text-white/90">{{ $order->created_at->format('M d, Y') }}</p>
+                    <p class="text-2xl font-bold text-white">#<?php echo e($order->order_number); ?></p>
+                    <p class="text-sm text-white/90"><?php echo e($order->created_at->format('M d, Y')); ?></p>
                 </div>
             </div>
         </div>
@@ -44,34 +44,35 @@
                         Billed From
                     </h3>
                     <div class="text-gray-700 space-y-1 text-sm">
-                    {{-- Company Name --}}
-                    @if(\App\Models\Setting::get('company_name'))
+                    
+                    <?php if(\App\Models\Setting::get('company_name')): ?>
                         <p class="font-semibold text-gray-900">
-                            {{ \App\Models\Setting::get('company_name') }}
+                            <?php echo e(\App\Models\Setting::get('company_name')); ?>
+
                         </p>
-                    @endif
+                    <?php endif; ?>
 
-                    {{-- Contact Info --}}
-                    @if(\App\Models\Setting::get('phone_number'))
-                        <p>Phone: {{ \App\Models\Setting::get('phone_number') }}</p>
-                    @endif
+                    
+                    <?php if(\App\Models\Setting::get('phone_number')): ?>
+                        <p>Phone: <?php echo e(\App\Models\Setting::get('phone_number')); ?></p>
+                    <?php endif; ?>
 
-                    @if(\App\Models\Setting::get('whatsapp_number'))
-                        <p>WhatsApp: {{ \App\Models\Setting::get('whatsapp_number') }}</p>
-                    @endif
+                    <?php if(\App\Models\Setting::get('whatsapp_number')): ?>
+                        <p>WhatsApp: <?php echo e(\App\Models\Setting::get('whatsapp_number')); ?></p>
+                    <?php endif; ?>
 
-                    @if(\App\Models\Setting::get('email'))
-                        <p>Email: {{ \App\Models\Setting::get('email') }}</p>
-                    @endif
+                    <?php if(\App\Models\Setting::get('email')): ?>
+                        <p>Email: <?php echo e(\App\Models\Setting::get('email')); ?></p>
+                    <?php endif; ?>
 
-                    {{-- GST --}}
-                    @if(\App\Models\Setting::get('gstin'))
-                        <p class="mt-1 font-medium">GSTIN: {{ \App\Models\Setting::get('gstin') }}</p>
-                    @endif
-                    {{-- Address --}}
-                    @if(\App\Models\Setting::get('address'))
-                        <p>{{ \App\Models\Setting::get('address') }}</p>
-                    @endif
+                    
+                    <?php if(\App\Models\Setting::get('gstin')): ?>
+                        <p class="mt-1 font-medium">GSTIN: <?php echo e(\App\Models\Setting::get('gstin')); ?></p>
+                    <?php endif; ?>
+                    
+                    <?php if(\App\Models\Setting::get('address')): ?>
+                        <p><?php echo e(\App\Models\Setting::get('address')); ?></p>
+                    <?php endif; ?>
                 </div>
                 </div>
                 <div class="bg-gradient-to-br from-gray-50 to-white p-6 rounded-lg border border-gray-200">
@@ -83,16 +84,16 @@
                         Billed To
                     </h3>
                     <div class="text-gray-700 space-y-1">
-                        <p class="font-semibold text-gray-900">{{ $order->user->name }}</p>
-                        <p class="text-sm">{{ $order->user->mobile }}</p>
-                        @if($order->user->email)
-                            <p class="text-sm">{{ $order->user->email }}</p>
-                        @endif
+                        <p class="font-semibold text-gray-900"><?php echo e($order->user->name); ?></p>
+                        <p class="text-sm"><?php echo e($order->user->mobile); ?></p>
+                        <?php if($order->user->email): ?>
+                            <p class="text-sm"><?php echo e($order->user->email); ?></p>
+                        <?php endif; ?>
                     </div>
                     <div class="text-gray-700 space-y-1 text-sm">
-                        <p>{{ $order->addresses->address }}</p>
-                        <p>{{ $order->addresses->city }}, {{ $order->addresses->state }}</p>
-                        <p>{{ $order->addresses->pincode }}</p>
+                        <p><?php echo e($order->addresses->address); ?></p>
+                        <p><?php echo e($order->addresses->city); ?>, <?php echo e($order->addresses->state); ?></p>
+                        <p><?php echo e($order->addresses->pincode); ?></p>
                     </div>
                 </div>
             </div>
@@ -112,53 +113,53 @@
                                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Product</th>
                                 <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Qty</th>
                                 <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">Price</th>
-                                @if($order->items->where('discount', '>', 0)->count() > 0)
+                                <?php if($order->items->where('discount', '>', 0)->count() > 0): ?>
                                 <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">Discount</th>
-                                @endif
+                                <?php endif; ?>
                                 <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">Subtotal</th>
                                 <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">GST</th>
                                 <th class="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">Total</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            @php
+                            <?php
                                 $totalGST = 0;
-                            @endphp
-                            @foreach($order->items as $item)
-                                @php
+                            ?>
+                            <?php $__currentLoopData = $order->items; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <?php
                                     $gstAmount = $item->subtotal * ($item->gst_percentage ?? 0) / 100;
                                     $totalGST += $gstAmount;
-                                @endphp
+                                ?>
                                 <tr class="hover:bg-gray-50 transition-colors">
                                     <td class="px-6 py-4">
-                                        <p class="font-medium text-gray-900">{{ $item->product_name }}</p>
-                                        @if($item->variant_details)
-                                            <p class="text-sm text-gray-500">{{ $item->variant_details }}</p>
-                                        @endif
+                                        <p class="font-medium text-gray-900"><?php echo e($item->product_name); ?></p>
+                                        <?php if($item->variant_details): ?>
+                                            <p class="text-sm text-gray-500"><?php echo e($item->variant_details); ?></p>
+                                        <?php endif; ?>
                                     </td>
-                                    <td class="px-6 py-4 text-center text-gray-800 font-medium">{{ $item->quantity }}</td>
-                                    <td class="px-6 py-4 text-right text-gray-800">₹{{ number_format($item->price, 2) }}</td>
-                                    @if($order->items->where('discount', '>', 0)->count() > 0)
+                                    <td class="px-6 py-4 text-center text-gray-800 font-medium"><?php echo e($item->quantity); ?></td>
+                                    <td class="px-6 py-4 text-right text-gray-800">₹<?php echo e(number_format($item->price, 2)); ?></td>
+                                    <?php if($order->items->where('discount', '>', 0)->count() > 0): ?>
                                     <td class="px-6 py-4 text-right">
-                                        @if($item->discount > 0)
-                                            <span class="text-green-600 font-medium">-₹{{ number_format($item->discount * $item->quantity, 2) }}</span>
-                                        @else
+                                        <?php if($item->discount > 0): ?>
+                                            <span class="text-green-600 font-medium">-₹<?php echo e(number_format($item->discount * $item->quantity, 2)); ?></span>
+                                        <?php else: ?>
                                             <span class="text-gray-400">-</span>
-                                        @endif
+                                        <?php endif; ?>
                                     </td>
-                                    @endif
-                                    <td class="px-6 py-4 text-right text-gray-800 font-medium">₹{{ number_format($item->subtotal, 2) }}</td>
+                                    <?php endif; ?>
+                                    <td class="px-6 py-4 text-right text-gray-800 font-medium">₹<?php echo e(number_format($item->subtotal, 2)); ?></td>
                                     <td class="px-6 py-4 text-center">
-                                        @if($item->gst_percentage)
-                                            <span class="text-sm text-gray-700">{{ $item->gst_percentage }}%</span>
-                                            <span class="block text-xs text-[#D4AF37] font-medium">₹{{ number_format($gstAmount, 2) }}</span>
-                                        @else
+                                        <?php if($item->gst_percentage): ?>
+                                            <span class="text-sm text-gray-700"><?php echo e($item->gst_percentage); ?>%</span>
+                                            <span class="block text-xs text-[#D4AF37] font-medium">₹<?php echo e(number_format($gstAmount, 2)); ?></span>
+                                        <?php else: ?>
                                             <span class="text-sm text-gray-400">-</span>
-                                        @endif
+                                        <?php endif; ?>
                                     </td>
-                                    <td class="px-6 py-4 text-right font-semibold text-[#D4AF37]">₹{{ number_format($item->subtotal + $gstAmount, 2) }}</td>
+                                    <td class="px-6 py-4 text-right font-semibold text-[#D4AF37]">₹<?php echo e(number_format($item->subtotal + $gstAmount, 2)); ?></td>
                                 </tr>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>
                 </div>
@@ -171,32 +172,32 @@
                         <div class="space-y-3">
                             <div class="flex justify-between text-gray-700">
                                 <span class="font-medium">Subtotal:</span>
-                                <span class="font-semibold">₹{{ number_format($order->items->sum('subtotal'), 2) }}</span>
+                                <span class="font-semibold">₹<?php echo e(number_format($order->items->sum('subtotal'), 2)); ?></span>
                             </div>
 
                             <div class="flex justify-between text-gray-700">
                                 <span class="font-medium">Total GST:</span>
-                                <span class="font-semibold text-[#D4AF37]">₹{{ number_format($totalGST, 2) }}</span>
+                                <span class="font-semibold text-[#D4AF37]">₹<?php echo e(number_format($totalGST, 2)); ?></span>
                             </div>
 
-                            @if($order->shipping_cost > 0)
+                            <?php if($order->shipping_cost > 0): ?>
                                 <div class="flex justify-between text-gray-700">
                                     <span class="font-medium">Shipping:</span>
-                                    <span class="font-semibold">₹{{ number_format($order->shipping_cost, 2) }}</span>
+                                    <span class="font-semibold">₹<?php echo e(number_format($order->shipping_cost, 2)); ?></span>
                                 </div>
-                            @endif
+                            <?php endif; ?>
 
-                            @if($order->discount > 0)
+                            <?php if($order->discount > 0): ?>
                                 <div class="flex justify-between text-green-600">
                                     <span class="font-medium">Discount:</span>
-                                    <span class="font-semibold">-₹{{ number_format($order->discount, 2) }}</span>
+                                    <span class="font-semibold">-₹<?php echo e(number_format($order->discount, 2)); ?></span>
                                 </div>
-                            @endif
+                            <?php endif; ?>
 
                             <div class="border-t-2 border-[#D4AF37]/50 pt-3 mt-3">
                                 <div class="flex justify-between items-center">
                                     <span class="text-xl font-bold text-gray-900">Grand Total:</span>
-                                    <span class="text-2xl font-bold text-[#D4AF37]">₹{{ number_format($order->total_amount, 2) }}</span>
+                                    <span class="text-2xl font-bold text-[#D4AF37]">₹<?php echo e(number_format($order->total_amount, 2)); ?></span>
                                 </div>
                             </div>
                         </div>
@@ -208,7 +209,7 @@
             <div class="border-t-2 border-gray-200 pt-6 text-center">
                 <p class="text-lg font-semibold text-gray-800 mb-2">Thank you for your business!</p>
                 <p class="text-sm text-gray-600">For any queries, please contact us at: <span class="text-[#D4AF37] font-medium">support@suvee.com</span></p>
-                <p class="text-xs text-gray-500 mt-3">{{ parse_url(config('app.url', 'https://suvee.com'), PHP_URL_HOST) }}</p>
+                <p class="text-xs text-gray-500 mt-3"><?php echo e(parse_url(config('app.url', 'https://suvee.com'), PHP_URL_HOST)); ?></p>
             </div>
         </div>
 
@@ -230,4 +231,4 @@
         // window.onload = function() { window.print(); }
     </script>
 </body>
-</html>
+</html><?php /**PATH /Users/vikasverma/Projects/suvee/resources/views/invoices/order.blade.php ENDPATH**/ ?>

@@ -58,5 +58,11 @@ class OrderController extends Controller
 
         return redirect()->back()->with('success', 'Payment status updated successfully');
     }
+
+    public function invoice(Order $order)
+    {
+        $order->load(['user', 'items.product']);
+        return view('invoices.order', compact('order'));
+    }
 }
 
