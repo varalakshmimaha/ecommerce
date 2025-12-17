@@ -9,14 +9,14 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ProfileController;
-
+use App\Http\Controllers\Frontend\AddressController;
+use App\Http\Controllers\Frontend\Auth\AuthenticatedSessionController as FrontendAuthenticatedSessionController;
+use App\Http\Controllers\Frontend\Auth\RegisterController;
 // Frontend Routes
 Route::get('/', function () {
     return view('frontend.home');
 })->name('home');
 
-use App\Http\Controllers\Frontend\Auth\AuthenticatedSessionController as FrontendAuthenticatedSessionController;
-use App\Http\Controllers\Frontend\Auth\RegisterController;
 
 // Frontend auth and dashboard
 Route::get('/user/register', [RegisterController::class, 'create'])->name('user.register');
@@ -29,6 +29,13 @@ Route::post('/user/logout', [FrontendAuthenticatedSessionController::class, 'des
 use App\Http\Controllers\Frontend\DashboardController;
 
 Route::middleware(['auth'])->group(function () {
+        // Address management
+        Route::get('/dashboard/addresses', [AddressController::class, 'index'])->name('user.dashboard.addresses');
+        Route::post('/dashboard/addresses', [AddressController::class, 'store'])->name('user.dashboard.addresses.store');
+        Route::put('/dashboard/addresses/{address}', [AddressController::class, 'update'])->name('user.dashboard.addresses.update');
+        Route::post('/dashboard/addresses/{address}', [AddressController::class, 'update']); // For AJAX edit with _method=PUT
+        Route::delete('/dashboard/addresses/{address}', [AddressController::class, 'destroy'])->name('user.dashboard.addresses.destroy');
+        Route::post('/dashboard/addresses/{address}/default', [AddressController::class, 'setDefault'])->name('user.dashboard.addresses.default');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('user.dashboard');
     Route::get('/dashboard/profile', [DashboardController::class, 'profile'])->name('user.dashboard.profile');
     Route::post('/dashboard/profile', [DashboardController::class, 'updateProfile'])->name('user.dashboard.profile.update');

@@ -100,8 +100,10 @@ class DashboardController extends Controller
     {
         $order = Order::where('order_number', $orderNumber)
             ->where('user_id', Auth::id())
-            ->with('items')
+            ->with('items', 'addresses', 'user')
             ->firstOrFail();
+
+        //dd($order->addresses);
 
         return view('frontend.invoice', compact('order'));
     }

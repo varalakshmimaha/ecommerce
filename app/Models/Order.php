@@ -13,6 +13,7 @@ class Order extends Model
     protected $fillable = [
         'order_number',
         'user_id',
+        'address_id',
         'name',
         'mobile',
         'email',
@@ -29,6 +30,11 @@ class Order extends Model
         'tracking_url',
         'notes',
     ];
+
+    public function addresses()
+    {
+        return $this->belongsTo(Address::class, 'address_id', 'id');
+    }
 
     protected $casts = [
         'subtotal' => 'decimal:2',

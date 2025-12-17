@@ -23,7 +23,7 @@
                 <span class="w-2 h-8 bg-[#D4AF37] rounded"></span>
                 Shop by Sub-Categories
             </h2>
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4" id="subcategories-grid">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-0" id="subcategories-grid">
                 <!-- Subcategories will load here -->
             </div>
         </div>
@@ -214,13 +214,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Grid display
                 gridEl.innerHTML = subcats.map(subcat => `
-                    <button onclick="filterBySubcategory(${subcat.id})" class="group text-left transform transition-all duration-300 hover:scale-105 w-full max-w-full">
-                        <div class="bg-white border border-gray-100 rounded-xl p-4 h-full shadow-lg hover:shadow-xl transition-all duration-300">
-                            <div class="w-full h-24 bg-gray-50 rounded-lg flex items-center justify-center mb-3 overflow-hidden">
-                                ${subcat.image ? `<img src="/storage/${subcat.image}" alt="${subcat.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">` : '<div class="text-3xl">📁</div>'}
-                            </div>
-                            <h3 class="font-semibold text-[#1A1A1A] group-hover:text-[#D4AF37] transition-colors text-sm break-words">${subcat.name}</h3>
+                    <button onclick="filterBySubcategory(${subcat.id})" class="flex flex-col items-center group p-2 w-full max-w-full bg-transparent border-none outline-none focus:outline-none">
+                        <div class="w-24 h-24 mb-3 rounded-full overflow-hidden border-4 border-[#fffbe6] group-hover:border-[#D4AF37] bg-gradient-to-tr from-[#fffbe6] to-[#f9e7b3] flex items-center justify-center shadow-md transition-all duration-300">
+                            ${subcat.image ? `<img src="/storage/${subcat.image}" alt="${subcat.name}" class="w-full h-full object-cover scale-100 group-hover:scale-110 transition-transform duration-300">` : '<div class="text-4xl">📁</div>'}
                         </div>
+                        <span class="font-semibold text-base md:text-lg text-[#1A1A1A] group-hover:text-[#D4AF37] transition-colors tracking-wide text-center">${subcat.name}</span>
                     </button>
                 `).join('');
 

@@ -35,32 +35,111 @@
         
         <!-- Checkout Form -->
         <div class="lg:col-span-2">
+            <?php if(auth()->guard()->check()): ?>
+            <div class="card p-6 mb-6">
+                <h2 class="text-xl font-bold text-gray-900 mb-4">Select Shipping Address</h2>
+                <div id="checkout-addresses-list">
+                    <!-- Address selector will be loaded here -->
+                </div>
+                <button type="button" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 mt-4" onclick="showCheckoutAddressForm()">Add New Address</button>
+                <div id="checkout-address-form-modal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg relative animate-scale-in">
+                        <button class="absolute top-2 right-2 text-[#D4AF37] text-2xl font-bold" onclick="hideCheckoutAddressForm()">&times;</button>
+                        <h3 class="text-xl font-bold mb-4 text-[#1A1A1A]">Add / Edit Address</h3>
+                        <form id="checkout-address-form" class="space-y-4">
+                            <input type="hidden" name="address_id" id="checkout_address_id">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-[#1A1A1A]">Name</label>
+                                    <input type="text" name="name" id="checkout_address_name" required class="input-field">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-[#1A1A1A]">Phone</label>
+                                    <input type="text" name="phone" id="checkout_address_phone" required class="input-field">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-[#1A1A1A]">Address</label>
+                                <input type="text" name="address" id="checkout_address_address" required class="input-field">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-[#1A1A1A]">City</label>
+                                    <input type="text" name="city" id="checkout_address_city" required class="input-field">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-[#1A1A1A]">State</label>
+                                    <input type="text" name="state" id="checkout_address_state" required class="input-field">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-[#1A1A1A]">Pincode</label>
+                                    <input type="text" name="pincode" id="checkout_address_pincode" required class="input-field">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-[#1A1A1A]">Country</label>
+                                    <input type="text" name="country" id="checkout_address_country" value="India" required class="input-field">
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" name="is_default" id="checkout_address_is_default" class="accent-[#D4AF37]">
+                                <label for="checkout_address_is_default" class="text-sm">Set as default address</label>
+                            </div>
+                            <div class="flex justify-end gap-2">
+                                <button type="button" class="px-6 py-2 rounded-lg border border-gray-200 text-[#1A1A1A] hover:bg-gray-50" onclick="hideCheckoutAddressForm()">Cancel</button>
+                                <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition-all duration-300">Save Address</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
             <form id="checkout-form" class="space-y-6">
+                <?php if(auth()->guard()->guest()): ?>
                 <div class="card p-6">
                     <h2 class="text-xl font-bold text-gray-900 mb-4">Shipping Information</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
-                            <input type="text" name="name" required class="input-field">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Mobile Number *</label>
-                            <input type="text" name="mobile" required class="input-field">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Address *</label>
-                            <textarea name="address" rows="3" required class="input-field"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Pincode *</label>
-                            <input type="text" name="pincode" required class="input-field">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Email (Optional)</label>
-                            <input type="email" name="email" class="input-field">
-                        </div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
+                        <input type="text" name="name" required class="input-field">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Mobile Number *</label>
+                        <input type="text" name="mobile" required class="input-field">
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Address *</label>
+                        <textarea name="address" rows="3" required class="input-field"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                        <input type="text" name="city" required class="input-field">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">State *</label>
+                        <input type="text" name="state" required class="input-field">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Pincode *</label>
+                        <input type="text" name="pincode" required class="input-field">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email (Optional)</label>
+                        <input type="email" name="email" class="input-field">
+                    </div>
+
+                    <!-- Country fixed -->
+                    <input type="hidden" name="country" value="India">
                     </div>
                 </div>
+                <?php endif; ?>
                 
                 <!-- Payment Section -->
                 <div class="card p-6">
@@ -112,6 +191,87 @@
 </div>
 
 <script>
+<?php if(auth()->guard()->check()): ?>
+// Checkout Address Management AJAX
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('checkout-addresses-list')) {
+        loadCheckoutAddresses();
+    }
+});
+
+let selectedAddressId = null;
+
+function loadCheckoutAddresses() {
+    fetch('/dashboard/addresses', {headers: {'X-Requested-With': 'XMLHttpRequest'}})
+        .then(res => res.text())
+        .then(html => {
+            // Render as radio list for selection
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            const addresses = Array.from(tempDiv.querySelectorAll('.bg-white.rounded-xl'));
+            let listHtml = addresses.map((el, idx) => {
+                const id = el.querySelector('button[onclick^="editAddress"]')?.getAttribute('onclick').match(/editAddress\((\d+),/)[1];
+                const checked = el.innerHTML.includes('Default') || idx === 0 ? 'checked' : '';
+                if (!selectedAddressId && checked) selectedAddressId = id;
+                return `<label class="flex items-center gap-4 mb-4 p-4 border rounded-lg cursor-pointer hover:border-[#D4AF37] transition-all">
+                    <input type="radio" name="shipping_address_id" value="${id}" ${checked} onchange="selectCheckoutAddress(${id})" class="accent-[#D4AF37] w-5 h-5">
+                    <div class="flex-1">${el.innerHTML}</div>
+                </label>`;
+            }).join('');
+            document.getElementById('checkout-addresses-list').innerHTML = listHtml;
+        });
+}
+
+function selectCheckoutAddress(id) {
+    selectedAddressId = id;
+}
+
+function showCheckoutAddressForm(address = null) {
+    document.getElementById('checkout-address-form-modal').classList.remove('hidden');
+    if (address) {
+        document.getElementById('checkout_address_id').value = address.id;
+        document.getElementById('checkout_address_name').value = address.name;
+        document.getElementById('checkout_address_phone').value = address.phone;
+        document.getElementById('checkout_address_address').value = address.address;
+        document.getElementById('checkout_address_city').value = address.city;
+        document.getElementById('checkout_address_state').value = address.state;
+        document.getElementById('checkout_address_pincode').value = address.pincode;
+        document.getElementById('checkout_address_country').value = address.country;
+        document.getElementById('checkout_address_is_default').checked = !!address.is_default;
+    } else {
+        document.getElementById('checkout-address-form').reset();
+        document.getElementById('checkout_address_id').value = '';
+    }
+}
+function hideCheckoutAddressForm() {
+    document.getElementById('checkout-address-form-modal').classList.add('hidden');
+}
+
+document.addEventListener('submit', function(e) {
+    if (e.target && e.target.id === 'checkout-address-form') {
+        e.preventDefault();
+        const form = e.target;
+        const id = document.getElementById('checkout_address_id').value;
+        const url = id ? `/dashboard/addresses/${id}` : '/dashboard/addresses';
+        const method = id ? 'PUT' : 'POST';
+        const formData = new FormData(form);
+        fetch(url, {
+            method: method,
+            headers: {'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content},
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                hideCheckoutAddressForm();
+                loadCheckoutAddresses();
+            } else {
+                alert('Error saving address');
+            }
+        });
+    }
+});
+<?php endif; ?>
 document.addEventListener('DOMContentLoaded', function() {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
     
@@ -174,7 +334,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle form submission
     document.getElementById('checkout-form').addEventListener('submit', function(e) {
         e.preventDefault();
-        
         const formData = new FormData(this);
         // Append items as indexed fields so Laravel receives them as arrays
         cart.forEach((item, idx) => {
@@ -187,7 +346,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
-
+        // If logged in, add selected address id
+        if (typeof selectedAddressId !== 'undefined' && selectedAddressId) {
+            formData.append('address_id', selectedAddressId);
+        }
         fetch(`${API_BASE}/checkout/place-order`, {
             method: 'POST',
             headers: {

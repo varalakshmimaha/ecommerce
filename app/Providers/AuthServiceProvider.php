@@ -7,12 +7,12 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 class AuthServiceProvider extends ServiceProvider
 {
     protected $policies = [
-        //
+        \App\Models\Address::class => \App\Policies\AddressPolicy::class,
     ];
 
     public function boot(): void
     {
-        //
+        $this->registerPolicies();
     }
 }
 

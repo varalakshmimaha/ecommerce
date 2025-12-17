@@ -235,7 +235,7 @@
                         @endforeach
                     </ul>
                 </div>
-                @foreach($footerSections as $section)
+                <!-- @foreach($footerSections as $section)
                 <div>
                     <h4 class="font-semibold mb-4 text-[#D4AF37]">{{ $section->title }}</h4>
                     <ul class="space-y-2">
@@ -246,7 +246,7 @@
                         @endforeach
                     </ul>
                 </div>
-                @endforeach
+                @endforeach -->
                 <div>
                     <h4 class="font-semibold mb-4 text-[#D4AF37]">Contact Us</h4>
                     <ul class="space-y-2 text-sm text-[#6B6B6B]">
@@ -370,6 +370,7 @@
             document.querySelectorAll('.cart-count').forEach(el => el.textContent = count);
         }
     </script>
+    @yield('scripts')
 </body>
 </html>
 

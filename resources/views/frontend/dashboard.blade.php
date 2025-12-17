@@ -3,12 +3,13 @@
 @section('title', 'My Dashboard')
 
 @section('content')
+
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-white">
     <div class="container mx-auto px-4 py-12">
         <!-- Welcome Header -->
         <div class="mb-8 animate-slide-down">
             <h1 class="text-4xl font-bold text-[#1A1A1A] mb-2">Welcome back, <span class="text-[#D4AF37]">{{ $user->name ?? 'User' }}</span></h1>
-            <p class="text-[#6B6B6B]">Manage your profile, orders, and queries from your dashboard</p>
+            <p class="text-[#6B6B6B]">Manage your profile, orders, addresses, and queries from your dashboard</p>
         </div>
 
         <!-- Tabs Navigation -->
@@ -28,6 +29,14 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                         </svg>
                         My Orders
+                    </span>
+                </button>
+                <button onclick="switchTab('addresses')" id="tab-addresses" class="tab-btn px-6 py-3 rounded-lg font-semibold transition-all duration-300 text-[#6B6B6B] hover:text-[#D4AF37] hover:bg-gray-50">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        Addresses
                     </span>
                 </button>
                 <button onclick="switchTab('queries')" id="tab-queries" class="tab-btn px-6 py-3 rounded-lg font-semibold transition-all duration-300 text-[#6B6B6B] hover:text-[#D4AF37] hover:bg-gray-50">
@@ -54,46 +63,23 @@
                         </div>
                         <h2 class="text-2xl font-bold text-[#1A1A1A]">Update Profile</h2>
                     </div>
-
-                    @if(session('success'))
-                        <div class="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-lg mb-4 animate-slide-down">
-                            {{ session('success') }}
-                        </div>
-                    @endif
-
-                    @if($errors->any())
-                        <div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-4 animate-slide-down">
-                            <ul class="list-disc list-inside">
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
                     <form method="POST" action="{{ route('user.dashboard.profile.update') }}" class="space-y-5">
                         @csrf
                         <div class="space-y-2">
                             <label class="block text-sm font-semibold text-[#1A1A1A]">Name</label>
-                            <input type="text" name="name" value="{{ old('name', $user->name) }}"
-                                class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#6B6B6B] focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all duration-300">
+                            <input type="text" name="name" value="{{ old('name', $user->name) }}" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#6B6B6B] focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all duration-300">
                         </div>
                         <div class="space-y-2">
                             <label class="block text-sm font-semibold text-[#1A1A1A]">Email</label>
-                            <input type="email" name="email" value="{{ old('email', $user->email) }}"
-                                class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#6B6B6B] focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all duration-300">
+                            <input type="email" name="email" value="{{ old('email', $user->email) }}" class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#6B6B6B] focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all duration-300">
                         </div>
                         <div class="space-y-2">
                             <label class="block text-sm font-semibold text-[#1A1A1A]">Mobile</label>
-                            <input type="text" value="{{ $user->mobile }}" readonly
-                                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-[#6B6B6B] cursor-not-allowed">
+                            <input type="text" value="{{ $user->mobile }}" readonly class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-[#6B6B6B] cursor-not-allowed">
                         </div>
-                        <button type="submit" class="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-[#1A1A1A] py-3 rounded-lg font-bold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">
-                            Update Profile
-                        </button>
+                        <button type="submit" class="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-[#1A1A1A] py-3 rounded-lg font-bold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Update Profile</button>
                     </form>
                 </div>
-
                 <!-- Change Password -->
                 <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 transform transition-all duration-300 hover:shadow-xl ">
                     <div class="flex items-center gap-3 mb-6">
@@ -118,14 +104,11 @@
                             <label class="block text-sm font-semibold text-[#1A1A1A]">Confirm New Password</label>
                             <input type="password" name="new_password_confirmation" required class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#6B6B6B] focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all duration-300">
                         </div>
-                        <button type="submit" class="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white py-3 rounded-lg font-bold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">
-                            Change Password
-                        </button>
+                        <button type="submit" class="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white py-3 rounded-lg font-bold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Change Password</button>
                     </form>
                 </div>
             </div>
         </div>
-
         <!-- Orders Tab -->
         <div id="content-orders" class="tab-content hidden">
             <div class="grid gap-6">
@@ -172,7 +155,76 @@
                 @endforelse
             </div>
         </div>
-
+        <!-- Addresses Tab -->
+        <div id="content-addresses" class="tab-content hidden">
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 animate-fade-in">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-3 bg-gradient-to-br from-[#D4AF37] to-[#B8962E] rounded-lg">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-bold text-[#1A1A1A]">My Addresses</h2>
+                </div>
+                <div class="mb-6">
+                    <button class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition-all duration-300" onclick="showAddressForm()">Add New Address</button>
+                </div>
+                <div id="addresses-list">
+                    <!-- Address list will be loaded here via AJAX or server-side include -->
+                </div>
+                <div id="address-form-modal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                    <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg relative animate-scale-in">
+                        <button class="absolute top-2 right-2 text-[#D4AF37] text-2xl font-bold" onclick="hideAddressForm()">&times;</button>
+                        <h3 class="text-xl font-bold mb-4 text-[#1A1A1A]">Add / Edit Address</h3>
+                        <form id="address-form" class="space-y-4">
+                            <input type="hidden" name="address_id" id="address_id">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-[#1A1A1A]">Name</label>
+                                    <input type="text" name="name" id="address_name" required class="input-field">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-[#1A1A1A]">Phone</label>
+                                    <input type="text" name="phone" id="address_phone" required class="input-field">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-[#1A1A1A]">Address</label>
+                                <input type="text" name="address" id="address_address" required class="input-field">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-[#1A1A1A]">City</label>
+                                    <input type="text" name="city" id="address_city" required class="input-field">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-[#1A1A1A]">State</label>
+                                    <input type="text" name="state" id="address_state" required class="input-field">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-semibold text-[#1A1A1A]">Pincode</label>
+                                    <input type="text" name="pincode" id="address_pincode" required class="input-field">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-[#1A1A1A]">Country</label>
+                                    <input type="text" name="country" id="address_country" value="India" required class="input-field">
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="checkbox" name="is_default" id="address_is_default" class="accent-[#D4AF37]">
+                                <label for="address_is_default" class="text-sm">Set as default address</label>
+                            </div>
+                            <div class="flex justify-end gap-2">
+                                <button type="button" class="px-6 py-2 rounded-lg border border-gray-200 text-[#1A1A1A] hover:bg-gray-50" onclick="hideAddressForm()">Cancel</button>
+                                <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition-all duration-300">Save Address</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Queries Tab -->
         <div id="content-queries" class="tab-content hidden">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -201,13 +253,10 @@
                                 <label class="block text-sm font-semibold text-[#1A1A1A]">Message</label>
                                 <textarea name="message" required rows="4" class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#6B6B6B] focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all duration-300"></textarea>
                             </div>
-                            <button type="submit" class="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white py-2 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">
-                                Submit Query
-                            </button>
+                            <button type="submit" class="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white py-2 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Submit Query</button>
                         </form>
                     </div>
                 </div>
-
                 <!-- Queries List -->
                 <div class="lg:col-span-2">
                     <h2 class="text-2xl font-bold text-[#1A1A1A] mb-6 flex items-center gap-3">
@@ -260,84 +309,179 @@
         </div>
     </div>
 </div>
+@endsection
 
-<style>
-@keyframes fade-in {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slide-down {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slide-up {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slide-right {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.animate-fade-in {
-    animation: fade-in 0.6s ease-out;
-}
-
-.animate-slide-down {
-    animation: slide-down 0.6s ease-out;
-}
-
-.animate-slide-up {
-    animation: slide-up 0.6s ease-out;
-}
-
-.animate-slide-right {
-    animation: slide-right 0.6s ease-out;
-}
-</style>
-
+@section('scripts')
 <script>
-// Tab Switching
-function switchTab(tab) {
-    // Hide all tabs
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('bg-gradient-to-r', 'from-[#D4AF37]', 'to-[#B8962E]', 'text-white', 'shadow-lg');
-        btn.classList.add('text-[#6B6B6B]');
+    // Main script for dashboard functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load addresses when the page loads if the address tab content exists
+        if (document.getElementById('content-addresses')) {
+            loadAddresses();
+        }
     });
 
-    // Show selected tab
-    document.getElementById('content-' + tab).classList.remove('hidden');
-    const activeBtn = document.getElementById('tab-' + tab);
-    activeBtn.classList.add('bg-gradient-to-r', 'from-[#D4AF37]', 'to-[#B8962E]', 'text-white', 'shadow-lg');
-    activeBtn.classList.remove('text-[#6B6B6B]');
-}
+    // Function to load addresses via AJAX
+    function loadAddresses() {
+        fetch('/dashboard/addresses', {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(res => res.text())
+            .then(html => {
+                const list = document.getElementById('addresses-list');
+                if(list) list.innerHTML = html;
+            });
+    }
+
+    // Function to show the address form modal (for adding or editing)
+    function showAddressForm(address = null) {
+        const modal = document.getElementById('address-form-modal');
+        if(!modal) return;
+        modal.classList.remove('hidden');
+
+        const form = document.getElementById('address-form');
+        if(!form) return;
+
+        if (address && typeof address === 'object') {
+            document.getElementById('address_id').value = address.id || '';
+            document.getElementById('address_name').value = address.name || '';
+            document.getElementById('address_phone').value = address.phone || '';
+            document.getElementById('address_address').value = address.address || '';
+            document.getElementById('address_city').value = address.city || '';
+            document.getElementById('address_state').value = address.state || '';
+            document.getElementById('address_pincode').value = address.pincode || '';
+            document.getElementById('address_country').value = address.country || '';
+            document.getElementById('address_is_default').checked = !!address.is_default;
+        } else {
+            form.reset();
+            document.getElementById('address_id').value = '';
+        }
+    }
+
+    // Function to hide the address form modal
+    function hideAddressForm() {
+        const modal = document.getElementById('address-form-modal');
+        if(modal) modal.classList.add('hidden');
+    }
+
+    // Function to handle the edit address action
+    function editAddress(id, address) {
+        showAddressForm(address);
+    }
+
+    // Event listener for form submissions
+    document.addEventListener('submit', function(e) {
+        // Handle Add/Edit Address form submission
+        if (e.target && e.target.id === 'address-form') {
+            e.preventDefault();
+            const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.disabled = true;
+
+            const id = document.getElementById('address_id').value;
+            const url = id ? `/dashboard/addresses/${id}` : '/dashboard/addresses';
+            const formData = new FormData(form);
+            if (id) {
+                formData.append('_method', 'PUT');
+            }
+
+            fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (submitBtn) submitBtn.disabled = false;
+                    if (data.success) {
+                        hideAddressForm();
+                        loadAddresses();
+                        // You can add a success notification here
+                    } else {
+                        alert('Error saving address. Please check the form and try again.');
+                    }
+                })
+                .catch(() => {
+                    if (submitBtn) submitBtn.disabled = false;
+                    alert('An unexpected error occurred. Please try again later.');
+                });
+        }
+
+        // Handle Delete Address form submission
+        if (e.target && e.target.classList.contains('delete-address-form')) {
+            e.preventDefault();
+            if (!confirm('Are you sure you want to delete this address?')) {
+                return;
+            }
+
+            const form = e.target;
+            fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value
+                    },
+                    body: new FormData(form)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        loadAddresses();
+                        alert('Address deleted successfully.');
+                    } else {
+                        alert('Error deleting address.');
+                    }
+                })
+                .catch(() => alert('An unexpected error occurred.'));
+        }
+
+        // Handle Set Default Address form submission
+        if (e.target && e.target.action && e.target.action.includes('/default')) {
+            e.preventDefault();
+            const form = e.target;
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value
+                },
+                body: new FormData(form)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    loadAddresses();
+                }
+            });
+        }
+    });
+
+    // Tab Switching functionality
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('bg-gradient-to-r', 'from-[#D4AF37]', 'to-[#B8962E]', 'text-white', 'shadow-lg');
+            btn.classList.add('text-[#6B6B6B]');
+        });
+        const content = document.getElementById('content-' + tab);
+        if(content) content.classList.remove('hidden');
+
+        const activeBtn = document.getElementById('tab-' + tab);
+        if(activeBtn) {
+            activeBtn.classList.add('bg-gradient-to-r', 'from-[#D4AF37]', 'to-[#B8962E]', 'text-white', 'shadow-lg');
+            activeBtn.classList.remove('text-[#6B6B6B]');
+        }
+    }
+
+    // Making functions globally available
+    window.switchTab = switchTab;
+    window.showAddressForm = showAddressForm;
+    window.hideAddressForm = hideAddressForm;
+    window.editAddress = editAddress;
 </script>
 @endsection

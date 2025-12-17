@@ -41,15 +41,38 @@
                         <svg class="w-5 h-5 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
-                        Bill To
+                        Billed From
                     </h3>
-                    <div class="text-gray-700 space-y-1">
-                        <p class="font-semibold text-gray-900">{{ $order->customer_name }}</p>
-                        <p class="text-sm">{{ $order->customer_mobile }}</p>
-                        @if($order->customer_email)
-                            <p class="text-sm">{{ $order->customer_email }}</p>
-                        @endif
-                    </div>
+                    <div class="text-gray-700 space-y-1 text-sm">
+                    {{-- Company Name --}}
+                    @if(\App\Models\Setting::get('company_name'))
+                        <p class="font-semibold text-gray-900">
+                            {{ \App\Models\Setting::get('company_name') }}
+                        </p>
+                    @endif
+
+                    {{-- Contact Info --}}
+                    @if(\App\Models\Setting::get('phone_number'))
+                        <p>Phone: {{ \App\Models\Setting::get('phone_number') }}</p>
+                    @endif
+
+                    @if(\App\Models\Setting::get('whatsapp_number'))
+                        <p>WhatsApp: {{ \App\Models\Setting::get('whatsapp_number') }}</p>
+                    @endif
+
+                    @if(\App\Models\Setting::get('email'))
+                        <p>Email: {{ \App\Models\Setting::get('email') }}</p>
+                    @endif
+
+                    {{-- GST --}}
+                    @if(\App\Models\Setting::get('gstin'))
+                        <p class="mt-1 font-medium">GSTIN: {{ \App\Models\Setting::get('gstin') }}</p>
+                    @endif
+                    {{-- Address --}}
+                    @if(\App\Models\Setting::get('address'))
+                        <p>{{ \App\Models\Setting::get('address') }}</p>
+                    @endif
+                </div>
                 </div>
                 <div class="bg-gradient-to-br from-gray-50 to-white p-6 rounded-lg border border-gray-200">
                     <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
@@ -57,12 +80,19 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
-                        Ship To
+                        Billed To
                     </h3>
+                    <div class="text-gray-700 space-y-1">
+                        <p class="font-semibold text-gray-900">{{ $order->user->name }}</p>
+                        <p class="text-sm">{{ $order->user->mobile }}</p>
+                        @if($order->user->email)
+                            <p class="text-sm">{{ $order->user->email }}</p>
+                        @endif
+                    </div>
                     <div class="text-gray-700 space-y-1 text-sm">
-                        <p>{{ $order->shipping_address }}</p>
-                        <p>{{ $order->shipping_city }}, {{ $order->shipping_state }}</p>
-                        <p>{{ $order->shipping_pincode }}</p>
+                        <p>{{ $order->addresses->address }}</p>
+                        <p>{{ $order->addresses->city }}, {{ $order->addresses->state }}</p>
+                        <p>{{ $order->addresses->pincode }}</p>
                     </div>
                 </div>
             </div>

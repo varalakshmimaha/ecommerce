@@ -21,11 +21,12 @@ class CheckoutController extends Controller
     public function placeOrder(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'mobile' => 'required|string|max:15',
+            'address_id' => 'nullable|exists:addresses,id',
+            'name' => 'required_without:address_id|string|max:255',
+            'mobile' => 'required_without:address_id|string|max:15',
             'email' => 'nullable|email|max:255',
-            'address' => 'required|string',
-            'pincode' => 'required|string|max:10',
+            'address' => 'required_without:address_id|string',
+            'pincode' => 'required_without:address_id|string|max:10',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
@@ -99,7 +100,7 @@ class CheckoutController extends Controller
             $isNewUser = false;
 
             if (!$userId && $request->email) {
-                $existing = User::where('email', $request->email)->first();
+                $existing = User::where('email', $request->email)->orwhere('mobile', $request->mobile)->first();
                 if ($existing) {
                     $userId = $existing->id;
                 } else {
@@ -109,7 +110,7 @@ class CheckoutController extends Controller
                         'name' => $request->name,
                         'mobile' => $request->mobile,
                         'email' => $request->email,
-                        'password' => Hash::make($newUserPassword),
+                        'password' => Hash::make(12345678),
                         'is_verified' => true,
                     ]);
                     $userId = $newUser->id;
@@ -118,13 +119,31 @@ class CheckoutController extends Controller
             }
 
             // Create order
+            $address = null;
+            if ($request->address_id) {
+                $address = \App\Models\Address::find($request->address_id);
+            }
+            if (!$address && $request->address) {
+                $createAddress = \App\Models\Address::create([
+                    'user_id' => $userId,
+                    'name' => $request->name,
+                    'phone' => $request->mobile,
+                    'address' => $request->address,
+                    'city' => $request->city,
+                    'state' => $request->state,
+                    'pincode' => $request->pincode,
+                    'country' => $request->country
+                ]);
+                $address = $createAddress;
+            }
             $order = Order::create([
                 'user_id' => $userId,
-                'name' => $request->name,
-                'mobile' => $request->mobile,
+                'address_id' => $address ? $address->id : null,
+                'name' => $address ? $address->name : $request->name,
+                'mobile' => $address ? $address->phone : $request->mobile,
                 'email' => $request->email,
-                'address' => $request->address,
-                'pincode' => $request->pincode,
+                'address' => $address ? $address->address . ', ' . $address->city . ', ' . $address->state . ' - ' . $address->pincode . ', ' . $address->country : $request->address,
+                'pincode' => $address ? $address->pincode : $request->pincode,
                 'subtotal' => $subtotal,
                 'gst_amount' => $gstAmount,
                 'shipping_charge' => $shippingCharge,

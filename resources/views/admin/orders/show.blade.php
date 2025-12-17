@@ -11,11 +11,19 @@
             <div>
                 <h3 class="font-semibold text-gray-900 mb-4">Customer Information</h3>
                 <div class="space-y-2 text-sm">
-                    <p><span class="font-medium">Name:</span> {{ $order->name }}</p>
-                    <p><span class="font-medium">Mobile:</span> {{ $order->mobile }}</p>
-                    <p><span class="font-medium">Email:</span> {{ $order->email ?? 'N/A' }}</p>
-                    <p><span class="font-medium">Address:</span> {{ $order->address }}</p>
-                    <p><span class="font-medium">Pincode:</span> {{ $order->pincode }}</p>
+                    @if($order->address_id && $order->address)
+                        <p><span class="font-medium">Name:</span> {{ $order->address->name }}</p>
+                        <p><span class="font-medium">Mobile:</span> {{ $order->address->phone }}</p>
+                        <p><span class="font-medium">Email:</span> {{ $order->email ?? 'N/A' }}</p>
+                        <p><span class="font-medium">Address:</span> {{ $order->address->address }}, {{ $order->address->city }}, {{ $order->address->state }} - {{ $order->address->pincode }}, {{ $order->address->country }}</p>
+                        <p><span class="font-medium">Pincode:</span> {{ $order->address->pincode }}</p>
+                    @else
+                        <p><span class="font-medium">Name:</span> {{ $order->name }}</p>
+                        <p><span class="font-medium">Mobile:</span> {{ $order->mobile }}</p>
+                        <p><span class="font-medium">Email:</span> {{ $order->email ?? 'N/A' }}</p>
+                        <p><span class="font-medium">Address:</span> {{ $order->address }}</p>
+                        <p><span class="font-medium">Pincode:</span> {{ $order->pincode }}</p>
+                    @endif
                 </div>
             </div>
             

@@ -236,7 +236,7 @@
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </ul>
                 </div>
-                <?php $__currentLoopData = $footerSections; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $section): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <!-- <?php $__currentLoopData = $footerSections; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $section): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                 <div>
                     <h4 class="font-semibold mb-4 text-[#D4AF37]"><?php echo e($section->title); ?></h4>
                     <ul class="space-y-2">
@@ -247,7 +247,7 @@
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </ul>
                 </div>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?> -->
                 <div>
                     <h4 class="font-semibold mb-4 text-[#D4AF37]">Contact Us</h4>
                     <ul class="space-y-2 text-sm text-[#6B6B6B]">
@@ -371,6 +371,7 @@
             document.querySelectorAll('.cart-count').forEach(el => el.textContent = count);
         }
     </script>
+    <?php echo $__env->yieldContent('scripts'); ?>
 </body>
 </html>
 

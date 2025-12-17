@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('order_number')->unique();
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('address_id')->nullable()->constrained('addresses')->onDelete('set null');
             $table->string('name');
             $table->string('mobile');
             $table->string('email')->nullable();
