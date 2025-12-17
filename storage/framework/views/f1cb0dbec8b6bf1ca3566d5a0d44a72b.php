@@ -9,11 +9,19 @@
             <div>
                 <h3 class="font-semibold text-gray-900 mb-4">Customer Information</h3>
                 <div class="space-y-2 text-sm">
-                    <p><span class="font-medium">Name:</span> <?php echo e($order->name); ?></p>
-                    <p><span class="font-medium">Mobile:</span> <?php echo e($order->mobile); ?></p>
-                    <p><span class="font-medium">Email:</span> <?php echo e($order->email ?? 'N/A'); ?></p>
-                    <p><span class="font-medium">Address:</span> <?php echo e($order->address); ?></p>
-                    <p><span class="font-medium">Pincode:</span> <?php echo e($order->pincode); ?></p>
+                    <?php if($order->address_id && $order->address): ?>
+                        <p><span class="font-medium">Name:</span> <?php echo e($order->addresses->name); ?></p>
+                        <p><span class="font-medium">Mobile:</span> <?php echo e($order->addresses->phone); ?></p>
+                        <p><span class="font-medium">Email:</span> <?php echo e($order->email ?? 'N/A'); ?></p>
+                        <p><span class="font-medium">Address:</span> <?php echo e($order->addresses->address); ?>, <?php echo e($order->addresses->city); ?>, <?php echo e($order->addresses->state); ?> - <?php echo e($order->addresses->pincode); ?>, <?php echo e($order->addresses->country); ?></p>
+                        <p><span class="font-medium">Pincode:</span> <?php echo e($order->addresses->pincode); ?></p>
+                    <?php else: ?>
+                        <p><span class="font-medium">Name:</span> <?php echo e($order->name); ?></p>
+                        <p><span class="font-medium">Mobile:</span> <?php echo e($order->mobile); ?></p>
+                        <p><span class="font-medium">Email:</span> <?php echo e($order->email ?? 'N/A'); ?></p>
+                        <p><span class="font-medium">Address:</span> <?php echo e($order->address); ?></p>
+                        <p><span class="font-medium">Pincode:</span> <?php echo e($order->pincode); ?></p>
+                    <?php endif; ?>
                 </div>
             </div>
             
@@ -39,6 +47,13 @@
                 </div>
             </div>
         </div>
+        
+        <?php if($order->order_status === 'cancelled' && $order->cancellation_remark): ?>
+        <div class="mb-6">
+            <h3 class="font-semibold text-gray-900 mb-4">Cancellation Remark</h3>
+            <p class="text-sm text-gray-600"><?php echo e($order->cancellation_remark); ?></p>
+        </div>
+        <?php endif; ?>
         
         <?php if($order->payment_proof): ?>
         <div class="mb-6">
@@ -97,6 +112,7 @@
         </div>
     </div>
     
+    <?php if(!in_array($order->order_status, ['cancelled', 'delivered'])): ?>
     <div class="admin-card">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Update Order Status</h3>
         <form action="<?php echo e(route('admin.orders.update-status', $order)); ?>" method="POST" class="space-y-4">
@@ -128,6 +144,7 @@
             <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Update Status</button>
         </form>
     </div>
+    <?php endif; ?>
     
     <?php if($order->payment_status === 'pending'): ?>
     <div class="admin-card">
@@ -137,8 +154,8 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Payment Status</label>
                 <select name="payment_status" class="input-field">
-                    <option value="verified">Verified</option>
-                    <option value="rejected">Rejected</option>
+                    <option value="verified">Verify Payment</option>
+                    <option value="rejected">Reject Payment</option>
                 </select>
             </div>
             <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Update Payment Status</button>

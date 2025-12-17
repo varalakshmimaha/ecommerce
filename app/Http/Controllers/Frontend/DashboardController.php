@@ -13,7 +13,9 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
+        $user = Auth::user()->load(['orders' => function ($query) {
+            $query->orderBy('created_at', 'desc')->with('items');
+        }]);
         return view('frontend.dashboard', compact('user'));
     }
 
@@ -21,15 +23,6 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         return view('frontend.dashboard.profile', compact('user'));
-    }
-
-    public function orders()
-    {
-        $orders = Order::where('user_id', Auth::id())
-            ->orderBy('created_at', 'desc')
-            ->with('items')
-            ->get();
-        return view('frontend.dashboard.orders', compact('orders'));
     }
 
     public function queries()

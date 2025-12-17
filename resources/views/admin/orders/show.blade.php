@@ -12,11 +12,11 @@
                 <h3 class="font-semibold text-gray-900 mb-4">Customer Information</h3>
                 <div class="space-y-2 text-sm">
                     @if($order->address_id && $order->address)
-                        <p><span class="font-medium">Name:</span> {{ $order->address->name }}</p>
-                        <p><span class="font-medium">Mobile:</span> {{ $order->address->phone }}</p>
+                        <p><span class="font-medium">Name:</span> {{ $order->addresses->name }}</p>
+                        <p><span class="font-medium">Mobile:</span> {{ $order->addresses->phone }}</p>
                         <p><span class="font-medium">Email:</span> {{ $order->email ?? 'N/A' }}</p>
-                        <p><span class="font-medium">Address:</span> {{ $order->address->address }}, {{ $order->address->city }}, {{ $order->address->state }} - {{ $order->address->pincode }}, {{ $order->address->country }}</p>
-                        <p><span class="font-medium">Pincode:</span> {{ $order->address->pincode }}</p>
+                        <p><span class="font-medium">Address:</span> {{ $order->addresses->address }}, {{ $order->addresses->city }}, {{ $order->addresses->state }} - {{ $order->addresses->pincode }}, {{ $order->addresses->country }}</p>
+                        <p><span class="font-medium">Pincode:</span> {{ $order->addresses->pincode }}</p>
                     @else
                         <p><span class="font-medium">Name:</span> {{ $order->name }}</p>
                         <p><span class="font-medium">Mobile:</span> {{ $order->mobile }}</p>
@@ -47,6 +47,13 @@
                 </div>
             </div>
         </div>
+        
+        @if($order->order_status === 'cancelled' && $order->cancellation_remark)
+        <div class="mb-6">
+            <h3 class="font-semibold text-gray-900 mb-4">Cancellation Remark</h3>
+            <p class="text-sm text-gray-600">{{ $order->cancellation_remark }}</p>
+        </div>
+        @endif
         
         @if($order->payment_proof)
         <div class="mb-6">
@@ -105,6 +112,7 @@
         </div>
     </div>
     
+    @if(!in_array($order->order_status, ['cancelled', 'delivered']))
     <div class="admin-card">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Update Order Status</h3>
         <form action="{{ route('admin.orders.update-status', $order) }}" method="POST" class="space-y-4">
@@ -136,6 +144,7 @@
             <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Update Status</button>
         </form>
     </div>
+    @endif
     
     @if($order->payment_status === 'pending')
     <div class="admin-card">
@@ -145,8 +154,8 @@
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Payment Status</label>
                 <select name="payment_status" class="input-field">
-                    <option value="verified">Verified</option>
-                    <option value="rejected">Rejected</option>
+                    <option value="verified">Verify Payment</option>
+                    <option value="rejected">Reject Payment</option>
                 </select>
             </div>
             <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Update Payment Status</button>
