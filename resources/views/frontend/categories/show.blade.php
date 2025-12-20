@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Grid display
                 gridEl.innerHTML = subcats.map(subcat => `
-                    <button onclick="filterBySubcategory(${subcat.id})" class="flex flex-col items-center group p-2 w-full max-w-full bg-transparent border-none outline-none focus:outline-none">
+                    <button onclick="filterBySubcategory(${subcat.id})" class="flex flex-col items-center group w-full max-w-full bg-transparent border-none outline-none focus:outline-none">
                         <div class="w-24 h-24 mb-3 rounded-full overflow-hidden border-4 border-[#fffbe6] group-hover:border-[#D4AF37] bg-gradient-to-tr from-[#fffbe6] to-[#f9e7b3] flex items-center justify-center shadow-md transition-all duration-300">
                             ${subcat.image ? `<img src="/storage/${subcat.image}" alt="${subcat.name}" class="w-full h-full object-cover scale-100 group-hover:scale-110 transition-transform duration-300">` : '<div class="text-4xl">📁</div>'}
                         </div>
