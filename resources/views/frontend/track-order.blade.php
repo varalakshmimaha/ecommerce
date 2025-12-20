@@ -1,4 +1,4 @@
-@extends('layouts.frontend')
+ @extends('layouts.frontend')
 
 @section('title', 'Track Order')
 
@@ -43,4 +43,4 @@ document.getElementById('track-form').addEventListener('submit', function(e){
         }).catch(err => { document.getElementById('track-result').innerHTML = '<p class="text-red-500">Failed to fetch order</p>'; });
 });
 </script>
-@endsection
+@endsection  

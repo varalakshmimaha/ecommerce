@@ -186,6 +186,40 @@ document.addEventListener('DOMContentLoaded', function() {
     updateCartCount();
 });
 </script>
+<style>
+.whatsapp-float {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    animation: float 2.5s ease-in-out infinite;
+}
+
+.whatsapp-float img {
+    width: 55px;
+    height: 55px;
+}
+
+/* Floating animation */
+@keyframes float {
+    0%   { transform: translateY(0); }
+    50%  { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
+}
+</style>
+
+<a href="https://wa.me/919845145363?text=Hi%20I%20am%20interested%20in%20your%20products"
+   class="whatsapp-float"
+   target="_blank">
+    <!--<img src="{{ asset('build/assets/whatsapp.png') }}" alt="WhatsApp">-->
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="64" height="64">
+  <path fill="#25D366"
+    d="M12 2a10 10 0 0 0-8.7 15.1L2 22l5-1.3A10 10 0 1 0 12 2z"/>
+  <path fill="#ffffff"
+    d="M16.7 14.5c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1-.2.2-.6.8-.7.9-.1.1-.3.2-.5.1-.2-.1-.9-.3-1.7-1-.6-.5-1-1.2-1.1-1.4-.1-.2 0-.4.1-.5l.4-.5c.1-.2.2-.3.2-.5s0-.3-.1-.5l-.7-1.7c-.2-.5-.4-.4-.5-.4H9.6c-.2 0-.5.1-.7.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.3c.1.1 1.6 2.4 3.8 3.3.5.2.9.3 1.2.4.5.2 1 .1 1.4.1.4-.1 1.4-.6 1.6-1.1.2-.5.2-.9.1-1-.1-.1-.2-.2-.4-.3z"/>
+</svg>
+
+</a>
 @endsection
 
 
