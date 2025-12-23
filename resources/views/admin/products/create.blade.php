@@ -14,7 +14,9 @@
                             <label class="block text-sm font-medium text-gray-700 mb-2">Related Products</label>
                             <select name="related_products[]" class="input-field related-products-select" multiple="multiple">
                                 @foreach(App\Models\Product::all() as $prod)
-                                    <option value="{{ $prod->id }}">{{ $prod->name }}</option>
+                                    <option value="{{ $prod->id }}"><img src="{{ asset('storage/' . $prod->main_image) }}" 
+                             alt="{{ $prod->name }}" 
+                             class="w-6 h-6 object-cover rounded-full mr-2"> &nbsp; {{ $prod->name }}</option>
                                 @endforeach
                             </select>
                         </div>

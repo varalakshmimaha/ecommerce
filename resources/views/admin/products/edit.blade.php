@@ -40,7 +40,9 @@
                     @endphp
                     @foreach(App\Models\Product::where('id', '!=', $product->id)->get() as $prod)
                         <option value="{{ $prod->id }}" {{ in_array($prod->id, $relatedProductIds) ? 'selected' : '' }}>
-                            {{ $prod->name }} (SKU: {{ $prod->sku }})
+                           <img src="{{ asset('storage/' . $prod->main_image) }}" 
+                             alt="{{ $prod->name }}" 
+                             class="w-6 h-6 object-cover rounded-full mr-2"> &nbsp; {{ $prod->name }}
                         </option>
                     @endforeach
                 </select>
