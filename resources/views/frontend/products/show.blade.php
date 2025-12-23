@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-[#B8962E] to-[#D4AF37] opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
                                 <div class="absolute inset-0 rounded-2xl bg-white m-1"></div>
                                 <div class="relative m-1 rounded-xl overflow-hidden">
-                                    <img id="main-image" src="/storage/${product.main_image}" alt="${product.name}" class="w-full h-96 object-contain rounded-lg zoom-image transition-all duration-500 group-hover:scale-105">
+                                    <img id="main-image" src="/storage/${product.main_image}" alt="${product.name}" class="w-full h-96 object-contain rounded-lg zoom-image transition-all duration-500 group-hover:scale-105 cursor-pointer" onclick="openGalleryPopup('/storage/${product.main_image}', [${product.images && product.images.length > 0 ? `'/storage/${product.main_image}', ${product.images.map(img => `'/storage/${img.image_path}'`).join(', ')}` : `'/storage/${product.main_image}'`}])">
                                 </div>
                             </div>
                             ${product.images && product.images.length > 0 ? `
@@ -433,5 +433,159 @@ window.addToCart = function(productId) {
         window.location.href = '/cart';
     }, 1000);
 };
+
+// Image Gallery Popup Functions
+let galleryImages = [];
+let currentImageIndex = 0;
+
+window.openGalleryPopup = function(imageSrc, allImages = []) {
+    galleryImages = allImages;
+    currentImageIndex = galleryImages.indexOf(imageSrc);
+    if (currentImageIndex === -1) currentImageIndex = 0;
+    
+    const popup = document.getElementById('image-gallery-popup');
+    const popupImage = document.getElementById('popup-image');
+    
+    if (popup && popupImage) {
+        popupImage.src = imageSrc;
+        popup.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        updateGalleryNavigation();
+    }
+};
+
+window.closeGalleryPopup = function() {
+    const popup = document.getElementById('image-gallery-popup');
+    if (popup) {
+        popup.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+};
+
+window.closeGalleryPopupOnBackdrop = function(event) {
+    // Close only if clicking on the backdrop (white background)
+    if (event.target === event.currentTarget) {
+        closeGalleryPopup();
+    }
+};
+
+window.nextGalleryImage = function() {
+    if (galleryImages.length === 0) return;
+    
+    currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
+    const popupImage = document.getElementById('popup-image');
+    if (popupImage) {
+        popupImage.style.opacity = '0';
+        setTimeout(() => {
+            popupImage.src = galleryImages[currentImageIndex];
+            popupImage.style.opacity = '1';
+        }, 200);
+        updateGalleryNavigation();
+    }
+};
+
+window.previousGalleryImage = function() {
+    if (galleryImages.length === 0) return;
+    
+    currentImageIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
+    const popupImage = document.getElementById('popup-image');
+    if (popupImage) {
+        popupImage.style.opacity = '0';
+        setTimeout(() => {
+            popupImage.src = galleryImages[currentImageIndex];
+            popupImage.style.opacity = '1';
+        }, 200);
+        updateGalleryNavigation();
+    }
+};
+
+function updateGalleryNavigation() {
+    const prevBtn = document.getElementById('gallery-prev-btn');
+    const nextBtn = document.getElementById('gallery-next-btn');
+    const counter = document.getElementById('gallery-counter');
+    
+    if (galleryImages.length <= 1) {
+        if (prevBtn) prevBtn.style.display = 'none';
+        if (nextBtn) nextBtn.style.display = 'none';
+    } else {
+        if (prevBtn) prevBtn.style.display = 'flex';
+        if (nextBtn) nextBtn.style.display = 'flex';
+    }
+    
+    if (counter && galleryImages.length > 1) {
+        counter.textContent = `${currentImageIndex + 1} / ${galleryImages.length}`;
+    }
+}
+
+// Close popup on escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeGalleryPopup();
+    } else if (e.key === 'ArrowRight') {
+        nextGalleryImage();
+    } else if (e.key === 'ArrowLeft') {
+        previousGalleryImage();
+    }
+});
 </script>
+
+<!-- Image Gallery Popup -->
+<div id="image-gallery-popup" class="fixed inset-0 bg-white z-50 hidden flex items-center justify-center p-4" onclick="closeGalleryPopupOnBackdrop(event)">
+    <div class="relative max-w-6xl max-h-[90vh] w-full h-full flex items-center justify-center" onclick="event.stopPropagation()">
+        <!-- Close Button -->
+        <button onclick="closeGalleryPopup()" class="absolute top-4 right-4 z-10 bg-gray-100 text-gray-800 p-3 rounded-full hover:bg-gray-200 transition-all duration-300">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+        
+        <!-- Previous Button -->
+        <button id="gallery-prev-btn" onclick="previousGalleryImage()" class="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 z-10 text-gray-800 p-3 hover:text-gray-600 transition-all duration-300">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+        </button>
+        
+        <!-- Next Button -->
+        <button id="gallery-next-btn" onclick="nextGalleryImage()" class="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 z-10 text-gray-800 p-3 hover:text-gray-600 transition-all duration-300">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+        </button>
+        
+        <!-- Image Counter -->
+        <div id="gallery-counter" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-100 text-gray-800 px-4 py-2 rounded-full text-sm font-medium">
+            1 / 1
+        </div>
+        
+        <!-- Main Image Container -->
+        <div class="relative max-w-full max-h-full flex items-center justify-center">
+            <img id="popup-image" src="" alt="Product Image" class="max-w-full max-h-full object-contain transition-opacity duration-200">
+        </div>
+    </div>
+</div>
+
+<style>
+#image-gallery-popup img {
+    transition: opacity 0.2s ease-in-out;
+}
+
+#gallery-prev-btn,
+#gallery-next-btn {
+    user-select: none;
+}
+
+@media (max-width: 768px) {
+    #gallery-prev-btn,
+    #gallery-next-btn {
+        padding: 2rem;
+    }
+    
+    #gallery-prev-btn svg,
+    #gallery-next-btn svg {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+}
+</style>
 @endsection

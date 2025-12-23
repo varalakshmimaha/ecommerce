@@ -1,8 +1,6 @@
-@extends('layouts.frontend')
+<?php $__env->startSection('title', 'Category - Products'); ?>
 
-@section('title', 'Category - Products')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-white py-8">
     <div class="container mx-auto px-4">
         <!-- Category Header - Mobile Optimized -->
@@ -265,7 +263,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const categorySlug = '{{ $slug }}';
+    const categorySlug = '<?php echo e($slug); ?>';
     let categoryId = null;
     let currentPage = 1;
     let currentSubCategory = '';
@@ -558,4 +556,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (window.updateCartCount) window.updateCartCount();
 });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.frontend', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /Users/vikasverma/Projects/suvee/resources/views/frontend/categories/show.blade.php ENDPATH**/ ?>
