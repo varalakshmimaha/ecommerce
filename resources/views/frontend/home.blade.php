@@ -40,7 +40,7 @@
 @endif
 
 <!-- Categories Section -->
-<section class="container mx-auto px-4 py-12">
+<section class="container mx-auto px-4 py-6">
     <h2 class="text-3xl font-bold text-[#1A1A1A] mb-8 text-center">Shop by Category</h2>
     <div class="w-full flex justify-center">
         <div id="categories" class="grid gap-6 text-center" style="grid-auto-flow: column; grid-auto-columns: minmax(0,1fr);"></div>
@@ -50,7 +50,7 @@
 </section>
 
 <!-- Product Tabs -->
-<section class="container mx-auto px-4 py-12 bg-white">
+<section class="container mx-auto px-4 py-6 bg-white">
     <div class="flex flex-wrap justify-center mb-8 border-b border-gray-200">
         <button class="product-tab px-6 py-3 font-semibold text-[#1A1A1A] border-b-2 border-[#D4AF37] active" data-type="featured">Featured</button>
         <button class="product-tab px-6 py-3 font-semibold text-[#1A1A1A] border-b-2 border-transparent" data-type="trending">Trending</button>

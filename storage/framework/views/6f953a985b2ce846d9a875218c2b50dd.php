@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
 
                             <!-- Stock & Details -->
-                            <div class="grid grid-cols-2 gap-4">
+                            <!--<div class="grid grid-cols-2 gap-4">
                                 <div class="bg-white rounded-xl border border-gray-100 p-4">
                                     <div class="flex items-center gap-2 mb-2">
                                         <svg class="w-5 h-5 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </div>
                                     <p class="text-xl font-bold text-[#1A1A1A]">${product.min_order_quantity}</p>
                                 </div>
-                            </div>
+                            </div>-->
 
                             <!-- Quantity Selector -->
                             <div class="bg-white rounded-xl border border-gray-100 p-6">
@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 ${product.attributes.map(attr => `
                                     <div class="bg-white/50 rounded-lg p-4 border border-[#D4AF37]/10">
                                         <p class="text-sm text-[#D4AF37] mb-1">${attr.attribute_name}</p>
-                                        <p class="text-[#1A1A1A] font-semibold">${attr.value}</p>
+                                        <p class="text-[#1A1A1A] font-semibold">${attr.attribute_value}</p>
                                     </div>
                                 `).join('')}
                             </div>

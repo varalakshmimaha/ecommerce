@@ -19,7 +19,7 @@
                     <ul class="divide-y divide-gray-200">
                         @foreach($order->items as $item)
                         <li class="p-6 flex items-center space-x-6">
-                            <img src="{{ $item->product->images->first() ? asset('storage/' . $item->product->images->first()->image_path) : 'https://via.placeholder.com/150' }}"
+                            <img src="{{ $item->product->main_image ? asset('storage/' . $item->product->main_image) : 'https://via.placeholder.com/150' }}"
                                  alt="{{ $item->product->name }}" class="w-24 h-24 rounded-md object-cover">
                             <div class="flex-1">
                                 <h3 class="text-base font-medium text-gray-900">{{ $item->product->name }}</h3>

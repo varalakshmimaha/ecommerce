@@ -51,6 +51,10 @@
                         Products
                         <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-[#D4AF37] to-[#B8962E] group-hover:w-full transition-all duration-300"></span>
                     </a>
+                    <a href="<?php echo e(route('track.order')); ?>" class="text-[#1A1A1A] hover:text-[#D4AF37] transition-all duration-300 font-medium relative group">
+                      Track Order
+                      <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-[#D4AF37] to-[#B8962E] group-hover:w-full transition-all duration-300"></span>
+                  </a>
                     <?php $__currentLoopData = $navPages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $navPage): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <a href="<?php echo e(route('page.show', $navPage)); ?>" class="text-[#1A1A1A] hover:text-[#D4AF37] transition-all duration-300 font-medium relative group">
                             <?php echo e($navPage->title); ?>

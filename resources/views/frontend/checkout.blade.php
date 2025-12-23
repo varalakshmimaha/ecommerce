@@ -150,17 +150,49 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
-                            <h3 class="font-semibold text-gray-900 mb-2">QR Code</h3>
-                            @php
+                            <h3 class="font-semibold text-gray-900 mb-2">
+                              Open your payment app <br>
+                              Scan this and pay <br>
+                              @php
                                 $qrCode = \App\Models\Setting::get('qr_code');
                             @endphp
                             @if($qrCode)
-                                <img src="{{ asset('storage/' . $qrCode) }}" alt="QR Code" class="w-48 h-48 object-contain border rounded-lg p-2">
+                                <img src="{{ asset('storage/' . $qrCode) }}" alt="QR Code" class="w-48 h-48 object-contain border rounded-lg p-2"><br>
                             @else
-                                <p class="text-gray-500 text-sm">QR code not configured</p>
+                               <!-- <p class="text-gray-500 text-sm">QR code not configured</p>-->
                             @endif
+                              Or <br>
+
+                              <div class="flex items-center gap-2 mt-2">
+                                  <!-- PhonePe -->
+                                  <svg width="24" height="24" viewBox="0 0 24 24">
+                                      <circle cx="12" cy="12" r="12" fill="#5F259F"/>
+                                      <text x="12" y="16" text-anchor="middle" fill="white" font-size="12" font-weight="bold">P</text>
+                                  </svg>
+
+                                  <!-- Google Pay -->
+                                  <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg"
+                                       class="h-12 w-12" alt="Google Pay">
+
+                                     
+
+                                      <!-- Mobile Number -->
+                                      <span id="mobileNumber" class="font-bold select-all">
+                                          9916849109
+                                      </span>
+                                      &nbsp;
+                                       <button
+                                          onclick="copyMobileNumber()"
+                                          type="button"
+                                          class="text-gray-500 hover:text-gray-800 transition"
+                                          title="Copy number"
+                                      >
+                                         Copy
+                                      </button>
+                              </div>
+                          </h3>
                         </div>
-                        <div>
+                        <!--<div>
                             <h3 class="font-semibold text-gray-900 mb-2">Bank Details</h3>
                             <div class="text-sm text-gray-700 space-y-1">
                                 @if(\App\Models\Setting::get('bank_name'))
@@ -176,7 +208,7 @@
                                 <p><strong>Account Holder:</strong> {{ \App\Models\Setting::get('bank_account_holder') }}</p>
                                 @endif
                             </div>
-                        </div>
+                        </div>-->
                     </div>
                     
                     <div>
@@ -193,6 +225,15 @@
 </div>
 
 <script>
+  function copyMobileNumber() {
+        const number = document.getElementById('mobileNumber').innerText;
+
+        navigator.clipboard.writeText(number).then(() => {
+            alert('Mobile number copied!');
+        }).catch(() => {
+            alert('Failed to copy');
+        });
+    }
 @auth
 // Checkout Address Management AJAX
 document.addEventListener('DOMContentLoaded', function() {

@@ -75,7 +75,10 @@
                     <tbody>
                         @foreach($order->items as $item)
                         <tr>
-                            <td>{{ $item->product_name }}</td>
+                            <td>
+                              <img src="{{ asset('storage/' . $item->product->main_image) }}" alt="{{ $item->name }}" class="w-16 h-16 object-cover rounded-lg">
+                              {{ $item->product_name }}
+                            </td>
                             <td>₹{{ number_format($item->price, 2) }}</td>
                             <td>{{ $item->quantity }}</td>
                             <td>₹{{ number_format($item->subtotal, 2) }}</td>
