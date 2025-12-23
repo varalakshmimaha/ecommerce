@@ -82,9 +82,18 @@ class Product extends Model
         return $this->hasMany(ProductAttribute::class);
     }
 
+    // Product.php model
     public function relatedProducts()
     {
-        return $this->belongsToMany(Product::class, 'related_products', 'product_id', 'related_product_id');
+        return $this->belongsToMany(Product::class, 'related_products', 'product_id', 'related_product_id')
+                    ->withTimestamps();
+    }
+
+    // And the inverse relationship if needed
+    public function relatedTo()
+    {
+        return $this->belongsToMany(Product::class, 'related_products', 'related_product_id', 'product_id')
+                    ->withTimestamps();
     }
 
     public function orderItems()

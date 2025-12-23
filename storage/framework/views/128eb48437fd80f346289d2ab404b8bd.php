@@ -1,8 +1,6 @@
-@extends('layouts.frontend')
+<?php $__env->startSection('title', 'Product Details'); ?>
 
-@section('title', 'Product Details')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-white py-8">
     <div id="product-detail" class="container mx-auto px-4">
         <!-- Product will be loaded here -->
@@ -68,7 +66,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const slug = '{{ $slug }}';
+    const slug = '<?php echo e($slug); ?>';
 
     fetch(`${API_BASE}/products/${slug}`)
         .then(res => res.json())
@@ -389,4 +387,5 @@ window.addToCart = function(productId) {
     }, 1000);
 };
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.frontend', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /Users/vikasverma/Projects/suvee/resources/views/frontend/products/show.blade.php ENDPATH**/ ?>

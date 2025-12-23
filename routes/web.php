@@ -93,6 +93,8 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     
     // Products
     Route::resource('products', ProductController::class);
+    // web.php
+    Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
     
     // Orders
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');

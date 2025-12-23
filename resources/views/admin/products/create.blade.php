@@ -10,6 +10,26 @@
         @csrf
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Related Products</label>
+                            <select name="related_products[]" class="input-field related-products-select" multiple="multiple">
+                                @foreach(App\Models\Product::all() as $prod)
+                                    <option value="{{ $prod->id }}">{{ $prod->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+            @section('scripts')
+            <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+            <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+            <script>
+                $(document).ready(function() {
+                    $('.related-products-select').select2({
+                        placeholder: 'Search and select related products',
+                        allowClear: true
+                    });
+                });
+            </script>
+            @endsection
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
                 <input type="text" name="name" value="{{ old('name') }}" required class="input-field">

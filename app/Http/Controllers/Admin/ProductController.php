@@ -88,6 +88,10 @@ class ProductController extends Controller
             }
         }
 
+        // Sync related products if provided
+        if ($request->has('related_products')) {
+            $product->relatedProducts()->sync($request->related_products);
+        }
         return redirect()->route('admin.products.index')->with('success', 'Product created successfully');
     }
 
@@ -98,6 +102,90 @@ class ProductController extends Controller
         $brands = Brand::where('is_active', true)->get();
         $product->load('images', 'attributes', 'relatedProducts');
         return view('admin.products.edit', compact('product', 'categories', 'subCategories', 'brands'));
+    }
+
+    // In ProductController.php
+    public function show()
+    {
+        // Since you're using resource routes but might not need show in admin
+        // You can either redirect or implement it
+        return redirect()->route('admin.products.index');
+        
+        // OR if you want to actually show it:
+        // return view('admin.products.show', compact('product'));
+    }
+
+    // ProductController.php
+    public function search(Request $request)
+    {
+        try {
+            $search = $request->get('search', '');
+            $exclude = $request->get('exclude', '');
+            
+            // Return empty if search term is too short
+            if (strlen($search) < 2) {
+                return response()->json([
+                    'success' => true,
+                    'data' => [],
+                    'message' => 'Enter at least 2 characters'
+                ]);
+            }
+            
+            // Build query
+            $query = Product::query()
+                ->select('id', 'name', 'sku', 'main_image', 'category_id', 'status')
+                ->where('status', 'published');
+            
+            // Exclude current product
+            if ($exclude) {
+                $query->where('id', '!=', $exclude);
+            }
+            
+            // Apply search filter
+            if ($search) {
+                $query->where(function($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('sku', 'like', "%{$search}%")
+                      ->orWhereHas('category', function($q) use ($search) {
+                          $q->where('name', 'like', "%{$search}%");
+                      });
+                });
+            }
+            
+            // Get results
+            $products = $query->orderBy('name')->limit(20)->get();
+            
+            // Format response with category name
+            $formattedProducts = $products->map(function($product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'sku' => $product->sku,
+                    'main_image' => $product->main_image,
+                    'category_name' => $product->category->name ?? 'Uncategorized'
+                ];
+            });
+            
+            return response()->json([
+                'success' => true,
+                'data' => $formattedProducts,
+                'count' => $formattedProducts->count()
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Product search error: ' . $e->getMessage(), [
+                'request' => $request->all(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            // Return error response but keep the app working
+            return response()->json([
+                'success' => false,
+                'message' => 'Error searching products. Please try again.',
+                'data' => [],
+                'debug' => config('app.debug') ? $e->getMessage() : null
+            ], 500);
+        }
     }
 
     public function update(Request $request, Product $product)
@@ -171,6 +259,12 @@ class ProductController extends Controller
             }
         }
 
+        // Sync related products if provided
+        if ($request->has('related_products')) {
+            $product->relatedProducts()->sync($request->related_products);
+        } else {
+            $product->relatedProducts()->detach();
+        }
         return redirect()->route('admin.products.index')->with('success', 'Product updated successfully');
     }
 
