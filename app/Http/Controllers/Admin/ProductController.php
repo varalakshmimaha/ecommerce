@@ -104,17 +104,6 @@ class ProductController extends Controller
         return view('admin.products.edit', compact('product', 'categories', 'subCategories', 'brands'));
     }
 
-    // In ProductController.php
-    public function show()
-    {
-        // Since you're using resource routes but might not need show in admin
-        // You can either redirect or implement it
-        return redirect()->route('admin.products.index');
-        
-        // OR if you want to actually show it:
-        // return view('admin.products.show', compact('product'));
-    }
-
     // ProductController.php
     public function search(Request $request)
     {
@@ -133,7 +122,7 @@ class ProductController extends Controller
             
             // Build query
             $query = Product::query()
-                ->select('id', 'name', 'sku', 'main_image', 'category_id', 'status')
+                ->select('id', 'name', 'main_image', 'category_id', 'status')
                 ->where('status', 'published');
             
             // Exclude current product
@@ -145,7 +134,6 @@ class ProductController extends Controller
             if ($search) {
                 $query->where(function($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('sku', 'like', "%{$search}%")
                       ->orWhereHas('category', function($q) use ($search) {
                           $q->where('name', 'like', "%{$search}%");
                       });
@@ -160,7 +148,6 @@ class ProductController extends Controller
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
-                    'sku' => $product->sku,
                     'main_image' => $product->main_image,
                     'category_name' => $product->category->name ?? 'Uncategorized'
                 ];
@@ -260,11 +247,30 @@ class ProductController extends Controller
         }
 
         // Sync related products if provided
-        if ($request->has('related_products')) {
-            $product->relatedProducts()->sync($request->related_products);
+        if ($request->filled('related_products')) {
+
+            $relatedIds = $request->related_products;
+
+            // If coming as "3,4"
+            if (is_string($relatedIds)) {
+                $relatedIds = explode(',', $relatedIds);
+            }
+
+            $relatedIds = collect($relatedIds)
+                ->map(fn ($id) => (int) trim($id))
+                ->unique()
+                ->reject(fn ($id) => $id === $product->id) // prevent self relation
+                ->values()
+                ->toArray();
+
+            $product->relatedProducts()->sync($relatedIds);
+
         } else {
+
             $product->relatedProducts()->detach();
+
         }
+
         return redirect()->route('admin.products.index')->with('success', 'Product updated successfully');
     }
 

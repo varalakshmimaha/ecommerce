@@ -62,6 +62,94 @@
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     transform: translateY(-2px);
 }
+
+/* Enhanced Gallery Styles */
+.product-gallery-main {
+    position: relative;
+    overflow: hidden;
+}
+
+.product-gallery-main::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #D4AF37, #B8962E, #D4AF37, #B8962E);
+    border-radius: 1rem;
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.5s ease;
+    background-size: 400% 400%;
+    animation: gradientShift 3s ease infinite;
+}
+
+.product-gallery-main:hover::before {
+    opacity: 1;
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Thumbnail selector enhancements */
+.product-gallery-main + div .inline-flex > div {
+    position: relative;
+    overflow: hidden;
+}
+
+.product-gallery-main + div .inline-flex > div::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.product-gallery-main + div .inline-flex > div:hover::before {
+    left: 100%;
+}
+
+/* Active thumbnail indicator */
+.product-gallery-main + div .inline-flex > div.border-\[\#D4AF37\] {
+    position: relative;
+}
+
+.product-gallery-main + div .inline-flex > div.border-\[\#D4AF37\]::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #D4AF37, #B8962E);
+    border-radius: 0.75rem;
+    z-index: -1;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
 </style>
 
 <script>
@@ -91,20 +179,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
                         <!-- Image Gallery -->
-                        <div class="space-y-4">
-                            <div class="bg-white rounded-2xl border border-gray-100 p-4 overflow-hidden">
-                                <img id="main-image" src="/storage/${product.main_image}" alt="${product.name}" class="w-full h-96 object-contain rounded-lg zoom-image">
+                        <div class="space-y-6">
+                            <div class="product-gallery-main bg-white rounded-2xl border-2 border-gray-100 overflow-hidden relative group">
+                                <!-- Animated border -->
+                                <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-[#B8962E] to-[#D4AF37] opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
+                                <div class="absolute inset-0 rounded-2xl bg-white m-1"></div>
+                                <div class="relative m-1 rounded-xl overflow-hidden">
+                                    <img id="main-image" src="/storage/${product.main_image}" alt="${product.name}" class="w-full h-96 object-contain rounded-lg zoom-image transition-all duration-500 group-hover:scale-105">
+                                </div>
                             </div>
                             ${product.images && product.images.length > 0 ? `
-                                <div class="grid grid-cols-5 gap-2">
-                                    <div class="cursor-pointer rounded-lg overflow-hidden border-2 border-[#D4AF37] bg-white" onclick="changeMainImage('/storage/${product.main_image}')">
-                                        <img src="/storage/${product.main_image}" alt="${product.name}" class="w-full h-20 object-contain">
-                                    </div>
-                                    ${product.images.map(img => `
-                                        <div class="cursor-pointer rounded-lg overflow-hidden border-2 border-gray-100 hover:border-[#D4AF37] transition-all bg-white" onclick="changeMainImage('/storage/${img.image_path}')">
-                                            <img src="/storage/${img.image_path}" alt="${product.name}" class="w-full h-20 object-contain">
+                                <div class="flex justify-center">
+                                    <div class="w-full max-w-md overflow-x-auto">
+                                        <div class="inline-flex gap-2 p-3 bg-white rounded-2xl border-2 border-gray-100 shadow-lg min-w-max">
+                                            <div class="cursor-pointer rounded-lg overflow-hidden border-2 border-[#D4AF37] bg-white transition-all duration-300 hover:scale-105 hover:shadow-lg flex-shrink-0" onclick="changeMainImage('/storage/${product.main_image}')">
+                                                <img src="/storage/${product.main_image}" alt="${product.name}" class="w-16 h-16 sm:w-20 sm:h-20 object-cover">
+                                            </div>
+                                            ${product.images.map(img => `
+                                                <div class="cursor-pointer rounded-lg overflow-hidden border-2 border-gray-200 hover:border-[#D4AF37] bg-white transition-all duration-300 hover:scale-105 hover:shadow-lg flex-shrink-0" onclick="changeMainImage('/storage/${img.image_path}')">
+                                                    <img src="/storage/${img.image_path}" alt="${product.name}" class="w-16 h-16 sm:w-20 sm:h-20 object-cover">
+                                                </div>
+                                            `).join('')}
                                         </div>
-                                    `).join('')}
+                                    </div>
                                 </div>
                             ` : ''}
                         </div>
@@ -130,10 +227,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <span class="text-green-400">(${Math.round(((product.mrp - parseFloat(product.discounted_price || product.selling_price)) / product.mrp) * 100)}% OFF)</span>
                                     </div>
                                 ` : ''}
-                                <div class="mt-2 text-sm text-[#6B6B6B]">
-                                    <span>GST: ${product.gst}% ${product.gst_type === 'inclusive' ? 'Inclusive' : 'Exclusive'}</span>
-                                </div>
-                            </div>
+                                                            </div>
 
                             <!-- Quantity Selector -->
                             <div class="bg-white rounded-xl border border-gray-100 p-6">
@@ -160,75 +254,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </svg>
                                 Add to Cart
                             </button>
-
-                            <!-- Product Meta -->
-                            <div class="bg-white rounded-xl border border-gray-100 p-6 space-y-3">
-                                ${product.category ? `
-                                    <div class="flex items-start gap-3">
-                                        <svg class="w-5 h-5 text-[#D4AF37] mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-                                        </svg>
-                                        <div>
-                                            <p class="text-sm text-[#6B6B6B]">Category</p>
-                                            <p class="text-[#1A1A1A] font-semibold">${product.category.name}</p>
-                                        </div>
-                                    </div>
-                                ` : ''}
-                                ${product.sub_category ? `
-                                    <div class="flex items-start gap-3">
-                                        <svg class="w-5 h-5 text-[#D4AF37] mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-                                        </svg>
-                                        <div>
-                                            <p class="text-sm text-[#6B6B6B]">Sub Category</p>
-                                            <p class="text-[#1A1A1A] font-semibold">${product.sub_category.name}</p>
-                                        </div>
-                                    </div>
-                                ` : ''}
-                                ${product.brand ? `
-                                    <div class="flex items-start gap-3">
-                                        <svg class="w-5 h-5 text-[#D4AF37] mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
-                                        </svg>
-                                        <div>
-                                            <p class="text-sm text-[#6B6B6B]">Brand</p>
-                                            <p class="text-[#1A1A1A] font-semibold">${product.brand.name}</p>
-                                        </div>
-                                    </div>
-                                ` : ''}
-                                ${product.sku ? `
-                                    <div class="flex items-start gap-3">
-                                        <svg class="w-5 h-5 text-[#D4AF37] mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
-                                        </svg>
-                                        <div>
-                                            <p class="text-sm text-[#6B6B6B]">SKU</p>
-                                            <p class="text-[#1A1A1A] font-semibold">${product.sku}</p>
-                                        </div>
-                                    </div>
-                                ` : ''}
-                            </div>
                         </div>
                     </div>
-
-                    <!-- Product Attributes -->
-                    ${product.attributes && product.attributes.length > 0 ? `
-                        <div class="bg-white rounded-2xl border border-gray-100 p-8 mb-8 animate-slide-up">
-                            <h2 class="text-2xl font-bold text-[#1A1A1A] mb-6 flex items-center gap-3">
-                                <span class="w-2 h-8 bg-[#D4AF37] rounded"></span>
-                                Product Specifications
-                            </h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                ${product.attributes.map(attr => `
-                                    <div class="bg-white/50 rounded-lg p-4 border border-[#D4AF37]/10">
-                                        <p class="text-sm text-[#D4AF37] mb-1">${attr.attribute_name}</p>
-                                        <p class="text-[#1A1A1A] font-semibold">${attr.attribute_value}</p>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    ` : ''}
-
                     <!-- Product Description -->
                     ${product.full_description ? `
                         <div class="bg-white rounded-2xl border border-gray-100 p-8 mb-8 animate-slide-up">
@@ -331,7 +358,25 @@ window.addToCartRelated = function(productId, quantity) {
 window.changeMainImage = function(src) {
     const mainImage = document.getElementById('main-image');
     if (mainImage) {
-        mainImage.src = src;
+        // Add fade effect
+        mainImage.style.opacity = '0';
+        setTimeout(() => {
+            mainImage.src = src;
+            mainImage.style.opacity = '1';
+        }, 200);
+        
+        // Update active thumbnail border
+        const thumbnails = document.querySelectorAll('.product-gallery-main + div .inline-flex > div');
+        thumbnails.forEach(thumb => {
+            const img = thumb.querySelector('img');
+            if (img && img.src === window.location.origin + src) {
+                thumb.classList.remove('border-gray-200');
+                thumb.classList.add('border-[#D4AF37]');
+            } else {
+                thumb.classList.remove('border-[#D4AF37]');
+                thumb.classList.add('border-gray-200');
+            }
+        });
     }
 };
 
