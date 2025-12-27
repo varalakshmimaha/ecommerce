@@ -3,37 +3,114 @@
 <?php $__env->startSection('content'); ?>
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-white py-8">
     <div class="container mx-auto px-4">
-        <!-- Category Header -->
-        <div class="mb-8 animate-fade-in">
-            <a href="/" class="text-[#D4AF37] hover:text-[#F5E6A8] text-sm mb-4 inline-flex items-center gap-2 transition-all duration-300">
+        <!-- Category Header - Mobile Optimized -->
+        <div class="mb-4 animate-fade-in">
+            <a href="/" class="text-[#D4AF37] hover:text-[#F5E6A8] text-sm mb-2 inline-flex items-center gap-2 transition-all duration-300">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                 </svg>
                 Back to Home
             </a>
-            <div class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] rounded-2xl p-8 text-white shadow-2xl shadow-[#D4AF37]/20">
-                <h1 class="text-4xl font-bold mb-2" id="category-name">Loading...</h1>
-                <p class="text-white/80 text-lg" id="category-description"></p>
+            <div class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] rounded-xl p-4 md:p-8 text-white shadow-xl shadow-[#D4AF37]/20">
+                <h1 class="text-2xl md:text-4xl font-bold mb-1 md:mb-2" id="category-name">Loading...</h1>
+                <p class="text-white/80 text-sm md:text-lg" id="category-description"></p>
             </div>
         </div>
 
-        <!-- Sub-Categories Slider -->
-        <div class="mb-8 animate-slide-up" id="subcategories-section">
-            <h2 class="text-2xl font-bold text-[#1A1A1A] mb-6 flex items-center gap-2">
-                <span class="w-2 h-8 bg-[#D4AF37] rounded"></span>
-                Shop by Sub-Categories
-            </h2>
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-0" id="subcategories-grid">
-                <!-- Subcategories will load here -->
+        <!-- Mobile Filter Toggle -->
+        <div class="hide-in-desktop-view mb-4">
+            <button onclick="toggleMobileFilters()" class="w-full bg-white border-2 border-[#D4AF37] text-[#D4AF37] py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-[#D4AF37] hover:text-white transition-all duration-300 shadow-md">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                </svg>
+                Filters & Categories
+            </button>
+        </div>
+
+        <!-- Sub-Categories Slider - Mobile Optimized -->
+        <div class="mb-6 animate-slide-up" id="subcategories-section">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-lg md:text-2xl font-bold text-[#1A1A1A] flex items-center gap-2">
+                    <span class="w-2 h-6 md:h-8 bg-[#D4AF37] rounded"></span>
+                    Sub-Categories
+                </h2>
+            </div>
+            <div class="overflow-x-auto pb-2">
+                <div class="flex gap-2 md:grid md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 md:gap-3 min-w-max justify-start" id="subcategories-grid">
+                    <!-- Subcategories will load here -->
+                </div>
             </div>
         </div>
 
         <!-- Filter & Products -->
-        <div class="flex flex-col lg:flex-row gap-8 overflow-hidden">
-            <!-- Sidebar Filters -->
-            <aside class="w-full lg:w-72 lg:flex-shrink-0">
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Mobile Filters (Collapsible) -->
+            <div id="mobile-filters" class="lg:hidden hidden">
+                <div class="fixed inset-0 bg-black/50 z-50" onclick="toggleMobileFilters()"></div>
+                <div class="fixed top-0 left-0 right-0 h-full max-h-[80vh] overflow-y-auto bg-white z-50 rounded-b-2xl shadow-2xl">
+                    <div class="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+                        <h3 class="text-lg font-bold text-[#1A1A1A]">Filters</h3>
+                        <button onclick="toggleMobileFilters()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="p-4 space-y-4">
+                        <!-- Sub-Category Filter -->
+                        <div class="bg-gray-50 rounded-xl p-4">
+                            <h3 class="font-semibold text-[#D4AF37] mb-3 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                                </svg>
+                                Sub-Categories
+                            </h3>
+                            <div id="subcategory-filters-mobile" class="space-y-2 text-[#6B6B6B]">
+                                <!-- Will load dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Brand Filter -->
+                        <div class="bg-gray-50 rounded-xl p-4">
+                            <h3 class="font-semibold text-[#D4AF37] mb-3 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                </svg>
+                                Brands
+                            </h3>
+                            <div id="brand-filters-mobile" class="space-y-2 text-[#6B6B6B]">
+                                <!-- Will load dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Price Filter -->
+                        <div class="bg-gray-50 rounded-xl p-4">
+                            <h3 class="font-semibold text-[#D4AF37] mb-3 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Price Range
+                            </h3>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm text-[#6B6B6B] mb-2">Min Price</label>
+                                    <input type="number" id="min-price-mobile" min="0" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#CFCFCF]/50 focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent transition-all duration-300" placeholder="0">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-[#6B6B6B] mb-2">Max Price</label>
+                                    <input type="number" id="max-price-mobile" min="0" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#CFCFCF]/50 focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent transition-all duration-300" placeholder="50000">
+                                </div>
+                                <button onclick="applyPriceFilterMobile()" class="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#D4AF37]/50 transition-all duration-300 transform hover:scale-105">Apply</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desktop Sidebar Filters - Hidden -->
+            <aside class="hide-in-mobile-view w-full lg:w-72 lg:flex-shrink-0" >
                 <!-- Sub-Category Filter -->
-                <div class="bg-white rounded-xl shadow-2xl border border-gray-100 p-6 mb-6 animate-slide-right">
+                <div class="bg-white rounded-xl shadow-xl border border-gray-100 p-6 mb-6 animate-slide-right">
                     <h3 class="font-semibold text-[#D4AF37] mb-4 flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
@@ -46,7 +123,7 @@
                 </div>
 
                 <!-- Brand Filter -->
-                <div class="bg-white rounded-xl shadow-2xl border border-gray-100 p-6 mb-6 animate-slide-right" style="animation-delay: 0.1s">
+                <div class="bg-white rounded-xl shadow-xl border border-gray-100 p-6 mb-6 animate-slide-right" style="animation-delay: 0.1s">
                     <h3 class="font-semibold text-[#D4AF37] mb-4 flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
@@ -59,7 +136,7 @@
                 </div>
 
                 <!-- Price Filter -->
-                <div class="bg-white rounded-xl shadow-2xl border border-gray-100 p-6 animate-slide-right" style="animation-delay: 0.2s">
+                <div class="bg-white rounded-xl shadow-xl border border-gray-100 p-6 animate-slide-right" style="animation-delay: 0.2s">
                     <h3 class="font-semibold text-[#D4AF37] mb-4 flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -82,13 +159,13 @@
 
             <!-- Products Grid -->
             <div class="flex-1">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                    <h2 class="text-2xl font-bold text-[#1A1A1A] flex items-center gap-2">
-                        <span class="w-2 h-8 bg-[#D4AF37] rounded"></span>
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-4">
+                    <h2 class="text-xl md:text-2xl font-bold text-[#1A1A1A] flex items-center gap-2">
+                        <span class="w-2 h-6 md:h-8 bg-[#D4AF37] rounded"></span>
                         Products
                     </h2>
-                    <div class="flex items-center space-x-4">
-                        <select id="sort-select" class="px-4 py-2 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent transition-all duration-300">
+                    <div class="flex items-center space-x-2 md:space-x-4">
+                        <select id="sort-select" class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent transition-all duration-300 text-sm md:text-base">
                             <option value="latest">Latest</option>
                             <option value="price-low">Price: Low to High</option>
                             <option value="price-high">Price: High to Low</option>
@@ -96,7 +173,7 @@
                     </div>
                 </div>
 
-                <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+                <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full">
                     <!-- Products will load here -->
                 </div>
 
@@ -152,6 +229,35 @@
 
 .animate-slide-right {
     animation: slide-right 0.6s ease-out;
+}
+
+/* Custom utility classes */
+.hide-in-mobile-view {
+    display: block;
+}
+
+.hide-in-desktop-view {
+    display: none;
+}
+
+@media (max-width: 1023px) {
+    .hide-in-mobile-view {
+        display: none !important;
+    }
+    
+    .hide-in-desktop-view {
+        display: block !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    .hide-in-mobile-view {
+        display: block !important;
+    }
+    
+    .hide-in-desktop-view {
+        display: none !important;
+    }
 }
 </style>
 
@@ -222,7 +328,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </button>
                 `).join('');
 
-                // Filter display
+                // Desktop Filter display (hidden)
                 let filterHTML = `<label class="flex items-center cursor-pointer hover:text-[#D4AF37] transition-colors"><input type="radio" name="subcat" value="" ${!currentSubCategory ? 'checked' : ''} class="mr-2 subcat-radio accent-[#D4AF37]"><span class="font-medium">All</span></label>`;
                 filterHTML += subcats.map(subcat => `
                     <label class="flex items-center cursor-pointer hover:text-[#D4AF37] transition-colors">
@@ -232,11 +338,39 @@ document.addEventListener('DOMContentLoaded', function() {
                 `).join('');
                 filterEl.innerHTML = filterHTML;
 
+                // Mobile Filter display
+                const mobileFilterEl = document.getElementById('subcategory-filters-mobile');
+                if (mobileFilterEl) {
+                    let mobileFilterHTML = `<label class="flex items-center cursor-pointer hover:text-[#D4AF37] transition-colors"><input type="radio" name="subcat-mobile" value="" ${!currentSubCategory ? 'checked' : ''} class="mr-2 subcat-radio-mobile accent-[#D4AF37]"><span class="font-medium">All</span></label>`;
+                    mobileFilterHTML += subcats.map(subcat => `
+                        <label class="flex items-center cursor-pointer hover:text-[#D4AF37] transition-colors">
+                            <input type="radio" name="subcat-mobile" value="${subcat.id}" ${currentSubCategory == subcat.id ? 'checked' : ''} class="mr-2 subcat-radio-mobile accent-[#D4AF37]">
+                            <span>${subcat.name}</span>
+                        </label>
+                    `).join('');
+                    mobileFilterEl.innerHTML = mobileFilterHTML;
+
+                    // Add event listeners for mobile filters
+                    document.querySelectorAll('.subcat-radio-mobile').forEach(radio => {
+                        radio.addEventListener('change', () => {
+                            currentSubCategory = radio.value;
+                            currentPage = 1;
+                            loadProducts();
+                            // Update desktop filter to match
+                            const desktopRadio = document.querySelector(`.subcat-radio[value="${radio.value}"]`);
+                            if (desktopRadio) desktopRadio.checked = true;
+                        });
+                    });
+                }
+
                 document.querySelectorAll('.subcat-radio').forEach(radio => {
                     radio.addEventListener('change', () => {
                         currentSubCategory = radio.value;
                         currentPage = 1;
                         loadProducts();
+                        // Update mobile filter to match
+                        const mobileRadio = document.querySelector(`.subcat-radio-mobile[value="${radio.value}"]`);
+                        if (mobileRadio) mobileRadio.checked = true;
                     });
                 });
             });
@@ -251,9 +385,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 if (brands.length === 0) {
                     filterEl.innerHTML = '<p class="text-sm text-[#6B6B6B]/70">No brands</p>';
+                    const mobileFilterEl = document.getElementById('brand-filters-mobile');
+                    if (mobileFilterEl) {
+                        mobileFilterEl.innerHTML = '<p class="text-sm text-[#6B6B6B]/70">No brands</p>';
+                    }
                     return;
                 }
 
+                // Desktop Filter display (hidden)
                 let html = `<label class="flex items-center cursor-pointer hover:text-[#D4AF37] transition-colors"><input type="radio" name="brand" value="" ${!currentBrand ? 'checked' : ''} class="mr-2 brand-radio accent-[#D4AF37]"><span class="font-medium">All</span></label>`;
                 html += brands.map(brand => `
                     <label class="flex items-center cursor-pointer hover:text-[#D4AF37] transition-colors">
@@ -263,11 +402,39 @@ document.addEventListener('DOMContentLoaded', function() {
                 `).join('');
                 filterEl.innerHTML = html;
 
+                // Mobile Filter display
+                const mobileFilterEl = document.getElementById('brand-filters-mobile');
+                if (mobileFilterEl) {
+                    let mobileFilterHTML = `<label class="flex items-center cursor-pointer hover:text-[#D4AF37] transition-colors"><input type="radio" name="brand-mobile" value="" ${!currentBrand ? 'checked' : ''} class="mr-2 brand-radio-mobile accent-[#D4AF37]"><span class="font-medium">All</span></label>`;
+                    mobileFilterHTML += brands.map(brand => `
+                        <label class="flex items-center cursor-pointer hover:text-[#D4AF37] transition-colors">
+                            <input type="radio" name="brand-mobile" value="${brand.id}" ${currentBrand == brand.id ? 'checked' : ''} class="mr-2 brand-radio-mobile accent-[#D4AF37]">
+                            <span>${brand.name}</span>
+                        </label>
+                    `).join('');
+                    mobileFilterEl.innerHTML = mobileFilterHTML;
+
+                    // Add event listeners for mobile filters
+                    document.querySelectorAll('.brand-radio-mobile').forEach(radio => {
+                        radio.addEventListener('change', () => {
+                            currentBrand = radio.value;
+                            currentPage = 1;
+                            loadProducts();
+                            // Update desktop filter to match
+                            const desktopRadio = document.querySelector(`.brand-radio[value="${radio.value}"]`);
+                            if (desktopRadio) desktopRadio.checked = true;
+                        });
+                    });
+                }
+
                 document.querySelectorAll('.brand-radio').forEach(radio => {
                     radio.addEventListener('change', () => {
                         currentBrand = radio.value;
                         currentPage = 1;
                         loadProducts();
+                        // Update mobile filter to match
+                        const mobileRadio = document.querySelector(`.brand-radio-mobile[value="${radio.value}"]`);
+                        if (mobileRadio) mobileRadio.checked = true;
                     });
                 });
             });
@@ -339,11 +506,24 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelector(`input[value="${subcatId}"]`)?.click();
     };
 
+    window.toggleMobileFilters = function() {
+        const mobileFilters = document.getElementById('mobile-filters');
+        mobileFilters.classList.toggle('hidden');
+    };
+
     window.applyPriceFilter = function() {
         minPrice = parseInt(document.getElementById('min-price').value) || 0;
         maxPrice = parseInt(document.getElementById('max-price').value) || 999999;
         currentPage = 1;
         loadProducts();
+    };
+
+    window.applyPriceFilterMobile = function() {
+        minPrice = parseInt(document.getElementById('min-price-mobile').value) || 0;
+        maxPrice = parseInt(document.getElementById('max-price-mobile').value) || 999999;
+        currentPage = 1;
+        loadProducts();
+        toggleMobileFilters();
     };
 
     window.changePage = function(page) {
