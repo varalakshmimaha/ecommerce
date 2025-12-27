@@ -1,12 +1,10 @@
-@extends('layouts.frontend')
+<?php $__env->startSection('title', 'Checkout'); ?>
 
-@section('title', 'Checkout')
-
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
     
@@ -41,7 +39,7 @@
         
         <!-- Checkout Form -->
         <div class="lg:col-span-2">
-            @auth
+            <?php if(auth()->guard()->check()): ?>
             <div class="card p-6 mb-6">
                 <h2 class="text-xl font-bold text-gray-900 mb-4">Select Shipping Address</h2>
                 <div id="checkout-addresses-list">
@@ -100,9 +98,9 @@
                     </div>
                 </div>
             </div>
-            @endauth
+            <?php endif; ?>
             <form id="checkout-form" class="space-y-6">
-                @guest
+                <?php if(auth()->guard()->guest()): ?>
                 <div class="card p-6">
                     <h2 class="text-xl font-bold text-gray-900 mb-4">Shipping Information</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -145,7 +143,7 @@
                     <input type="hidden" name="country" value="India">
                     </div>
                 </div>
-                @endguest
+                <?php endif; ?>
                 
                 <!-- Payment Section -->
                 <div class="card p-6">
@@ -161,12 +159,12 @@
                             <h3 class="font-semibold text-gray-900 mb-2">
                               Open your payment app <br>
                               Scan this and pay <br>
-                              @php
+                              <?php
                                 $qrCode = \App\Models\Setting::get('qr_code');
-                              @endphp
-                              @if($qrCode)
-                                  <img src="{{ asset('storage/' . $qrCode) }}" alt="QR Code" class="w-48 h-48 object-contain border rounded-lg p-2"><br>
-                              @endif
+                              ?>
+                              <?php if($qrCode): ?>
+                                  <img src="<?php echo e(asset('storage/' . $qrCode)); ?>" alt="QR Code" class="w-48 h-48 object-contain border rounded-lg p-2"><br>
+                              <?php endif; ?>
                               Or <br>
 
                               <div class="flex items-center gap-2 mt-2">
@@ -313,11 +311,11 @@
         // Load payment methods
         loadPaymentMethods();
         
-        @auth
+        <?php if(auth()->guard()->check()): ?>
         if (document.getElementById('checkout-addresses-list')) {
             loadCheckoutAddresses();
         }
-        @endauth
+        <?php endif; ?>
     });
 
 let selectedAddressId = null;
@@ -569,7 +567,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 // Get Razorpay key from settings
-                const razorpayKey = '{{ \App\Models\PaymentSetting::getSettings("razorpay")["key_id"] ?? "" }}';
+                const razorpayKey = '<?php echo e(\App\Models\PaymentSetting::getSettings("razorpay")["key_id"] ?? ""); ?>';
                 
                 if (!razorpayKey) {
                     alert('Razorpay is not configured properly');
@@ -648,5 +646,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
 
+
+<?php echo $__env->make('layouts.frontend', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /Users/vikasverma/Projects/suwish/resources/views/frontend/checkout.blade.php ENDPATH**/ ?>

@@ -62,6 +62,23 @@
                             <dd class="text-sm font-medium text-gray-900">{{ $order->created_at->format('M d, Y') }}</dd>
                         </div>
                         <div class="flex justify-between">
+                            <dt class="text-sm text-gray-500">Payment Method</dt>
+                            <dd>
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    {{ $order->payment_method === 'razorpay' ? 'bg-blue-100 text-blue-800' : '' }}
+                                    {{ $order->payment_method === 'cod' ? 'bg-green-100 text-green-800' : '' }}
+                                    {{ $order->payment_method === 'manual' ? 'bg-purple-100 text-purple-800' : '' }}">
+                                    {{ ucfirst($order->payment_method) }}
+                                </span>
+                            </dd>
+                        </div>
+                        @if($order->razorpay_payment_id)
+                        <div class="flex justify-between">
+                            <dt class="text-sm text-gray-500">Razorpay Payment ID</dt>
+                            <dd class="text-sm font-medium text-gray-900">{{ $order->razorpay_payment_id }}</dd>
+                        </div>
+                        @endif
+                        <div class="flex justify-between">
                             <dt class="text-sm text-gray-500">Status</dt>
                             <dd>
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 

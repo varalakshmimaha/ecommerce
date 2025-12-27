@@ -3,12 +3,12 @@
     "file": "assets/module.esm-cf6647c1.js"
   },
   "resources/css/admin.css": {
-    "file": "assets/admin-beb661e5.css",
+    "file": "assets/admin-10cdac59.css",
     "isEntry": true,
     "src": "resources/css/admin.css"
   },
   "resources/css/app.css": {
-    "file": "assets/app-791a1ec6.css",
+    "file": "assets/app-4f8baa83.css",
     "isEntry": true,
     "src": "resources/css/app.css"
   },

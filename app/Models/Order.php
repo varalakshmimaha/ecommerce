@@ -10,6 +10,10 @@ class Order extends Model
 {
     use HasFactory;
 
+    const PAYMENT_METHOD_MANUAL = 'manual';
+    const PAYMENT_METHOD_COD = 'cod';
+    const PAYMENT_METHOD_RAZORPAY = 'razorpay';
+
     protected $fillable = [
         'order_number',
         'user_id',
@@ -26,6 +30,9 @@ class Order extends Model
         'payment_status',
         'order_status',
         'payment_proof',
+        'payment_method',
+        'razorpay_order_id',
+        'razorpay_payment_id',
         'tracking_id',
         'tracking_url',
         'notes',
@@ -62,6 +69,21 @@ class Order extends Model
     public function items()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function scopeManualPayment($query)
+    {
+        return $query->where('payment_method', self::PAYMENT_METHOD_MANUAL);
+    }
+
+    public function scopeCodPayment($query)
+    {
+        return $query->where('payment_method', self::PAYMENT_METHOD_COD);
+    }
+
+    public function scopeRazorpayPayment($query)
+    {
+        return $query->where('payment_method', self::PAYMENT_METHOD_RAZORPAY);
     }
 }
 

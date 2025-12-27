@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\PaymentSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -15,6 +16,7 @@ use App\Models\Setting;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NewUserCredentials;
 use Illuminate\Support\Facades\Hash;
+use Razorpay\Api\Api;
 
 class CheckoutController extends Controller
 {
@@ -32,10 +34,18 @@ class CheckoutController extends Controller
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.attributes' => 'nullable|array',
             'payment_proof' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'payment_method' => 'required|in:manual,cod,razorpay',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Additional validation for manual payment
+        if ($request->payment_method === 'manual' && !$request->hasFile('payment_proof')) {
+            return response()->json([
+                'error' => 'Payment proof is required for manual payment'
+            ], 422);
         }
 
         try {
@@ -150,6 +160,7 @@ class CheckoutController extends Controller
                 'total_amount' => $totalAmount,
                 'payment_status' => 'pending',
                 'order_status' => 'pending',
+                'payment_method' => $request->payment_method,
                 'payment_proof' => $paymentProofPath,
             ]);
 
@@ -262,6 +273,193 @@ class CheckoutController extends Controller
             'total_amount' => $totalAmount,
             'items' => $items,
         ]);
+    }
+
+    public function createRazorpayOrder(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.attributes' => 'nullable|array',
+            'address_id' => 'nullable|exists:addresses,id',
+            'name' => 'required_without:address_id|string|max:255',
+            'mobile' => 'required_without:address_id|string|max:15',
+            'email' => 'nullable|email|max:255',
+            'address' => 'required_without:address_id|string',
+            'pincode' => 'required_without:address_id|string|max:10',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        try {
+            // Calculate total amount
+            $subtotal = 0;
+            $gstAmount = 0;
+            $items = [];
+
+            foreach ($request->items as $item) {
+                $product = Product::findOrFail($item['product_id']);
+                
+                if ($product->stock_quantity < $item['quantity']) {
+                    return response()->json([
+                        'error' => "Insufficient stock for {$product->name}"
+                    ], 400);
+                }
+
+                $price = $product->final_price;
+                
+                // Apply attribute-based pricing if any
+                if (!empty($item['attributes'])) {
+                    foreach ($item['attributes'] as $attr) {
+                        $attribute = $product->attributes()
+                            ->where('attribute_name', $attr['name'])
+                            ->where('attribute_value', $attr['value'])
+                            ->first();
+                        
+                        if ($attribute) {
+                            $price += $attribute->price_adjustment;
+                        }
+                    }
+                }
+
+                $itemSubtotal = $price * $item['quantity'];
+                $itemGst = ($itemSubtotal * $product->gst) / 100;
+                
+                $subtotal += $itemSubtotal;
+                $gstAmount += $itemGst;
+
+                $items[] = [
+                    'product' => $product,
+                    'quantity' => $item['quantity'],
+                    'price' => $price,
+                    'subtotal' => $itemSubtotal,
+                    'attributes' => $item['attributes'] ?? null,
+                ];
+            }
+
+            $shippingCharge = (float) Setting::get('shipping_charge', 0);
+            $totalAmount = $subtotal + $gstAmount + $shippingCharge;
+
+            // Get Razorpay settings
+            $razorpaySettings = PaymentSetting::getSettings('razorpay');
+            
+            if (empty($razorpaySettings['key_id']) || empty($razorpaySettings['key_secret'])) {
+                return response()->json([
+                    'error' => 'Razorpay is not configured'
+                ], 400);
+            }
+
+            // Create Razorpay order
+            $api = new Api($razorpaySettings['key_id'], $razorpaySettings['key_secret']);
+            
+            $razorpayOrder = $api->order->create([
+                'receipt' => 'receipt_' . time(),
+                'amount' => $totalAmount * 100, // Convert to paise
+                'currency' => 'INR',
+                'payment_capture' => 1
+            ]);
+
+            // Create order in database with pending status
+            $userId = auth()->id();
+            $order = Order::create([
+                'user_id' => $userId,
+                'razorpay_order_id' => $razorpayOrder['id'],
+                'name' => $request->name,
+                'mobile' => $request->mobile,
+                'email' => $request->email,
+                'address' => $request->address,
+                'pincode' => $request->pincode,
+                'subtotal' => $subtotal,
+                'gst_amount' => $gstAmount,
+                'shipping_charge' => $shippingCharge,
+                'total_amount' => $totalAmount,
+                'payment_status' => 'pending',
+                'order_status' => 'pending',
+                'payment_method' => 'razorpay',
+            ]);
+
+            // Create order items
+            foreach ($items as $item) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['product']->id,
+                    'product_name' => $item['product']->name,
+                    'price' => $item['price'],
+                    'quantity' => $item['quantity'],
+                    'subtotal' => $item['subtotal'],
+                    'attributes' => $item['attributes'],
+                ]);
+
+                // Update stock
+                $item['product']->decrement('stock_quantity', $item['quantity']);
+            }
+
+            return response()->json([
+                'success' => true,
+                'razorpay_order_id' => $razorpayOrder['id'],
+                'order_id' => $order->id,
+                'amount' => $totalAmount,
+                'key_id' => $razorpaySettings['key_id']
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Failed to create Razorpay order: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function verifyRazorpayPayment(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'razorpay_payment_id' => 'required|string',
+            'razorpay_order_id' => 'required|string',
+            'order_id' => 'required|exists:orders,id'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        try {
+            $order = Order::findOrFail($request->order_id);
+            
+            // Verify payment with Razorpay
+            $razorpaySettings = PaymentSetting::getSettings('razorpay');
+            $api = new Api($razorpaySettings['key_id'], $razorpaySettings['key_secret']);
+            
+            // Fetch payment details
+            $payment = $api->payment->fetch($request->razorpay_payment_id);
+            
+            // Verify payment status and order ID
+            if ($payment->status === 'captured' && $payment->order_id === $request->razorpay_order_id) {
+                // Update order status
+                $order->update([
+                    'razorpay_payment_id' => $request->razorpay_payment_id,
+                    'payment_status' => 'verified',
+                    'order_status' => 'confirmed'
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'order_number' => $order->order_number
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Payment verification failed'
+                ]);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Payment verification failed: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
 

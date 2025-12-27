@@ -36,6 +36,14 @@
                 <h3 class="font-semibold text-gray-900 mb-4">Order Information</h3>
                 <div class="space-y-2 text-sm">
                     <p><span class="font-medium">Order Date:</span> {{ $order->created_at->format('M d, Y H:i') }}</p>
+                    <p><span class="font-medium">Payment Method:</span> 
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $order->payment_method === 'razorpay' ? 'bg-blue-100 text-blue-800' : ($order->payment_method === 'cod' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800') }}">
+                            {{ ucfirst($order->payment_method) }}
+                        </span>
+                    </p>
+                    @if($order->razorpay_payment_id)
+                    <p><span class="font-medium">Razorpay Payment ID:</span> {{ $order->razorpay_payment_id }}</p>
+                    @endif
                     <p><span class="font-medium">Payment Status:</span> 
                         <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $order->payment_status === 'verified' ? 'bg-green-100 text-green-800' : ($order->payment_status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800') }}">
                             {{ ucfirst($order->payment_status) }}

@@ -8,6 +8,9 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Api\PaymentMethodController;
+use App\Http\Controllers\Webhook\RazorpayWebhookController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Frontend\AddressController;
 use App\Http\Controllers\Frontend\Auth\AuthenticatedSessionController as FrontendAuthenticatedSessionController;
@@ -87,6 +90,14 @@ Route::get('/track-order', function(){
     return view('frontend.track-order');
 })->name('track.order');
 
+// API Routes
+Route::get('/api/payment-methods', [PaymentMethodController::class, 'index']);
+Route::post('/api/checkout/create-razorpay-order', [\App\Http\Controllers\Api\CheckoutController::class, 'createRazorpayOrder']);
+Route::post('/api/checkout/verify-razorpay-payment', [\App\Http\Controllers\Api\CheckoutController::class, 'verifyRazorpayPayment']);
+
+// Webhook Routes
+Route::post('/webhooks/razorpay', [RazorpayWebhookController::class, 'handle']);
+
 Route::get('admin/products/search', [ProductController::class, 'search'])->name('admin.products.search');
 
 // Admin Routes
@@ -159,6 +170,11 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::post('/settings/footer-links', [SettingController::class, 'storeFooterLink'])->name('settings.footer-links.store');
     Route::post('/settings/footer-links/{footerLink}', [SettingController::class, 'updateFooterLink'])->name('settings.footer-links.update');
     Route::delete('/settings/footer-links/{footerLink}', [SettingController::class, 'destroyFooterLink'])->name('settings.footer-links.destroy');
+    
+    // Payment Settings
+    Route::get('/payment', [PaymentController::class, 'index'])->name('payment.index');
+    Route::post('/payment', [PaymentController::class, 'update'])->name('payment.update');
+    Route::post('/payment/test-razorpay', [PaymentController::class, 'testRazorpayConnection'])->name('payment.test-razorpay');
     // Shipping
     Route::get('/shipping', [\App\Http\Controllers\Admin\ShippingController::class, 'index'])->name('shipping.index');
     Route::post('/shipping', [\App\Http\Controllers\Admin\ShippingController::class, 'update'])->name('shipping.update');
