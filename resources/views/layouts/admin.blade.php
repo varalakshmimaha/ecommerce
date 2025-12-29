@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Admin Panel') - Suvee</title>
+    <title>@yield('title', 'Admin Panel') - Suwish</title>
     @vite(['resources/css/admin.css', 'resources/js/admin.js'])
 </head>
 <body class="bg-gradient-to-br from-gray-50 to-white">

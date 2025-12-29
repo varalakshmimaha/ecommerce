@@ -1,8 +1,6 @@
-@extends('layouts.frontend')
+<?php $__env->startSection('title', 'Cart'); ?>
 
-@section('title', 'Cart')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="container mx-auto px-4 py-8">
     <h1 class="text-2xl font-semibold mb-6">Your Cart</h1>
 
@@ -189,4 +187,6 @@ document.addEventListener('DOMContentLoaded', function() {
     refresh();
 });
 </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.frontend', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/thesuwishclothing/htdocs/thesuwishclothing.com/suwish/resources/views/frontend/cart.blade.php ENDPATH**/ ?>
