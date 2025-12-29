@@ -9,7 +9,7 @@
 <body class="bg-gradient-to-br from-primary-500 to-primary-700 min-h-screen flex items-center justify-center">
     <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md animate-scale-in">
         <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">Suvee Admin</h1>
+            <h1 class="text-3xl font-bold text-gray-900">Suwish Admin</h1>
             <p class="text-gray-600 mt-2">Sign in to your account</p>
         </div>
 
