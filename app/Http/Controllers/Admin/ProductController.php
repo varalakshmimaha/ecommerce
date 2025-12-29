@@ -13,10 +13,66 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with(['category', 'subCategory'])->paginate(20);
-        return view('admin.products.index', compact('products'));
+        $query = Product::with(['category', 'subCategory', 'brand']);
+        
+        // Search by product name or SKU
+        if ($request->filled('search')) {
+            $searchTerm = $request->input('search');
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('sku', 'like', '%' . $searchTerm . '%');
+            });
+        }
+        
+        // Filter by category
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->input('category_id'));
+        }
+        
+        // Filter by brand
+        if ($request->filled('brand_id')) {
+            $query->where('brand_id', $request->input('brand_id'));
+        }
+        
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+        
+        // Filter by stock status
+        if ($request->filled('stock_status')) {
+            $stockStatus = $request->input('stock_status');
+            if ($stockStatus === 'in_stock') {
+                $query->where('stock_quantity', '>', 0);
+            } elseif ($stockStatus === 'out_of_stock') {
+                $query->where('stock_quantity', '=', 0);
+            } elseif ($stockStatus === 'low_stock') {
+                $query->where('stock_quantity', '<=', 10);
+            }
+        }
+        
+        // Filter by price range
+        if ($request->filled('min_price')) {
+            $query->where('selling_price', '>=', $request->input('min_price'));
+        }
+        if ($request->filled('max_price')) {
+            $query->where('selling_price', '<=', $request->input('max_price'));
+        }
+        
+        // Sort products
+        $sortBy = $request->input('sort_by', 'created_at');
+        $sortOrder = $request->input('sort_order', 'desc');
+        $query->orderBy($sortBy, $sortOrder);
+        
+        $products = $query->paginate(20)->withQueryString();
+        
+        // Get filter options for dropdowns
+        $categories = Category::where('is_active', true)->get();
+        $brands = Brand::where('is_active', true)->get();
+        
+        return view('admin.products.index', compact('products', 'categories', 'brands'));
     }
 
     public function create()

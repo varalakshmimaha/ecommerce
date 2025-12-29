@@ -49,19 +49,78 @@
     </div>
 </section>
 
-<!-- Product Tabs -->
+<!-- Product Sections -->
 <section class="container mx-auto px-4 py-6 bg-white">
-    <div class="flex flex-wrap justify-center mb-8 border-b border-gray-200">
-        <button class="product-tab px-6 py-3 font-semibold text-text-heading border-b-2 border-brand-gold active" data-type="featured">Featured</button>
-        <button class="product-tab px-6 py-3 font-semibold text-text-heading border-b-2 border-transparent" data-type="trending">Trending</button>
-        <button class="product-tab px-6 py-3 font-semibold text-text-heading border-b-2 border-transparent" data-type="new-arrival">New Arrival</button>
-        <button class="product-tab px-6 py-3 font-semibold text-text-heading border-b-2 border-transparent" data-type="top-rated">Top Rated</button>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Featured Products Column -->
+        <div class="space-y-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-text-heading flex items-center gap-3">
+                    <span class="w-2 h-8 bg-brand-gold rounded"></span>
+                    Featured Products
+                </h2>
+                <a href="{{ route('products.index') }}?type=featured" class="text-brand-gold hover:text-brand-amber text-sm font-medium transition-colors">
+                    View All →
+                </a>
+            </div>
+            <div id="featured-products" class="space-y-4">
+                <!-- Featured products will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- Trending Products Column -->
+        <div class="space-y-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-text-heading flex items-center gap-3">
+                    <span class="w-2 h-8 bg-brand-amber rounded"></span>
+                    Trending Products
+                </h2>
+                <a href="{{ route('products.index') }}?type=trending" class="text-brand-amber hover:text-brand-burnt text-sm font-medium transition-colors">
+                    View All →
+                </a>
+            </div>
+            <div id="trending-products" class="space-y-4">
+                <!-- Trending products will be loaded here -->
+            </div>
+        </div>
+        
+        <!-- New Arrival Products Column -->
+        <div class="space-y-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-text-heading flex items-center gap-3">
+                    <span class="w-2 h-8 bg-brand-burnt rounded"></span>
+                    New Arrivals
+                </h2>
+                <a href="{{ route('products.index') }}?type=new-arrival" class="text-brand-burnt hover:text-brand-crimson text-sm font-medium transition-colors">
+                    View All →
+                </a>
+            </div>
+            <div id="new-arrival-products" class="space-y-4">
+                <!-- New arrival products will be loaded here -->
+            </div>
+        </div>
+        
     </div>
-    <div id="products-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Products will be loaded here -->
+    
+    <!-- Top Rated Section (Full Width) -->
+    <div class="mt-12 pt-8 border-t border-gray-200">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-text-heading flex items-center gap-3">
+                <span class="w-2 h-8 bg-brand-crimson rounded"></span>
+                Top Rated Products
+            </h2>
+            <a href="{{ route('products.index') }}?type=top-rated" class="text-brand-crimson hover:text-brand-gold text-sm font-medium transition-colors">
+                View All →
+            </a>
+        </div>
+        <div id="top-rated-products" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Top rated products will be loaded here -->
+        </div>
     </div>
-    <div class="text-center mt-8">
-        <a href="{{ route('products.index') }}" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">View All Products</a>
+    
+    <div class="text-center mt-12">
+        <a href="{{ route('products.index') }}" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-8 py-4 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 text-lg">View All Products</a>
     </div>
 </section>
 
@@ -118,47 +177,80 @@ document.addEventListener('DOMContentLoaded', function() {
             `).join('');
         });
     
-    // Load Products
-    function loadProducts(type = 'featured') {
-        fetch(`${API_BASE}/products?type=${type}&per_page=8`)
+    // Load Products for each section
+    function loadProducts(type = 'featured', containerId = null, limit = 4) {
+        fetch(`${API_BASE}/products?type=${type}&per_page=${limit}`)
             .then(res => res.json())
             .then(data => {
-                const container = document.getElementById('products-container');
-                container.innerHTML = data.data.map(product => `
-                    <div class="card overflow-hidden group">
-                        <a href="/products/${product.slug}">
-                            <div class="relative overflow-hidden">
-                                <img src="/storage/${product.main_image}" alt="${product.name}" class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500">
-                                ${product.discounted_price ? `<span class="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-sm">Sale</span>` : ''}
-                            </div>
-                            <div class="p-4">
-                                <h3 class="font-semibold text-text-heading mb-2 line-clamp-2">${product.name}</h3>
-                                <div class="flex items-center space-x-2">
-                                    <span class="text-lg font-bold text-brand-gold">₹${parseFloat(product.discounted_price || product.selling_price).toFixed(2)}</span>
-                                    ${product.discounted_price ? `<span class="text-sm text-gray-500 line-through">₹${parseFloat(product.selling_price).toFixed(2)}</span>` : ''}
-                                </div>
-                                <button onclick="addToCart(${product.id}, 1); event.preventDefault();" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 w-full mt-4">Add to Cart</button>
-                            </div>
-                        </a>
-                    </div>
-                `).join('');
+                const container = document.getElementById(containerId || `${type}-products`);
+                if (!container) return;
+                
+                if (type === 'top-rated') {
+                    // Top rated uses grid layout
+                    container.innerHTML = data.data.map(product => createProductCard(product)).join('');
+                } else {
+                    // Featured, Trending, New Arrival use vertical list layout
+                    container.innerHTML = data.data.map(product => createProductCardVertical(product)).join('');
+                }
+            })
+            .catch(error => {
+                console.error(`Error loading ${type} products:`, error);
+                const container = document.getElementById(containerId || `${type}-products`);
+                if (container) {
+                    container.innerHTML = '<p class="text-gray-500 text-center py-4">Failed to load products</p>';
+                }
             });
     }
     
-    loadProducts('featured');
+    // Product card for grid layout (Top Rated)
+    function createProductCard(product) {
+        return `
+            <div class="card overflow-hidden group">
+                <a href="/products/${product.slug}">
+                    <div class="relative overflow-hidden">
+                        <img src="/storage/${product.main_image}" alt="${product.name}" class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500">
+                        ${product.discounted_price ? `<span class="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-sm">Sale</span>` : ''}
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-text-heading mb-2 line-clamp-2">${product.name}</h3>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-lg font-bold text-brand-gold">₹${parseFloat(product.discounted_price || product.selling_price).toFixed(2)}</span>
+                            ${product.discounted_price ? `<span class="text-sm text-gray-500 line-through">₹${parseFloat(product.selling_price).toFixed(2)}</span>` : ''}
+                        </div>
+                        <button onclick="addToCart(${product.id}, 1); event.preventDefault();" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 w-full mt-4">Add to Cart</button>
+                    </div>
+                </a>
+            </div>
+        `;
+    }
     
-    // Tab switching
-    document.querySelectorAll('.product-tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-            document.querySelectorAll('.product-tab').forEach(t => {
-                t.classList.remove('active', 'border-brand-gold');
-                t.classList.add('border-transparent');
-            });
-            this.classList.add('active', 'border-brand-gold');
-            this.classList.remove('border-transparent');
-            loadProducts(this.dataset.type);
-        });
-    });
+    // Product card for vertical layout (Featured, Trending, New Arrival)
+    function createProductCardVertical(product) {
+        return `
+            <div class="card overflow-hidden group">
+                <a href="/products/${product.slug}" class="flex gap-4 p-4">
+                    <div class="relative overflow-hidden flex-shrink-0 w-24 h-24 rounded-lg">
+                        <img src="/storage/${product.main_image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                        ${product.discounted_price ? `<span class="absolute top-1 right-1 bg-red-500 text-white px-1 py-0.5 rounded text-xs">Sale</span>` : ''}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-semibold text-text-heading mb-2 line-clamp-2 text-sm">${product.name}</h3>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-base font-bold text-brand-gold">₹${parseFloat(product.discounted_price || product.selling_price).toFixed(2)}</span>
+                            ${product.discounted_price ? `<span class="text-xs text-gray-500 line-through">₹${parseFloat(product.selling_price).toFixed(2)}</span>` : ''}
+                        </div>
+                        <button onclick="addToCart(${product.id}, 1); event.preventDefault();" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 text-sm mt-2">Add to Cart</button>
+                    </div>
+                </a>
+            </div>
+        `;
+    }
+    
+    // Load all sections
+    loadProducts('featured', 'featured-products', 4);
+    loadProducts('trending', 'trending-products', 4);
+    loadProducts('new-arrival', 'new-arrival-products', 4);
+    loadProducts('top-rated', 'top-rated-products', 8);
     
     // Add to Cart
     window.addToCart = function(productId, quantity) {
