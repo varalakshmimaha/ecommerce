@@ -11,6 +11,27 @@ export default {
         sans: ['Poppins', 'sans-serif'],
       },
       colors: {
+        brand: {
+          gold: '#F4B41A',
+          amber: '#F28C28',
+          burnt: '#E36F2D',
+          crimson: '#C73A2B',
+        },
+        text: {
+          heading: '#111111',
+          body: '#444444',
+          muted: '#777777',
+        },
+        surface: {
+          main: '#FFFFFF',
+          alt: '#FAF6F2',
+          card: '#FFF8F2',
+        },
+        ui: {
+          hover: '#D97706',
+          border: '#EAD7C5',
+          success: '#E8A23A',
+        },
         primary: {
           50: '#f0f9ff',
           100: '#e0f2fe',

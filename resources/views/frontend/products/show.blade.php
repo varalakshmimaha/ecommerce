@@ -7,8 +7,8 @@
     <div id="product-detail" class="container mx-auto px-4">
         <!-- Product will be loaded here -->
         <div class="text-center py-12">
-            <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#D4AF37] border-t-transparent"></div>
-            <p class="text-[#6B6B6B] mt-4">Loading product details...</p>
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-brand-gold border-t-transparent"></div>
+            <p class="text-text-muted mt-4">Loading product details...</p>
         </div>
     </div>
 </div>
@@ -78,7 +78,7 @@
     left: -2px;
     right: -2px;
     bottom: -2px;
-    background: linear-gradient(45deg, #D4AF37, #B8962E, #D4AF37, #B8962E);
+    background: linear-gradient(45deg, var(--brand-gold), var(--brand-amber), var(--brand-gold), var(--brand-amber));
     border-radius: 1rem;
     opacity: 0;
     z-index: -1;
@@ -136,7 +136,7 @@
     left: -2px;
     right: -2px;
     bottom: -2px;
-    background: linear-gradient(45deg, #D4AF37, #B8962E);
+    background: linear-gradient(45deg, var(--brand-gold), var(--brand-amber));
     border-radius: 0.75rem;
     z-index: -1;
     animation: pulse 2s infinite;
@@ -167,15 +167,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     <!-- Breadcrumb -->
                     <div class="mb-6">
                         <div class="flex items-center gap-2 text-sm text-[#6B6B6B]">
-                            <a href="/" class="hover:text-[#D4AF37] transition-colors">Home</a>
+                            <a href="/" class="hover:text-brand-gold transition-colors">Home</a>
                             <span>/</span>
-                            <a href="/products" class="hover:text-[#D4AF37] transition-colors">Products</a>
+                            <a href="/products" class="hover:text-brand-gold transition-colors">Products</a>
                             ${product.category ? `
                                 <span>/</span>
-                                <a href="/category/${product.category.slug}" class="hover:text-[#D4AF37] transition-colors">${product.category.name}</a>
+                                <a href="/category/${product.category.slug}" class="hover:text-brand-gold transition-colors">${product.category.name}</a>
                             ` : ''}
                             <span>/</span>
-                            <span class="text-[#D4AF37]">${product.name}</span>
+                            <span class="text-brand-gold">${product.name}</span>
                         </div>
                     </div>
 
@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="space-y-6">
                             <div class="product-gallery-main bg-white rounded-2xl border-2 border-gray-100 overflow-hidden relative group">
                                 <!-- Animated border -->
-                                <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-[#B8962E] to-[#D4AF37] opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
+                                <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
                                 <div class="absolute inset-0 rounded-2xl bg-white m-1"></div>
                                 <div class="relative m-1 rounded-xl overflow-hidden">
                                     <img id="main-image" src="/storage/${product.main_image}" alt="${product.name}" class="w-full h-96 object-contain rounded-lg zoom-image transition-all duration-500 group-hover:scale-105 cursor-pointer" onclick="openGalleryPopup('/storage/${product.main_image}', [${product.images && product.images.length > 0 ? `'/storage/${product.main_image}', ${product.images.map(img => `'/storage/${img.image_path}'`).join(', ')}` : `'/storage/${product.main_image}'`}])">
@@ -194,11 +194,11 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <div class="flex justify-center">
                                     <div class="w-full max-w-md overflow-x-auto">
                                         <div class="inline-flex gap-2 p-3 bg-white rounded-2xl border-2 border-gray-100 shadow-lg min-w-max">
-                                            <div class="cursor-pointer rounded-lg overflow-hidden border-2 border-[#D4AF37] bg-white transition-all duration-300 hover:scale-105 hover:shadow-lg flex-shrink-0" onclick="changeMainImage('/storage/${product.main_image}')">
+                                            <div class="cursor-pointer rounded-lg overflow-hidden border-2 border-brand-gold bg-white transition-all duration-300 hover:scale-105 hover:shadow-lg flex-shrink-0" onclick="changeMainImage('/storage/${product.main_image}')">
                                                 <img src="/storage/${product.main_image}" alt="${product.name}" class="w-16 h-16 sm:w-20 sm:h-20 object-cover">
                                             </div>
                                             ${product.images.map(img => `
-                                                <div class="cursor-pointer rounded-lg overflow-hidden border-2 border-gray-200 hover:border-[#D4AF37] bg-white transition-all duration-300 hover:scale-105 hover:shadow-lg flex-shrink-0" onclick="changeMainImage('/storage/${img.image_path}')">
+                                                <div class="cursor-pointer rounded-lg overflow-hidden border-2 border-gray-200 hover:border-brand-gold bg-white transition-all duration-300 hover:scale-105 hover:shadow-lg flex-shrink-0" onclick="changeMainImage('/storage/${img.image_path}')">
                                                     <img src="/storage/${img.image_path}" alt="${product.name}" class="w-16 h-16 sm:w-20 sm:h-20 object-cover">
                                                 </div>
                                             `).join('')}
@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <!-- Price -->
                             <div class="bg-white rounded-xl border border-gray-100 p-6">
                                 <div class="flex items-end gap-3 mb-2">
-                                    <span class="text-4xl font-bold text-[#D4AF37]">₹${parseFloat(product.discounted_price || product.selling_price).toFixed(2)}</span>
+                                    <span class="text-4xl font-bold text-brand-gold">₹${parseFloat(product.discounted_price || product.selling_price).toFixed(2)}</span>
                                     ${product.discounted_price ? `
                                         <span class="text-2xl text-[#6B6B6B] line-through mb-1">₹${parseFloat(product.selling_price).toFixed(2)}</span>
                                     ` : ''}
@@ -233,15 +233,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
                             <!-- Quantity Selector -->
                             <div class="bg-white rounded-xl border border-gray-100 p-6">
-                                <label class="block text-sm font-semibold text-[#D4AF37] mb-3">Quantity</label>
+                                <label class="block text-sm font-semibold text-brand-gold mb-3">Quantity</label>
                                 <div class="flex items-center gap-4">
-                                    <button onclick="decreaseQuantity()" class="w-12 h-12 bg-white border border-gray-200 rounded-lg flex items-center justify-center text-[#1A1A1A] hover:bg-[#D4AF37] hover:text-white transition-all duration-300">
+                                    <button onclick="decreaseQuantity()" class="w-12 h-12 bg-white border border-gray-200 rounded-lg flex items-center justify-center text-text-heading hover:bg-brand-gold hover:text-white transition-all duration-300">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
                                         </svg>
                                     </button>
-                                    <input type="number" id="quantity" value="${product.min_order_quantity}" min="${product.min_order_quantity}" class="w-24 text-center px-4 py-3 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] text-xl font-bold focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent">
-                                    <button onclick="increaseQuantity()" class="w-12 h-12 bg-white border border-gray-200 rounded-lg flex items-center justify-center text-[#1A1A1A] hover:bg-[#D4AF37] hover:text-white transition-all duration-300">
+                                    <input type="number" id="quantity" value="${product.min_order_quantity}" min="${product.min_order_quantity}" class="w-24 text-center px-4 py-3 bg-white border border-gray-200 rounded-lg text-text-heading text-xl font-bold focus:ring-2 focus:ring-brand-gold focus:border-transparent">
+                                    <button onclick="increaseQuantity()" class="w-12 h-12 bg-white border border-gray-200 rounded-lg flex items-center justify-center text-text-heading hover:bg-brand-gold hover:text-white transition-all duration-300">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                                         </svg>
@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
 
                             <!-- Add to Cart Button -->
-                            <button onclick="addToCart(${product.id})" class="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-[#D4AF37]/50 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-3">
+                            <button onclick="addToCart(${product.id})" class="w-full bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-brand-gold/50 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-3">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                                 </svg>
@@ -261,8 +261,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     <!-- Product Description -->
                     ${product.full_description ? `
                         <div class="bg-white rounded-2xl border border-gray-100 p-8 mb-8 animate-slide-up">
-                            <h2 class="text-2xl font-bold text-[#1A1A1A] mb-6 flex items-center gap-3">
-                                <span class="w-2 h-8 bg-[#D4AF37] rounded"></span>
+                            <h2 class="text-2xl font-bold text-text-heading mb-6 flex items-center gap-3">
+                                <span class="w-2 h-8 bg-brand-gold rounded"></span>
                                 Product Description
                             </h2>
                             <div class="prose prose-lg prose-invert max-w-none">

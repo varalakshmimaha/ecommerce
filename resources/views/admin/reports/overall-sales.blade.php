@@ -13,7 +13,7 @@
                 <span class="flex items-center text-gray-500">to</span>
                 <input type="date" id="end_date" name="end_date" value="{{ $endDate }}" class="input-field px-3 py-2 border border-gray-300 rounded">
             </div>
-            <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 px-6">Filter</button>
+            <button type="submit" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 px-6">Filter</button>
             <a href="javascript:void(0)" onclick="downloadReport()" class="btn px-6 text-center">Download</a>
         </form>
     </div>
@@ -24,7 +24,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm text-gray-600 font-medium">Total Orders</p>
-                    <p id="total-orders" class="text-3xl font-bold text-[#D4AF37] mt-2">0</p>
+                    <p id="total-orders" class="text-3xl font-bold text-brand-gold mt-2">0</p>
                 </div>
                 <svg class="w-12 h-12 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
@@ -96,7 +96,7 @@
                     <span class="text-gray-600">Avg Order Value</span>
                     <span id="avg-order-value" class="font-semibold text-gray-900">₹0</span>
                 </div>
-                <div class="flex justify-between items-center py-2 text-lg font-bold text-[#D4AF37] bg-primary-50 px-3 py-3 rounded mt-4">
+                <div class="flex justify-between items-center py-2 text-lg font-bold text-brand-gold bg-primary-50 px-3 py-3 rounded mt-4">
                     <span>Total Amount</span>
                     <span id="total-amount">₹0</span>
                 </div>

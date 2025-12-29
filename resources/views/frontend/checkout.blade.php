@@ -8,13 +8,13 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
+    <h1 class="text-3xl font-bold text-text-heading mb-8">Checkout</h1>
     
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Order Summary -->
         <div class="lg:col-span-1">
             <div class="card p-6 sticky top-24">
-                <h2 class="text-xl font-bold text-gray-900 mb-4">Order Summary</h2>
+                <h2 class="text-xl font-bold text-text-heading mb-4">Order Summary</h2>
                 <div id="order-summary">
                     <!-- Order summary will be loaded here -->
                 </div>
@@ -33,7 +33,7 @@
                     </div>
                     <div class="flex justify-between font-bold text-lg border-t pt-2 mt-2">
                         <span>Total:</span>
-                        <span id="total-amount" class="text-[#D4AF37]">₹0.00</span>
+                        <span id="total-amount" class="text-brand-gold">₹0.00</span>
                     </div>
                 </div>
             </div>
@@ -43,58 +43,58 @@
         <div class="lg:col-span-2">
             @auth
             <div class="card p-6 mb-6">
-                <h2 class="text-xl font-bold text-gray-900 mb-4">Select Shipping Address</h2>
+                <h2 class="text-xl font-bold text-text-heading mb-4">Select Shipping Address</h2>
                 <div id="checkout-addresses-list">
                     <!-- Address selector will be loaded here -->
                 </div>
-                <button type="button" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 mt-4" onclick="showCheckoutAddressForm()">Add New Address</button>
+                <button type="button" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 mt-4" onclick="showCheckoutAddressForm()">Add New Address</button>
                 <div id="checkout-address-form-modal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
                     <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg relative animate-scale-in">
-                        <button class="absolute top-2 right-2 text-[#D4AF37] text-2xl font-bold" onclick="hideCheckoutAddressForm()">&times;</button>
-                        <h3 class="text-xl font-bold mb-4 text-[#1A1A1A]">Add / Edit Address</h3>
+                        <button class="absolute top-2 right-2 text-brand-gold text-2xl font-bold" onclick="hideCheckoutAddressForm()">&times;</button>
+                        <h3 class="text-xl font-bold mb-4 text-text-heading">Add / Edit Address</h3>
                         <form id="checkout-address-form" class="space-y-4">
                             <input type="hidden" name="address_id" id="checkout_address_id">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-semibold text-[#1A1A1A]">Name</label>
+                                    <label class="block text-sm font-semibold text-text-heading">Name</label>
                                     <input type="text" name="name" id="checkout_address_name" required class="input-field">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-semibold text-[#1A1A1A]">Phone</label>
+                                    <label class="block text-sm font-semibold text-text-heading">Phone</label>
                                     <input type="text" name="phone" id="checkout_address_phone" required class="input-field">
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold text-[#1A1A1A]">Address</label>
+                                <label class="block text-sm font-semibold text-text-heading">Address</label>
                                 <input type="text" name="address" id="checkout_address_address" required class="input-field">
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-semibold text-[#1A1A1A]">City</label>
+                                    <label class="block text-sm font-semibold text-text-heading">City</label>
                                     <input type="text" name="city" id="checkout_address_city" required class="input-field">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-semibold text-[#1A1A1A]">State</label>
+                                    <label class="block text-sm font-semibold text-text-heading">State</label>
                                     <input type="text" name="state" id="checkout_address_state" required class="input-field">
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-semibold text-[#1A1A1A]">Pincode</label>
+                                    <label class="block text-sm font-semibold text-text-heading">Pincode</label>
                                     <input type="text" name="pincode" id="checkout_address_pincode" required class="input-field">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-semibold text-[#1A1A1A]">Country</label>
+                                    <label class="block text-sm font-semibold text-text-heading">Country</label>
                                     <input type="text" name="country" id="checkout_address_country" value="India" required class="input-field">
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
-                                <input type="checkbox" name="is_default" id="checkout_address_is_default" class="accent-[#D4AF37]">
+                                <input type="checkbox" name="is_default" id="checkout_address_is_default" class="accent-brand-gold">
                                 <label for="checkout_address_is_default" class="text-sm">Set as default address</label>
                             </div>
                             <div class="flex justify-end gap-2">
-                                <button type="button" class="px-6 py-2 rounded-lg border border-gray-200 text-[#1A1A1A] hover:bg-gray-50" onclick="hideCheckoutAddressForm()">Cancel</button>
-                                <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition-all duration-300">Save Address</button>
+                                <button type="button" class="px-6 py-2 rounded-lg border border-gray-200 text-text-heading hover:bg-gray-50" onclick="hideCheckoutAddressForm()">Cancel</button>
+                                <button type="submit" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition-all duration-300">Save Address</button>
                             </div>
                         </form>
                     </div>
@@ -104,7 +104,7 @@
             <form id="checkout-form" class="space-y-6">
                 @guest
                 <div class="card p-6">
-                    <h2 class="text-xl font-bold text-gray-900 mb-4">Shipping Information</h2>
+                    <h2 class="text-xl font-bold text-text-heading mb-4">Shipping Information</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
@@ -149,7 +149,7 @@
                 
                 <!-- Payment Section -->
                 <div class="card p-6">
-                    <h2 class="text-xl font-bold text-gray-900 mb-4">Payment Method</h2>
+                    <h2 class="text-xl font-bold text-text-heading mb-4">Payment Method</h2>
                     
                     <div id="payment-methods" class="space-y-4 mb-6">
                         <!-- Payment methods will be loaded here -->
@@ -221,7 +221,7 @@
                     </div>
                 </div>
                 
-                <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 w-full text-lg py-4">Place Order</button>
+                <button type="submit" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 w-full text-lg py-4">Place Order</button>
             </form>
         </div>
     </div>
@@ -270,13 +270,13 @@
     function renderPaymentMethods(methods) {
         const container = document.getElementById('payment-methods');
         container.innerHTML = methods.map((method, index) => `
-            <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:border-[#D4AF37] transition-all">
+            <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:border-brand-gold transition-all">
                 <input type="radio" 
                        name="payment_method" 
                        value="${method.method}" 
                        ${index === 0 ? 'checked' : ''}
                        onchange="selectPaymentMethod('${method.method}')"
-                       class="accent-[#D4AF37] w-5 h-5">
+                       class="accent-brand-gold w-5 h-5">
                 <div class="ml-4 flex-1">
                     <div class="font-semibold text-gray-900">${method.name}</div>
                     <div class="text-sm text-gray-600">${method.description}</div>
@@ -334,8 +334,8 @@ function loadCheckoutAddresses() {
                 const id = el.querySelector('button[onclick^="editAddress"]')?.getAttribute('onclick').match(/editAddress\((\d+),/)[1];
                 const checked = el.innerHTML.includes('Default') || idx === 0 ? 'checked' : '';
                 if (!selectedAddressId && checked) selectedAddressId = id;
-                return `<label class="flex items-center gap-4 mb-4 p-4 border rounded-lg cursor-pointer hover:border-[#D4AF37] transition-all">
-                    <input type="radio" name="shipping_address_id" value="${id}" ${checked} onchange="selectCheckoutAddress(${id})" class="accent-[#D4AF37] w-5 h-5">
+                return `<label class="flex items-center gap-4 mb-4 p-4 border rounded-lg cursor-pointer hover:border-brand-gold transition-all">
+                    <input type="radio" name="shipping_address_id" value="${id}" ${checked} onchange="selectCheckoutAddress(${id})" class="accent-brand-gold w-5 h-5">
                     <div class="flex-1">${el.innerHTML}</div>
                 </label>`;
             }).join('');
@@ -440,7 +440,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="flex-1">
                                 <h4 class="font-semibold text-sm">${product.name}</h4>
                                 <p class="text-sm text-gray-600">Qty: ${item.quantity}</p>
-                                <p class="text-sm font-semibold text-[#D4AF37]">₹${parseFloat(price).toFixed(2)}</p>
+                                <p class="text-sm font-semibold text-brand-gold">₹${parseFloat(price).toFixed(2)}</p>
                             </div>
                         </div>
                     `;
@@ -594,7 +594,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         contact: document.querySelector('input[name="mobile"]')?.value || ''
                     },
                     theme: {
-                        color: '#D4AF37'
+                        color: '#F4B41A'
                     },
                     modal: {
                         ondismiss: function() {

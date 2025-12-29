@@ -14,50 +14,73 @@
         font-family: 'Poppins', sans-serif;
     }
 
-    /* Global golden hover effects */
+    :root {
+        --brand-gold: #F4B41A;
+        --brand-amber: #F28C28;
+        --brand-burnt: #E36F2D;
+        --brand-crimson: #C73A2B;
+
+        --text-heading: #111111;
+        --text-body: #444444;
+        --text-muted: #777777;
+
+        --bg-main: #FFFFFF;
+        --bg-alt: #FAF6F2;
+        --bg-card: #FFF8F2;
+
+        --ui-hover: #D97706;
+        --ui-border: #EAD7C5;
+        --ui-success: #E8A23A;
+
+        --gradient-cta: linear-gradient(135deg, #F4B41A, #F28C28, #C73A2B);
+        --gradient-subtle: linear-gradient(180deg, #FDF2E9, #F4B41A);
+        --gradient-button: linear-gradient(135deg, #F4B41A, #F28C28, #C73A2B);
+    }
+
+    /* Global hover effects */
     a:hover {
-        color: #D4AF37;
+        color: var(--ui-hover);
     }
 
     button:not(.no-hover):hover {
-        color: #D4AF37;
+        color: var(--ui-hover);
     }
 
-    /* Golden theme for checkboxes and radio buttons */
+    /* Theme for checkboxes and radio buttons */
     input[type="checkbox"],
     input[type="radio"] {
-        accent-color: #D4AF37;
+        accent-color: var(--brand-gold);
         @apply cursor-pointer;
     }
 
     input[type="checkbox"]:focus,
     input[type="radio"]:focus {
-        @apply ring-2 ring-[#D4AF37] ring-offset-2;
+        @apply ring-2 ring-brand-gold ring-offset-2;
     }
 
     /* Golden theme for select elements */
     select {
-        accent-color: #D4AF37;
+        accent-color: var(--brand-gold);
         @apply cursor-pointer;
     }
 
     select:focus {
-        @apply ring-2 ring-[#D4AF37] border-[#D4AF37];
+        @apply ring-2 ring-brand-gold border-brand-gold;
     }
 }
 
 @layer components {
     .btn-primary {
-        background: linear-gradient(to right, #D4AF37, #B8962E);
+        background: var(--gradient-button);
         @apply text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl;
     }
 
     .btn-secondary {
-        @apply bg-white hover:bg-gray-50 text-[#1A1A1A] hover:text-[#D4AF37] font-semibold py-3 px-6 rounded-lg transition-all duration-300 border border-gray-200;
+        @apply bg-white hover:bg-gray-50 text-[#111111] hover:text-brand-gold font-semibold py-3 px-6 rounded-lg transition-all duration-300 border border-gray-200;
     }
 
     .btn {
-        background: linear-gradient(to right, #D4AF37, #B8962E);
+        background: var(--gradient-button);
         @apply text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 hover:shadow-lg;
     }
 
@@ -74,7 +97,7 @@
     }
 
     .input-field {
-        @apply w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all duration-300 bg-white text-[#1A1A1A] placeholder-[#6B6B6B];
+        @apply w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-brand-gold transition-all duration-300 bg-white text-[#111111] placeholder-[#777777];
     }
 
     .input-field:focus {
