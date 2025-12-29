@@ -278,7 +278,7 @@
 
     <!-- Floating WhatsApp Button -->
     <?php if(\App\Models\Setting::get('whatsapp_number')): ?>
-    <a href="https://wa.me/<?php echo e(str_replace('+', '', \App\Models\Setting::get('whatsapp_number'))); ?>" 
+    <a href="https://wa.me/91<?php echo e(\App\Models\Setting::get('whatsapp_number')); ?>" 
        target="_blank" 
        class="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 animate-bounce-slow z-50">
         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">

@@ -14,13 +14,13 @@
                     <?php endif; ?>
                     <input type="file" name="company_logo" accept="image/*" class="input-field">
                 </div>
-                <div>
+                <!--<div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">QR Code</label>
                     <?php if($settings['qr_code']): ?>
                     <img src="<?php echo e(asset('storage/' . $settings['qr_code'])); ?>" alt="QR Code" class="w-32 h-32 object-contain mb-2">
                     <?php endif; ?>
                     <input type="file" name="qr_code" accept="image/*" class="input-field">
-                </div>
+                </div>-->
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Company Description</label>
@@ -44,7 +44,7 @@
                     <textarea name="address" rows="3" class="input-field"><?php echo e($settings['address']); ?></textarea>
                 </div>
             </div>
-            <h3 class="text-lg font-semibold text-gray-900 mt-8 mb-4">Bank Details</h3>
+            <!--<h3 class="text-lg font-semibold text-gray-900 mt-8 mb-4">Bank Details</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Bank Name</label>
@@ -62,7 +62,7 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">Account Holder Name</label>
                     <input type="text" name="bank_account_holder" value="<?php echo e($settings['bank_account_holder']); ?>" class="input-field">
                 </div>
-            </div>
+            </div>-->
             <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Save Settings</button>
         </form>
     </div>

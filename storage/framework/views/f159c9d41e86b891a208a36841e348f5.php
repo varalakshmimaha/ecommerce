@@ -1,5 +1,9 @@
 <?php $__env->startSection('title', 'Checkout'); ?>
 
+<?php $__env->startSection('scripts'); ?>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<?php $__env->stopSection(); ?>
+
 <?php $__env->startSection('content'); ?>
 <div class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
@@ -143,22 +147,24 @@
                 
                 <!-- Payment Section -->
                 <div class="card p-6">
-                    <h2 class="text-xl font-bold text-gray-900 mb-4">Payment</h2>
-                    <p class="text-gray-600 mb-4">Please make payment using one of the following methods:</p>
+                    <h2 class="text-xl font-bold text-gray-900 mb-4">Payment Method</h2>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div>
+                    <div id="payment-methods" class="space-y-4 mb-6">
+                        <!-- Payment methods will be loaded here -->
+                    </div>
+
+                    <!-- Manual Payment Section (shown when manual is selected) -->
+                    <div id="manual-payment-section" class="hidden space-y-4">
+                        <div class="border rounded-lg p-4 bg-gray-50">
                             <h3 class="font-semibold text-gray-900 mb-2">
                               Open your payment app <br>
                               Scan this and pay <br>
                               <?php
                                 $qrCode = \App\Models\Setting::get('qr_code');
-                            ?>
-                            <?php if($qrCode): ?>
-                                <img src="<?php echo e(asset('storage/' . $qrCode)); ?>" alt="QR Code" class="w-48 h-48 object-contain border rounded-lg p-2"><br>
-                            <?php else: ?>
-                               <!-- <p class="text-gray-500 text-sm">QR code not configured</p>-->
-                            <?php endif; ?>
+                              ?>
+                              <?php if($qrCode): ?>
+                                  <img src="<?php echo e(asset('storage/' . $qrCode)); ?>" alt="QR Code" class="w-48 h-48 object-contain border rounded-lg p-2"><br>
+                              <?php endif; ?>
                               Or <br>
 
                               <div class="flex items-center gap-2 mt-2">
@@ -172,47 +178,44 @@
                                   <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg"
                                        class="h-12 w-12" alt="Google Pay">
 
-                                     
-
-                                      <!-- Mobile Number -->
-                                      <span id="mobileNumber" class="font-bold select-all">
-                                          9916849109
-                                      </span>
-                                      &nbsp;
-                                       <button
-                                          onclick="copyMobileNumber()"
-                                          type="button"
-                                          class="text-gray-500 hover:text-gray-800 transition"
-                                          title="Copy number"
-                                      >
-                                         Copy
-                                      </button>
+                                  <!-- Mobile Number -->
+                                  <span id="mobileNumber" class="font-bold select-all">
+                                      9916849109
+                                  </span>
+                                  &nbsp;
+                                   <button
+                                      onclick="copyMobileNumber()"
+                                      type="button"
+                                      class="text-gray-500 hover:text-gray-800 transition"
+                                      title="Copy number"
+                                  >
+                                     Copy
+                                  </button>
                               </div>
                           </h3>
                         </div>
-                        <!--<div>
-                            <h3 class="font-semibold text-gray-900 mb-2">Bank Details</h3>
-                            <div class="text-sm text-gray-700 space-y-1">
-                                <?php if(\App\Models\Setting::get('bank_name')): ?>
-                                <p><strong>Bank:</strong> <?php echo e(\App\Models\Setting::get('bank_name')); ?></p>
-                                <?php endif; ?>
-                                <?php if(\App\Models\Setting::get('bank_account_number')): ?>
-                                <p><strong>Account Number:</strong> <?php echo e(\App\Models\Setting::get('bank_account_number')); ?></p>
-                                <?php endif; ?>
-                                <?php if(\App\Models\Setting::get('bank_ifsc')): ?>
-                                <p><strong>IFSC:</strong> <?php echo e(\App\Models\Setting::get('bank_ifsc')); ?></p>
-                                <?php endif; ?>
-                                <?php if(\App\Models\Setting::get('bank_account_holder')): ?>
-                                <p><strong>Account Holder:</strong> <?php echo e(\App\Models\Setting::get('bank_account_holder')); ?></p>
-                                <?php endif; ?>
-                            </div>
-                        </div>-->
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Upload Payment Proof *</label>
+                            <input type="file" name="payment_proof" accept="image/*" class="input-field">
+                            <p class="text-xs text-gray-500 mt-1">Upload screenshot of payment transaction</p>
+                        </div>
                     </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Upload Payment Proof *</label>
-                        <input type="file" name="payment_proof" accept="image/*" required class="input-field">
-                        <p class="text-xs text-gray-500 mt-1">Upload screenshot of payment transaction</p>
+
+                    <!-- COD Section (shown when COD is selected) -->
+                    <div id="cod-payment-section" class="hidden">
+                        <div class="border rounded-lg p-4 bg-green-50">
+                            <h3 class="font-semibold text-green-900 mb-2">Cash on Delivery</h3>
+                            <p class="text-sm text-green-700">Pay cash when your order is delivered. No additional charges.</p>
+                        </div>
+                    </div>
+
+                    <!-- Razorpay Section (shown when Razorpay is selected) -->
+                    <div id="razorpay-payment-section" class="hidden">
+                        <div class="border rounded-lg p-4 bg-purple-50">
+                            <h3 class="font-semibold text-purple-900 mb-2">Online Payment</h3>
+                            <p class="text-sm text-purple-700">Pay securely using credit card, debit card, UPI, wallets, etc.</p>
+                        </div>
                     </div>
                 </div>
                 
@@ -232,13 +235,88 @@
             alert('Failed to copy');
         });
     }
-<?php if(auth()->guard()->check()): ?>
-// Checkout Address Management AJAX
-document.addEventListener('DOMContentLoaded', function() {
-    if (document.getElementById('checkout-addresses-list')) {
-        loadCheckoutAddresses();
+
+    // Payment methods functionality
+    let selectedPaymentMethod = null;
+
+    function loadPaymentMethods() {
+        fetch('/api/payment-methods')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.methods.length > 0) {
+                    renderPaymentMethods(data.methods);
+                } else {
+                    // Fallback to manual payment if no methods configured
+                    renderPaymentMethods([{
+                        method: 'manual',
+                        name: 'Manual Payment',
+                        description: 'Pay via QR code, UPI, or bank transfer'
+                    }]);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading payment methods:', error);
+                // Fallback to manual payment
+                renderPaymentMethods([{
+                    method: 'manual',
+                    name: 'Manual Payment',
+                    description: 'Pay via QR code, UPI, or bank transfer'
+                }]);
+            });
     }
-});
+
+    function renderPaymentMethods(methods) {
+        const container = document.getElementById('payment-methods');
+        container.innerHTML = methods.map((method, index) => `
+            <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:border-[#D4AF37] transition-all">
+                <input type="radio" 
+                       name="payment_method" 
+                       value="${method.method}" 
+                       ${index === 0 ? 'checked' : ''}
+                       onchange="selectPaymentMethod('${method.method}')"
+                       class="accent-[#D4AF37] w-5 h-5">
+                <div class="ml-4 flex-1">
+                    <div class="font-semibold text-gray-900">${method.name}</div>
+                    <div class="text-sm text-gray-600">${method.description}</div>
+                </div>
+            </label>
+        `).join('');
+
+        // Select first method by default
+        if (methods.length > 0) {
+            selectPaymentMethod(methods[0].method);
+        }
+    }
+
+    function selectPaymentMethod(method) {
+        selectedPaymentMethod = method;
+        
+        // Hide all payment sections
+        document.getElementById('manual-payment-section').classList.add('hidden');
+        document.getElementById('cod-payment-section').classList.add('hidden');
+        document.getElementById('razorpay-payment-section').classList.add('hidden');
+        
+        // Show relevant section
+        if (method === 'manual') {
+            document.getElementById('manual-payment-section').classList.remove('hidden');
+        } else if (method === 'cod') {
+            document.getElementById('cod-payment-section').classList.remove('hidden');
+        } else if (method === 'razorpay') {
+            document.getElementById('razorpay-payment-section').classList.remove('hidden');
+        }
+    }
+    
+    // Checkout Address Management AJAX
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load payment methods
+        loadPaymentMethods();
+        
+        <?php if(auth()->guard()->check()): ?>
+        if (document.getElementById('checkout-addresses-list')) {
+            loadCheckoutAddresses();
+        }
+        <?php endif; ?>
+    });
 
 let selectedAddressId = null;
 
@@ -312,7 +390,6 @@ document.addEventListener('submit', function(e) {
         });
     }
 });
-<?php endif; ?>
 document.addEventListener('DOMContentLoaded', function() {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
     
@@ -375,6 +452,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle form submission
     document.getElementById('checkout-form').addEventListener('submit', function(e) {
         e.preventDefault();
+        
+        // Validate payment method selection
+        if (!selectedPaymentMethod) {
+            alert('Please select a payment method');
+            return;
+        }
+        
+        // For manual payment, validate payment proof
+        if (selectedPaymentMethod === 'manual') {
+            const paymentProof = document.querySelector('input[name="payment_proof"]');
+            if (!paymentProof || !paymentProof.files.length) {
+                alert('Please upload payment proof for manual payment');
+                return;
+            }
+        }
+        
         const formData = new FormData(this);
         // Append items as indexed fields so Laravel receives them as arrays
         cart.forEach((item, idx) => {
@@ -391,6 +484,47 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeof selectedAddressId !== 'undefined' && selectedAddressId) {
             formData.append('address_id', selectedAddressId);
         }
+        // Add selected payment method
+        formData.append('payment_method', selectedPaymentMethod);
+        
+        // For Razorpay, handle payment flow
+        if (selectedPaymentMethod === 'razorpay') {
+            // Create Razorpay order first
+            fetch(`${API_BASE}/checkout/create-razorpay-order`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    items: cart.map(item => ({
+                        product_id: item.product_id,
+                        quantity: item.quantity,
+                        attributes: item.attributes || []
+                    })),
+                    address_id: typeof selectedAddressId !== 'undefined' ? selectedAddressId : null,
+                    ...Object.fromEntries(formData.entries())
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    openRazorpayCheckout(data.razorpay_order_id, data.order_id, data.amount);
+                } else {
+                    alert('Error creating payment order: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        } else {
+            // For manual and COD, proceed with normal order placement
+            placeOrder(formData);
+        }
+    });
+    
+    function placeOrder(formData) {
         fetch(`${API_BASE}/checkout/place-order`, {
             method: 'POST',
             headers: {
@@ -419,7 +553,91 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error:', error);
             alert('An error occurred. Please try again.');
         });
-    });
+    }
+    
+    function openRazorpayCheckout(razorpayOrderId, orderId, amount) {
+        // Get Razorpay key from server
+        fetch('/api/payment-methods')
+            .then(response => response.json())
+            .then(data => {
+                const razorpayMethod = data.methods.find(m => m.method === 'razorpay');
+                if (!razorpayMethod) {
+                    alert('Razorpay is not available');
+                    return;
+                }
+
+                // Get Razorpay key from settings
+                const razorpayKey = '<?php echo e(\App\Models\PaymentSetting::getSettings("razorpay")["key_id"] ?? ""); ?>';
+                
+                if (!razorpayKey) {
+                    alert('Razorpay is not configured properly');
+                    return;
+                }
+
+                // Initialize Razorpay
+                const options = {
+                    key: razorpayKey,
+                    amount: amount * 100, // Convert to paise
+                    currency: 'INR',
+                    name: 'Suvee',
+                    description: 'Order Payment',
+                    order_id: razorpayOrderId,
+                    handler: function (response) {
+                        // Payment successful
+                        verifyRazorpayPayment(response.razorpay_payment_id, orderId, razorpayOrderId);
+                    },
+                    prefill: {
+                        name: document.querySelector('input[name="name"]')?.value || '',
+                        email: document.querySelector('input[name="email"]')?.value || '',
+                        contact: document.querySelector('input[name="mobile"]')?.value || ''
+                    },
+                    theme: {
+                        color: '#D4AF37'
+                    },
+                    modal: {
+                        ondismiss: function() {
+                            console.log('Razorpay modal closed');
+                        }
+                    }
+                };
+
+                const rzp = new Razorpay(options);
+                rzp.open();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to initialize payment: ' + error.message);
+            });
+    }
+    
+    function verifyRazorpayPayment(paymentId, orderId, razorpayOrderId) {
+        fetch('/api/checkout/verify-razorpay-payment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({
+                razorpay_payment_id: paymentId,
+                razorpay_order_id: razorpayOrderId,
+                order_id: orderId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                localStorage.removeItem('cart');
+                updateCartCount();
+                window.location.href = '/order/success/' + encodeURIComponent(data.order_number);
+            } else {
+                alert('Payment verification failed: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Payment verification failed');
+        });
+    }
     
     function updateCartCount() {
         const cart = JSON.parse(localStorage.getItem('cart') || '[]');
