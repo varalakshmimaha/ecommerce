@@ -125,7 +125,7 @@
         <div class="border-t pt-6">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-semibold text-gray-900">Related Products</h3>
-                <button type="button" onclick="openSuveeRelatedProductsModal()" class="suvee-add-related-btn bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-5 py-2.5 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 flex items-center space-x-2 relative z-10">
+                <button type="button" onclick="openSuveeRelatedProductsModal()" class="suvee-add-related-btn bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-5 py-2.5 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 flex items-center space-x-2 relative z-10">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                     </svg>
@@ -196,7 +196,7 @@
                     </div>
                 </div>
             </div>
-            <button type="button" onclick="addAttributeRow()" class="mt-4 text-[#D4AF37] hover:text-[#D4AF37] font-medium">
+            <button type="button" onclick="addAttributeRow()" class="mt-4 text-brand-gold hover:text-brand-amber font-medium">
                 + Add Another Attribute
             </button>
         </div>
@@ -218,7 +218,7 @@
         
         <div class="flex justify-end space-x-4 pt-6 border-t">
             <a href="{{ route('admin.products.index') }}" class="suvee-form-cancel-btn px-5 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-all duration-300 hover:shadow-md transform hover:-translate-y-0.5">Cancel</a>
-            <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Create Product</button>
+            <button type="submit" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Create Product</button>
         </div>
     </form>
 </div>
@@ -259,14 +259,14 @@
                         <input type="text" 
                                id="suvee-product-search" 
                                placeholder="Search by product name or SKU..." 
-                               class="suvee-search-input w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl bg-white shadow-sm focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all text-base">
+                               class="suvee-search-input w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl bg-white shadow-sm focus:ring-2 focus:ring-brand-gold focus:border-brand-gold transition-all text-base">
                     </div>
                     <p class="suvee-search-hint text-xs text-gray-400 mt-2 ml-1">Type at least 2 characters to search products</p>
                 </div>
                 
                 <!-- Selected Products Count -->
                 <div id="suvee-selected-count" class="suvee-selected-count mb-4 hidden">
-                    <div class="inline-flex items-center px-3 py-1.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] text-sm font-medium">
+                    <div class="inline-flex items-center px-3 py-1.5 rounded-full bg-brand-gold/10 text-brand-gold text-sm font-medium">
                         <span id="suvee-selected-number">0</span> product(s) selected
                     </div>
                 </div>
@@ -295,7 +295,7 @@
                         <button type="button" onclick="closeSuveeRelatedProductsModal()" class="suvee-cancel-btn px-5 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-colors">
                             Cancel
                         </button>
-                        <button type="button" onclick="addSuveeSelectedProducts()" id="suvee-add-products-btn" class="suvee-add-btn px-5 py-2.5 bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white rounded-lg hover:shadow-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300" disabled>
+                        <button type="button" onclick="addSuveeSelectedProducts()" id="suvee-add-products-btn" class="suvee-add-btn px-5 py-2.5 bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white rounded-lg hover:shadow-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300" disabled>
                             <span class="flex items-center space-x-2">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
