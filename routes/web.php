@@ -159,9 +159,20 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::get('/product-attributes', [\App\Http\Controllers\Admin\ProductAttributeController::class, 'index'])->name('product-attributes.index');
     Route::get('/product-attributes/create', [\App\Http\Controllers\Admin\ProductAttributeController::class, 'create'])->name('product-attributes.create');
     Route::post('/product-attributes', [\App\Http\Controllers\Admin\ProductAttributeController::class, 'store'])->name('product-attributes.store');
+    Route::get('/product-attributes/{productAttribute}', [\App\Http\Controllers\Admin\ProductAttributeController::class, 'show'])->name('product-attributes.show');
     Route::get('/product-attributes/{productAttribute}/edit', [\App\Http\Controllers\Admin\ProductAttributeController::class, 'edit'])->name('product-attributes.edit');
     Route::put('/product-attributes/{productAttribute}', [\App\Http\Controllers\Admin\ProductAttributeController::class, 'update'])->name('product-attributes.update');
     Route::delete('/product-attributes/{productAttribute}', [\App\Http\Controllers\Admin\ProductAttributeController::class, 'destroy'])->name('product-attributes.destroy');
+    Route::post('/product-attributes/{productAttribute}/toggle-status', [\App\Http\Controllers\Admin\ProductAttributeController::class, 'toggleStatus'])->name('product-attributes.toggle-status');
+
+    // Product Attribute Values
+    Route::get('/product-attribute-values', [\App\Http\Controllers\Admin\ProductAttributeValueController::class, 'index'])->name('product-attribute-values.index');
+    Route::get('/product-attribute-values/create', [\App\Http\Controllers\Admin\ProductAttributeValueController::class, 'create'])->name('product-attribute-values.create');
+    Route::post('/product-attribute-values', [\App\Http\Controllers\Admin\ProductAttributeValueController::class, 'store'])->name('product-attribute-values.store');
+    Route::get('/product-attribute-values/{productAttributeValue}/edit', [\App\Http\Controllers\Admin\ProductAttributeValueController::class, 'edit'])->name('product-attribute-values.edit');
+    Route::put('/product-attribute-values/{productAttributeValue}', [\App\Http\Controllers\Admin\ProductAttributeValueController::class, 'update'])->name('product-attribute-values.update');
+    Route::delete('/product-attribute-values/{productAttributeValue}', [\App\Http\Controllers\Admin\ProductAttributeValueController::class, 'destroy'])->name('product-attribute-values.destroy');
+    Route::post('/product-attribute-values/{productAttributeValue}/toggle-status', [\App\Http\Controllers\Admin\ProductAttributeValueController::class, 'toggleStatus'])->name('product-attribute-values.toggle-status');
 
     // Pages (dynamic pages managed by admin)
     Route::get('/pages', [\App\Http\Controllers\Admin\PageController::class, 'index'])->name('pages.index');

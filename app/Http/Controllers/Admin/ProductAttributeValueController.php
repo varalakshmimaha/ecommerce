@@ -37,9 +37,9 @@ class ProductAttributeValueController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'attribute_id' => 'required|exists:product_attributes,id',
+            'product_attribute_id' => 'required|exists:product_attributes,id',
             'value' => 'required|string|max:255',
-            'hex_code' => 'nullable|string|max:7',
+            'hex_color' => 'nullable|string|max:7|regex:/^#[0-9A-Fa-f]{6}$/',
             'is_active' => 'boolean',
             'sort_order' => 'integer|min:0',
         ]);
@@ -48,7 +48,7 @@ class ProductAttributeValueController extends Controller
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
 
         // Check for duplicate value within the same attribute
-        $existing = ProductAttributeValue::where('attribute_id', $validated['attribute_id'])
+        $existing = ProductAttributeValue::where('product_attribute_id', $validated['product_attribute_id'])
             ->where('value', $validated['value'])
             ->first();
 
@@ -58,8 +58,8 @@ class ProductAttributeValueController extends Controller
 
         ProductAttributeValue::create($validated);
 
-        return redirect()->route('admin.product-attribute-values.index', ['attribute_id' => $validated['attribute_id']])
-            ->with('success', 'Attribute value created successfully.');
+        return redirect()->route('admin.product-attribute-values.index')
+            ->with('success', 'Product attribute value created successfully.');
     }
 
     public function edit(ProductAttributeValue $productAttributeValue)
@@ -71,9 +71,9 @@ class ProductAttributeValueController extends Controller
     public function update(Request $request, ProductAttributeValue $productAttributeValue)
     {
         $validated = $request->validate([
-            'attribute_id' => 'required|exists:product_attributes,id',
+            'product_attribute_id' => 'required|exists:product_attributes,id',
             'value' => 'required|string|max:255',
-            'hex_code' => 'nullable|string|max:7',
+            'hex_color' => 'nullable|string|max:7|regex:/^#[0-9A-Fa-f]{6}$/',
             'is_active' => 'boolean',
             'sort_order' => 'integer|min:0',
         ]);
@@ -82,7 +82,7 @@ class ProductAttributeValueController extends Controller
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
 
         // Check for duplicate value within the same attribute (excluding current record)
-        $existing = ProductAttributeValue::where('attribute_id', $validated['attribute_id'])
+        $existing = ProductAttributeValue::where('product_attribute_id', $validated['product_attribute_id'])
             ->where('value', $validated['value'])
             ->where('id', '!=', $productAttributeValue->id)
             ->first();
@@ -93,7 +93,7 @@ class ProductAttributeValueController extends Controller
 
         $productAttributeValue->update($validated);
 
-        return redirect()->route('admin.product-attribute-values.index', ['attribute_id' => $validated['attribute_id']])
+        return redirect()->route('admin.product-attribute-values.index')
             ->with('success', 'Attribute value updated successfully.');
     }
 
