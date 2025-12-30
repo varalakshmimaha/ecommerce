@@ -12,9 +12,34 @@
         <style>
             :root {
                 @foreach($themeColors as $variable => $value)
-                    {{ $variable }}: {{ $value }};
+                    {{ $variable }}: {{ $value }} !important;
                 @endforeach
             }
+            
+            /* Override specific classes with theme colors */
+            .bg-brand-gold { background-color: var(--brand-gold) !important; }
+            .bg-brand-amber { background-color: var(--brand-amber) !important; }
+            .bg-brand-burnt { background-color: var(--brand-burnt) !important; }
+            .bg-brand-crimson { background-color: var(--brand-crimson) !important; }
+            
+            .text-brand-gold { color: var(--brand-gold) !important; }
+            .text-brand-amber { color: var(--brand-amber) !important; }
+            .text-brand-burnt { color: var(--brand-burnt) !important; }
+            .text-brand-crimson { color: var(--brand-crimson) !important; }
+            
+            .text-text-heading { color: var(--text-heading) !important; }
+            .text-text-body { color: var(--text-body) !important; }
+            .text-text-muted { color: var(--text-muted) !important; }
+            
+            .bg-surface-primary { background-color: var(--surface-primary) !important; }
+            .bg-surface-secondary { background-color: var(--surface-secondary) !important; }
+            .bg-surface-light { background-color: var(--surface-light) !important; }
+            .bg-surface-medium { background-color: var(--surface-medium) !important; }
+            .bg-surface-dark { background-color: var(--surface-dark) !important; }
+            
+            .border-ui-border { border-color: var(--ui-border) !important; }
+            .focus\\:ring-ui-focus:focus { --tw-ring-color: var(--ui-focus) !important; }
+            .accent-brand-gold { accent-color: var(--brand-gold) !important; }
         </style>
     @endif
 </head>
