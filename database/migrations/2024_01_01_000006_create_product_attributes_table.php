@@ -10,12 +10,14 @@ return new class extends Migration
     {
         Schema::create('product_attributes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->string('attribute_name'); // color, size, etc.
-            $table->string('attribute_value');
-            $table->decimal('price_adjustment', 10, 2)->default(0);
-            $table->integer('stock_adjustment')->default(0);
+            $table->string('name'); // Color, Size, Material
+            $table->string('slug')->unique(); // color, size, material
+            $table->text('description')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->integer('sort_order')->default(0);
             $table->timestamps();
+            
+            $table->index(['is_active', 'sort_order']);
         });
     }
 
