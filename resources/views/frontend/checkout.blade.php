@@ -413,6 +413,10 @@ document.addEventListener('DOMContentLoaded', function() {
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                @auth
+                ,
+                'Authorization': `Bearer {{ auth()->user()->createToken("checkout")->plainTextToken }}`
+                @endauth
             },
             body: JSON.stringify({ items })
         })
@@ -497,6 +501,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    @auth
+                    ,
+                    'Authorization': `Bearer {{ auth()->user()->createToken("checkout")->plainTextToken }}`
+                    @endauth
                 },
                 body: JSON.stringify({
                     items: cart.map(item => ({
@@ -527,11 +535,19 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     function placeOrder(formData) {
+        const headers = {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        };
+        
+        // Add authorization token if user is logged in
+        @auth
+        const token = '{{ auth()->user()->createToken("checkout")->plainTextToken }}';
+        headers['Authorization'] = `Bearer ${token}`;
+        @endauth
+        
         fetch(`${API_BASE}/checkout/place-order`, {
             method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            },
+            headers: headers,
             body: formData
         })
         .then(res => res.json())
@@ -613,12 +629,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function verifyRazorpayPayment(paymentId, orderId, razorpayOrderId) {
+        const headers = {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        };
+        
+        // Add authorization token if user is logged in
+        @auth
+        const token = '{{ auth()->user()->createToken("checkout")->plainTextToken }}';
+        headers['Authorization'] = `Bearer ${token}`;
+        @endauth
+        
         fetch('/api/checkout/verify-razorpay-payment', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            },
+            headers: headers,
             body: JSON.stringify({
                 razorpay_payment_id: paymentId,
                 razorpay_order_id: razorpayOrderId,
