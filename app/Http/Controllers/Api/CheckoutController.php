@@ -105,14 +105,12 @@ class CheckoutController extends Controller
             }
 
             // Auto-create or attach user when guest provides email
-            $userId = auth()->id();
+            $userId = $request->user()->id;
             $newUserPassword = null;
             $isNewUser = false;
 
             if (!$userId) {
-                if ($request->mobile) {
-                    $existing = User::where('mobile', $request->mobile)->first();
-                }
+                $existing = User::where('mobile', $request->mobile)->first();
                 if ($existing) {
                     $userId = $existing->id;
                 } else {
@@ -365,7 +363,7 @@ class CheckoutController extends Controller
             ]);
 
             // Create order in database with pending status
-            $userId = auth()->id();
+            $userId = $request->user()->id;
             $order = Order::create([
                 'user_id' => $userId,
                 'razorpay_order_id' => $razorpayOrder['id'],
