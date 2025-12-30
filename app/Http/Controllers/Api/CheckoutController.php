@@ -104,27 +104,35 @@ class CheckoutController extends Controller
                 $paymentProofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
             }
 
-            // Auto-create or attach user when guest provides email
-            $userId = auth()->id();
-            $newUserPassword = null;
+            // Handle user identification
+            $userId = null;
             $isNewUser = false;
 
-            if (!$userId) {
-                $existing = User::where('mobile', $request->mobile)->first();
-                if ($existing) {
-                    $userId = $existing->id;
+            // If user is authenticated, use their ID
+            if (auth()->check()) {
+                $userId = auth()->id();
+            } elseif (!$userId) {
+                // For guest users, check by mobile if provided
+                if ($request->has('mobile')) {
+                    $existing = User::where('mobile', $request->mobile)->first();
+                    if ($existing) {
+                        $userId = $existing->id;
+                    } else {
+                        // Create new user only if mobile is provided
+                        $newUser = User::create([
+                            'name' => $request->name,
+                            'mobile' => $request->mobile,
+                            'email' => $request->email,
+                            'password' => Hash::make(12345678),
+                            'is_verified' => true,
+                        ]);
+                        $userId = $newUser->id;
+                        $isNewUser = true;
+                    }
                 } else {
-                    // Generate random password for new user
-                    $newUserPassword = Str::random(12);
-                    $newUser = User::create([
-                        'name' => $request->name,
-                        'mobile' => $request->mobile,
-                        'email' => $request->email,
-                        'password' => Hash::make(12345678),
-                        'is_verified' => true,
-                    ]);
-                    $userId = $newUser->id;
-                    $isNewUser = true;
+                    return response()->json([
+                        'error' => 'Mobile number is required for guest checkout'
+                    ], 422);
                 }
             }
 
