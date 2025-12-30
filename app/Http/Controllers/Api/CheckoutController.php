@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\ProductVariation;
 use App\Models\PaymentSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -31,8 +32,8 @@ class CheckoutController extends Controller
             'pincode' => 'required_without:address_id|string|max:10',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
+            'items.*.variation_id' => 'nullable|exists:product_variations,id',
             'items.*.quantity' => 'required|integer|min:1',
-            'items.*.attributes' => 'nullable|array',
             'payment_proof' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'payment_method' => 'required|in:manual,cod,razorpay',
         ]);
@@ -57,26 +58,41 @@ class CheckoutController extends Controller
 
             foreach ($request->items as $item) {
                 $product = Product::findOrFail($item['product_id']);
-                
-                if ($product->stock_quantity < $item['quantity']) {
-                    return response()->json([
-                        'error' => "Insufficient stock for {$product->name}"
-                    ], 400);
-                }
-
+                $variation = null;
                 $price = $product->final_price;
+                $stock = $product->stock_quantity;
                 
-                // Apply attribute-based pricing if any
-                if (!empty($item['attributes'])) {
-                    foreach ($item['attributes'] as $attr) {
-                        $attribute = $product->attributes()
-                            ->where('attribute_name', $attr['name'])
-                            ->where('attribute_value', $attr['value'])
-                            ->first();
-                        
-                        if ($attribute) {
-                            $price += $attribute->price_adjustment;
-                        }
+                // Handle variation if provided
+                if (!empty($item['variation_id'])) {
+                    $variation = ProductVariation::findOrFail($item['variation_id']);
+                    
+                    // Ensure variation belongs to the product
+                    if ($variation->product_id !== $product->id) {
+                        return response()->json([
+                            'error' => "Variation does not belong to product {$product->name}"
+                        ], 400);
+                    }
+                    
+                    if (!$variation->is_active) {
+                        return response()->json([
+                            'error' => "Variation is not available for {$product->name}"
+                        ], 400);
+                    }
+                    
+                    if ($variation->stock < $item['quantity']) {
+                        return response()->json([
+                            'error' => "Insufficient stock for {$product->name} - {$variation->variation_title}"
+                        ], 400);
+                    }
+                    
+                    $price = $variation->price;
+                    $stock = $variation->stock;
+                } else {
+                    // Check product stock if no variation
+                    if ($stock < $item['quantity']) {
+                        return response()->json([
+                            'error' => "Insufficient stock for {$product->name}"
+                        ], 400);
                     }
                 }
 
@@ -88,10 +104,10 @@ class CheckoutController extends Controller
 
                 $items[] = [
                     'product' => $product,
+                    'variation' => $variation,
                     'quantity' => $item['quantity'],
                     'price' => $price,
                     'subtotal' => $itemSubtotal,
-                    'attributes' => $item['attributes'] ?? null,
                 ];
             }
 
@@ -182,18 +198,27 @@ class CheckoutController extends Controller
 
             // Create order items
             foreach ($items as $item) {
+                $productName = $item['product']->name;
+                if ($item['variation']) {
+                    $productName .= ' - ' . $item['variation']->variation_title;
+                }
+
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $item['product']->id,
-                    'product_name' => $item['product']->name,
+                    'variation_id' => $item['variation'] ? $item['variation']->id : null,
+                    'product_name' => $productName,
                     'price' => $item['price'],
                     'quantity' => $item['quantity'],
                     'subtotal' => $item['subtotal'],
-                    'attributes' => $item['attributes'],
                 ]);
 
                 // Update stock
-                $item['product']->decrement('stock_quantity', $item['quantity']);
+                if ($item['variation']) {
+                    $item['variation']->decrement('stock', $item['quantity']);
+                } else {
+                    $item['product']->decrement('stock_quantity', $item['quantity']);
+                }
             }
 
             DB::commit();
@@ -235,8 +260,8 @@ class CheckoutController extends Controller
         $validator = Validator::make($request->all(), [
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
+            'items.*.variation_id' => 'nullable|exists:product_variations,id',
             'items.*.quantity' => 'required|integer|min:1',
-            'items.*.attributes' => 'nullable|array',
         ]);
 
         if ($validator->fails()) {
@@ -249,19 +274,27 @@ class CheckoutController extends Controller
 
         foreach ($request->items as $item) {
             $product = Product::findOrFail($item['product_id']);
+            $variation = null;
             $price = $product->final_price;
             
-            if (!empty($item['attributes'])) {
-                foreach ($item['attributes'] as $attr) {
-                    $attribute = $product->attributes()
-                        ->where('attribute_name', $attr['name'])
-                        ->where('attribute_value', $attr['value'])
-                        ->first();
-                    
-                    if ($attribute) {
-                        $price += $attribute->price_adjustment;
-                    }
+            // Handle variation if provided
+            if (!empty($item['variation_id'])) {
+                $variation = ProductVariation::findOrFail($item['variation_id']);
+                
+                // Ensure variation belongs to the product
+                if ($variation->product_id !== $product->id) {
+                    return response()->json([
+                        'error' => "Variation does not belong to product {$product->name}"
+                    ], 400);
                 }
+                
+                if (!$variation->is_active) {
+                    return response()->json([
+                        'error' => "Variation is not available for {$product->name}"
+                    ], 400);
+                }
+                
+                $price = $variation->price;
             }
 
             $itemSubtotal = $price * $item['quantity'];
@@ -272,7 +305,8 @@ class CheckoutController extends Controller
 
             $items[] = [
                 'product_id' => $product->id,
-                'product_name' => $product->name,
+                'variation_id' => $variation ? $variation->id : null,
+                'product_name' => $product->name . ($variation ? ' - ' . $variation->variation_title : ''),
                 'quantity' => $item['quantity'],
                 'price' => $price,
                 'subtotal' => $itemSubtotal,

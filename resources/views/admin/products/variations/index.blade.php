@@ -121,6 +121,13 @@
                                     @endif
                                     <div>
                                         <div class="font-medium text-gray-900">{{ $variation->variation_title }}</div>
+                                        <div class="text-sm text-gray-500">
+                                            @foreach($variation->attributeValues as $attrValue)
+                                                <span class="inline-block px-2 py-1 bg-gray-100 rounded text-xs mr-1 mb-1">
+                                                    {{ $attrValue->attribute->name }}: {{ $attrValue->attributeValue->value }}
+                                                </span>
+                                            @endforeach
+                                        </div>
                                         @if($variation->is_default)
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-brand-gold text-white">
                                                 Default
@@ -190,16 +197,12 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-12 text-center">
-                                <div class="text-gray-500">
-                                    <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
-                                    </svg>
-                                    <h3 class="text-lg font-medium text-gray-900 mb-2">No variations found</h3>
-                                    <p class="text-gray-500 mb-4">Get started by creating a new variation for this product.</p>
-                                    <a href="{{ route('admin.products.variations.create', $product) }}" 
-                                       class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg transition-all duration-300">
-                                        Create First Variation
+                            <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                                No variations found. 
+                                <a href="{{ route('admin.products.variations.create', $product) }}" 
+                                   class="text-brand-gold hover:text-brand-amber font-medium">
+                                    Create one
+                                </a>
                                     </a>
                                 </div>
                             </td>
@@ -228,30 +231,20 @@ function toggleVariationStatus(variationId) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
         }
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
             location.reload();
-        }
-    });
-}
-
-function setDefaultVariation(variationId) {
-    fetch(`/admin/products/{{ $product->id }}/variations/${variationId}/set-default`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        } else {
+            alert(data.message || 'Something went wrong');
         }
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload();
-        }
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Something went wrong');
     });
 }
 

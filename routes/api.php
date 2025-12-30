@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ProductVariationController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -19,6 +20,14 @@ Route::get('/categories', [ProductController::class, 'categories']);
 Route::get('/categories/{category}', [ProductController::class, 'showCategory']);
 Route::get('/brands', [ProductController::class, 'brands']);
 Route::get('/banners', [ProductController::class, 'banners']);
+
+// Product Variation Routes
+Route::get('/products/{product}/variations', [ProductVariationController::class, 'index']);
+Route::get('/products/{product}/variations/find', [ProductVariationController::class, 'findByAttributes']);
+Route::get('/products/{product}/variations/available', [ProductVariationController::class, 'getAvailableCombinations']);
+Route::get('/products/{product}/variations/attributes', [ProductVariationController::class, 'getAttributes']);
+Route::get('/products/{product}/variations/{variation}/stock', [ProductVariationController::class, 'checkStock']);
+Route::get('/products/{product}/variations/price-range', [ProductVariationController::class, 'getPriceRange']);
 
 // Auth Routes
 Route::post('/register', [AuthController::class, 'register']);
