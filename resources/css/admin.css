@@ -14,26 +14,35 @@
     }
 
     :root {
+        /* Default theme colors - will be overridden by dynamic theme */
         --brand-gold: #F4B41A;
         --brand-amber: #F28C28;
         --brand-burnt: #E36F2D;
         --brand-crimson: #C73A2B;
 
-        --text-heading: #111111;
-        --text-body: #444444;
-        --text-muted: #777777;
+        --text-heading: #1A1A1A;
+        --text-body: #374151;
+        --text-muted: #6B6B6B;
+        --text-white: #FFFFFF;
 
-        --bg-main: #FFFFFF;
-        --bg-alt: #FAF6F2;
-        --bg-card: #FFF8F2;
+        --surface-primary: #FFFFFF;
+        --surface-secondary: #F9FAFB;
+        --surface-light: #F3F4F6;
+        --surface-medium: #E5E7EB;
+        --surface-dark: #111827;
 
-        --ui-hover: #D97706;
-        --ui-border: #EAD7C5;
-        --ui-success: #E8A23A;
+        --ui-primary: #3B82F6;
+        --ui-success: #10B981;
+        --ui-warning: #F59E0B;
+        --ui-error: #EF4444;
+        --ui-info: #06B6D4;
+        --ui-hover: #F3F4F6;
+        --ui-border: #D1D5DB;
+        --ui-focus: #F4B41A;
 
-        --gradient-cta: linear-gradient(135deg, #F4B41A, #F28C28, #C73A2B);
-        --gradient-subtle: linear-gradient(180deg, #FDF2E9, #F4B41A);
-        --gradient-button: linear-gradient(135deg, #F4B41A, #F28C28, #C73A2B);
+        --gradient-cta: linear-gradient(135deg, var(--brand-gold), var(--brand-amber), var(--brand-crimson));
+        --gradient-subtle: linear-gradient(180deg, #FDF2E9, var(--brand-gold));
+        --gradient-button: linear-gradient(135deg, var(--brand-gold), var(--brand-amber), var(--brand-crimson));
     }
 
     /* Golden theme for checkboxes and radio buttons */
