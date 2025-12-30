@@ -25,9 +25,11 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// Checkout Routes
+// Checkout Routes (works for both authenticated and guest users)
 Route::post('/checkout/calculate', [CheckoutController::class, 'calculateTotal']);
 Route::post('/checkout/place-order', [CheckoutController::class, 'placeOrder']);
+Route::post('/checkout/create-razorpay-order', [CheckoutController::class, 'createRazorpayOrder']);
+Route::post('/checkout/verify-razorpay-payment', [CheckoutController::class, 'verifyRazorpayPayment']);
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {

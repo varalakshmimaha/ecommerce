@@ -108,10 +108,18 @@ class CheckoutController extends Controller
             $userId = null;
             $isNewUser = false;
 
-            // If user is authenticated, use their ID
-            if (auth()->check()) {
-                $userId = auth()->id();
-            } elseif (!$userId) {
+            // Try to authenticate user from token if provided
+            $token = $request->bearerToken();
+            if ($token) {
+                // Try to find user by token
+                $sanctumToken = \Laravel\Sanctum\PersonalAccessToken::findToken($token);
+                if ($sanctumToken) {
+                    $userId = $sanctumToken->tokenable_id;
+                }
+            }
+
+            // If still no user ID, check guest user logic
+            if (!$userId) {
                 // For guest users, check by mobile if provided
                 if ($request->has('mobile')) {
                     $existing = User::where('mobile', $request->mobile)->first();
