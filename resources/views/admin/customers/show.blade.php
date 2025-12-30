@@ -85,12 +85,6 @@
                         <div class="text-sm text-text-muted">Customer Since</div>
                         <div class="font-medium text-text-heading">{{ $customer->created_at->format('M d, Y') }}</div>
                     </div>
-                    @if($customer->notes)
-                        <div>
-                            <div class="text-sm text-text-muted">Notes</div>
-                            <div class="font-medium text-text-heading">{{ $customer->notes }}</div>
-                        </div>
-                    @endif
                 </div>
 
                 <!-- Quick Actions -->

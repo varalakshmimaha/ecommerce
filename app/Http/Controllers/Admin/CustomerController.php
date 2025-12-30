@@ -68,7 +68,6 @@ class CustomerController extends Controller
             'state' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:20',
             'country' => 'nullable|string|max:100',
-            'notes' => 'nullable|string|max:1000',
             'is_verified' => 'boolean',
         ]);
 
@@ -180,7 +179,6 @@ class CustomerController extends Controller
             'state' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:20',
             'country' => 'nullable|string|max:100',
-            'notes' => 'nullable|string|max:1000',
             'is_verified' => 'boolean',
         ]);
 

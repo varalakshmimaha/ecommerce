@@ -149,53 +149,6 @@
                 </div>
             </div>
 
-            <!-- Additional Information -->
-            <div>
-                <h3 class="text-lg font-semibold text-text-heading mb-4 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                    Additional Information
-                </h3>
-                <div>
-                    <label for="notes" class="block text-sm font-medium text-text-heading mb-2">Notes</label>
-                    <textarea id="notes" name="notes" rows="3" 
-                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
-                              placeholder="Add any additional notes about this customer...">{{ old('notes', $customer->notes) }}</textarea>
-                    @error('notes')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-            </div>
-
-            <!-- Customer Statistics -->
-            <div class="bg-gray-50 rounded-lg p-4">
-                <h3 class="text-lg font-semibold text-text-heading mb-3">Customer Statistics</h3>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div class="bg-white rounded-lg p-4 border border-gray-200">
-                        <div class="text-sm text-text-muted">Total Orders</div>
-                        <div class="text-2xl font-bold text-brand-gold">{{ $customer->orders()->count() }}</div>
-                    </div>
-                    <div class="bg-white rounded-lg p-4 border border-gray-200">
-                        <div class="text-sm text-text-muted">Total Spent</div>
-                        <div class="text-2xl font-bold text-brand-gold">₹{{ number_format($customer->orders()->sum('total_amount'), 2) }}</div>
-                    </div>
-                    <div class="bg-white rounded-lg p-4 border border-gray-200">
-                        <div class="text-sm text-text-muted">Last Order</div>
-                        <div class="text-sm font-semibold text-text-heading">
-                            @php
-                                $lastOrder = $customer->orders()->latest()->first();
-                            @endphp
-                            {{ $lastOrder ? $lastOrder->created_at->format('M d, Y') : 'No orders' }}
-                        </div>
-                    </div>
-                    <div class="bg-white rounded-lg p-4 border border-gray-200">
-                        <div class="text-sm text-text-muted">Customer Since</div>
-                        <div class="text-sm font-semibold text-text-heading">{{ $customer->created_at->format('M d, Y') }}</div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Form Actions -->
             <div class="flex items-center justify-between pt-6 border-t border-gray-200">
                 <div class="flex gap-3">
