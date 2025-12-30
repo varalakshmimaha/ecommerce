@@ -2,13 +2,13 @@
 <div class="bg-white rounded-xl shadow-md border border-gray-100 p-6 mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fade-in">
     <div>
         <div class="flex items-center gap-2 mb-2">
-            <span class="inline-block w-2 h-6 bg-gradient-to-b from-[#D4AF37] to-[#B8962E] rounded"></span>
-            <span class="font-bold text-lg text-[#1A1A1A]">{{ $address->name }}</span>
+            <span class="inline-block w-2 h-6 bg-gradient-to-b from-brand-gold via-brand-amber to-brand-crimson rounded"></span>
+            <span class="font-bold text-lg text-text-heading">{{ $address->name }}</span>
             @if($address->is_default)
-                <span class="ml-2 px-2 py-1 text-xs rounded-full bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white font-semibold">Default</span>
+                <span class="ml-2 px-2 py-1 text-xs rounded-full bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white font-semibold">Default</span>
             @endif
         </div>
-        <div class="text-[#6B6B6B] text-sm">
+        <div class="text-text-muted text-sm">
             <div>{{ $address->address }}, {{ $address->city }}, {{ $address->state }} - {{ $address->pincode }}</div>
             <div>{{ $address->country }}</div>
             <div>Phone: {{ $address->phone }}</div>
@@ -18,10 +18,10 @@
         @if(!$address->is_default)
         <form method="POST" action="{{ route('user.dashboard.addresses.default', $address) }}" class="inline">
             @csrf
-            <button type="submit" class="px-4 py-2 rounded-lg bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white font-semibold hover:shadow-lg transition-all duration-300">Set Default</button>
+            <button type="submit" class="px-4 py-2 rounded-lg bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white font-semibold hover:shadow-lg transition-all duration-300">Set Default</button>
         </form>
         @endif
-        <button class="px-4 py-2 rounded-lg border border-gray-200 text-[#1A1A1A] hover:bg-gray-50 font-semibold transition-all duration-300" onclick='editAddress({{ $address->id }}, @json($address))'>Edit</button>
+        <button class="px-4 py-2 rounded-lg border border-gray-200 text-text-heading hover:bg-gray-50 font-semibold transition-all duration-300" onclick='editAddress({{ $address->id }}, @json($address))'>Edit</button>
         <form method="POST" action="{{ route('user.dashboard.addresses.destroy', $address) }}" class="inline delete-address-form">
             @csrf
             @method('DELETE')
@@ -31,5 +31,5 @@
 </div>
 @endforeach
 @if($addresses->isEmpty())
-    <div class="text-center text-[#6B6B6B] py-8">No addresses found. Add your first address!</div>
+    <div class="text-center text-text-muted py-8">No addresses found. Add your first address!</div>
 @endif

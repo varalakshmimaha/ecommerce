@@ -7,13 +7,13 @@
     <div class="container mx-auto px-4">
         <!-- Category Header - Mobile Optimized -->
         <div class="mb-4 animate-fade-in">
-            <a href="/" class="text-[#D4AF37] hover:text-[#F5E6A8] text-sm mb-2 inline-flex items-center gap-2 transition-all duration-300">
+            <a href="/" class="text-brand-gold hover:text-brand-amber text-sm mb-2 inline-flex items-center gap-2 transition-all duration-300">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                 </svg>
                 Back to Home
             </a>
-            <div class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] rounded-xl p-4 md:p-8 text-white shadow-xl shadow-[#D4AF37]/20">
+            <div class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson rounded-xl p-4 md:p-8 text-white shadow-xl shadow-brand-gold/20">
                 <h1 class="text-2xl md:text-4xl font-bold mb-1 md:mb-2" id="category-name">Loading...</h1>
                 <p class="text-white/80 text-sm md:text-lg" id="category-description"></p>
             </div>
@@ -21,7 +21,7 @@
 
         <!-- Mobile Filter Toggle -->
         <div class="hide-in-desktop-view mb-4">
-            <button onclick="toggleMobileFilters()" class="w-full bg-white border-2 border-[#D4AF37] text-[#D4AF37] py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-[#D4AF37] hover:text-white transition-all duration-300 shadow-md">
+            <button onclick="toggleMobileFilters()" class="w-full bg-white border-2 border-brand-gold text-brand-gold py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-brand-gold hover:text-white transition-all duration-300 shadow-md">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
                 </svg>
@@ -32,8 +32,8 @@
         <!-- Sub-Categories Slider - Mobile Optimized -->
         <div class="mb-6 animate-slide-up" id="subcategories-section">
             <div class="flex items-center justify-between mb-3">
-                <h2 class="text-lg md:text-2xl font-bold text-[#1A1A1A] flex items-center gap-2">
-                    <span class="w-2 h-6 md:h-8 bg-[#D4AF37] rounded"></span>
+                <h2 class="text-lg md:text-2xl font-bold text-text-heading flex items-center gap-2">
+                    <span class="w-2 h-6 md:h-8 bg-brand-gold rounded"></span>
                     Sub-Categories
                 </h2>
             </div>
@@ -61,33 +61,33 @@
                     <div class="p-4 space-y-4">
                         <!-- Sub-Category Filter -->
                         <div class="bg-gray-50 rounded-xl p-4">
-                            <h3 class="font-semibold text-[#D4AF37] mb-3 flex items-center gap-2">
+                            <h3 class="font-semibold text-brand-gold mb-3 flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
                                 </svg>
                                 Sub-Categories
                             </h3>
-                            <div id="subcategory-filters-mobile" class="space-y-2 text-[#6B6B6B]">
+                            <div id="subcategory-filters-mobile" class="space-y-2 text-text-muted">
                                 <!-- Will load dynamically -->
                             </div>
                         </div>
 
                         <!-- Brand Filter -->
                         <div class="bg-gray-50 rounded-xl p-4">
-                            <h3 class="font-semibold text-[#D4AF37] mb-3 flex items-center gap-2">
+                            <h3 class="font-semibold text-brand-gold mb-3 flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                                 </svg>
                                 Brands
                             </h3>
-                            <div id="brand-filters-mobile" class="space-y-2 text-[#6B6B6B]">
+                            <div id="brand-filters-mobile" class="space-y-2 text-text-muted">
                                 <!-- Will load dynamically -->
                             </div>
                         </div>
 
                         <!-- Price Filter -->
                         <div class="bg-gray-50 rounded-xl p-4">
-                            <h3 class="font-semibold text-[#D4AF37] mb-3 flex items-center gap-2">
+                            <h3 class="font-semibold text-brand-gold mb-3 flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
@@ -95,14 +95,14 @@
                             </h3>
                             <div class="space-y-3">
                                 <div>
-                                    <label class="block text-sm text-[#6B6B6B] mb-2">Min Price</label>
-                                    <input type="number" id="min-price-mobile" min="0" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#CFCFCF]/50 focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent transition-all duration-300" placeholder="0">
+                                    <label class="block text-sm text-text-muted mb-2">Min Price</label>
+                                    <input type="number" id="min-price-mobile" min="0" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-text-heading placeholder-text-muted/50 focus:ring-2 focus:ring-brand-gold focus:border-transparent transition-all duration-300" placeholder="0">
                                 </div>
                                 <div>
-                                    <label class="block text-sm text-[#6B6B6B] mb-2">Max Price</label>
-                                    <input type="number" id="max-price-mobile" min="0" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#CFCFCF]/50 focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent transition-all duration-300" placeholder="50000">
+                                    <label class="block text-sm text-text-muted mb-2">Max Price</label>
+                                    <input type="number" id="max-price-mobile" min="0" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-text-heading placeholder-text-muted/50 focus:ring-2 focus:ring-brand-gold focus:border-transparent transition-all duration-300" placeholder="50000">
                                 </div>
-                                <button onclick="applyPriceFilterMobile()" class="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#D4AF37]/50 transition-all duration-300 transform hover:scale-105">Apply</button>
+                                <button onclick="applyPriceFilterMobile()" class="w-full bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-brand-gold/50 transition-all duration-300 transform hover:scale-105">Apply</button>
                             </div>
                         </div>
                     </div>
@@ -147,14 +147,14 @@
                     </h3>
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-sm text-[#6B6B6B] mb-2">Min Price</label>
-                            <input type="number" id="min-price" min="0" class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#CFCFCF]/50 focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent transition-all duration-300" placeholder="0">
+                            <label class="block text-sm text-text-muted mb-2">Min Price</label>
+                            <input type="number" id="min-price" min="0" class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-text-heading placeholder-text-muted/50 focus:ring-2 focus:ring-brand-gold focus:border-transparent transition-all duration-300" placeholder="0">
                         </div>
                         <div>
-                            <label class="block text-sm text-[#6B6B6B] mb-2">Max Price</label>
-                            <input type="number" id="max-price" min="0" class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] placeholder-[#CFCFCF]/50 focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent transition-all duration-300" placeholder="50000">
+                            <label class="block text-sm text-text-muted mb-2">Max Price</label>
+                            <input type="number" id="max-price" min="0" class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-text-heading placeholder-text-muted/50 focus:ring-2 focus:ring-brand-gold focus:border-transparent transition-all duration-300" placeholder="50000">
                         </div>
-                        <button onclick="applyPriceFilter()" class="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#D4AF37]/50 transition-all duration-300 transform hover:scale-105">Apply</button>
+                        <button onclick="applyPriceFilter()" class="w-full bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white py-2 rounded-lg font-semibold hover:shadow-lg hover:shadow-brand-gold/50 transition-all duration-300 transform hover:scale-105">Apply</button>
                     </div>
                 </div>
             </aside>
@@ -162,12 +162,12 @@
             <!-- Products Grid -->
             <div class="flex-1">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-4">
-                    <h2 class="text-xl md:text-2xl font-bold text-[#1A1A1A] flex items-center gap-2">
-                        <span class="w-2 h-6 md:h-8 bg-[#D4AF37] rounded"></span>
+                    <h2 class="text-xl md:text-2xl font-bold text-text-heading flex items-center gap-2">
+                        <span class="w-2 h-6 md:h-8 bg-brand-gold rounded"></span>
                         Products
                     </h2>
                     <div class="flex items-center space-x-2 md:space-x-4">
-                        <select id="sort-select" class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-[#1A1A1A] focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent transition-all duration-300 text-sm md:text-base">
+                        <select id="sort-select" class="px-3 py-2 bg-white border border-gray-200 rounded-lg text-text-heading focus:ring-2 focus:ring-brand-gold focus:border-transparent transition-all duration-300 text-sm md:text-base">
                             <option value="latest">Latest</option>
                             <option value="price-low">Price: Low to High</option>
                             <option value="price-high">Price: High to Low</option>
