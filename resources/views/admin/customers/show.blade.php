@@ -40,16 +40,16 @@
                     <h2 class="text-xl font-bold text-text-heading">{{ $customer->name }}</h2>
                     <p class="text-text-muted">Customer ID: #{{ $customer->id }}</p>
                     <div class="mt-3">
-                        @if($customer->is_active)
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                                Active Customer
-                            </span>
-                        @else
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
-                                Inactive Customer
-                            </span>
-                        @endif
-                    </div>
+                    @if($customer->is_verified)
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                            Verified Customer
+                        </span>
+                    @else
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                            Unverified Customer
+                        </span>
+                    @endif
+                </div>
                 </div>
 
                 <div class="space-y-4">
@@ -61,10 +61,12 @@
                         <div class="text-sm text-text-muted">Mobile</div>
                         <div class="font-medium text-text-heading">{{ $customer->mobile }}</div>
                     </div>
-                    @if($customer->full_address)
+                    @if($customer->addresses->where('is_default', true)->first())
                         <div>
                             <div class="text-sm text-text-muted">Address</div>
-                            <div class="font-medium text-text-heading">{{ $customer->full_address }}</div>
+                            <div class="font-medium text-text-heading">
+                                {{ $customer->addresses->where('is_default', true)->first()->full_address }}
+                            </div>
                         </div>
                     @endif
                     <div>
@@ -86,8 +88,8 @@
                             @csrf
                             <button type="submit" 
                                     class="w-full bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-3 py-2 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 text-sm"
-                                    onclick="return confirm('Are you sure you want to {{ $customer->is_active ? 'deactivate' : 'activate' }} this customer?')">
-                                {{ $customer->is_active ? 'Deactivate' : 'Activate' }}
+                                    onclick="return confirm('Are you sure you want to {{ $customer->is_verified ? 'unverify' : 'verify' }} this customer?')">
+                                {{ $customer->is_verified ? 'Unverify' : 'Verify' }}
                             </button>
                         </form>
                     </div>

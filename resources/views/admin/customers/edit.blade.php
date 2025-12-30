@@ -62,12 +62,30 @@
                         @enderror
                     </div>
                     <div>
+                        <label for="password" class="block text-sm font-medium text-text-heading mb-2">Password (leave blank to keep current)</label>
+                        <input type="password" id="password" name="password"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
+                               placeholder="Enter new password">
+                        @error('password')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="password_confirmation" class="block text-sm font-medium text-text-heading mb-2">Confirm Password</label>
+                        <input type="password" id="password_confirmation" name="password_confirmation"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
+                               placeholder="Confirm new password">
+                        @error('password_confirmation')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
                         <label class="block text-sm font-medium text-text-heading mb-2">Status</label>
                         <div class="flex items-center">
-                            <input type="checkbox" id="is_active" name="is_active" value="1" 
-                                   {{ old('is_active', $customer->is_active) ? 'checked' : '' }}
+                            <input type="checkbox" id="is_verified" name="is_verified" value="1" 
+                                   {{ old('is_verified', $customer->is_verified) ? 'checked' : '' }}
                                    class="w-4 h-4 text-brand-gold border-gray-300 rounded focus:ring-brand-gold">
-                            <label for="is_active" class="ml-2 text-sm text-text-heading">Active Customer</label>
+                            <label for="is_verified" class="ml-2 text-sm text-text-heading">Verified Customer</label>
                         </div>
                     </div>
                 </div>
@@ -87,14 +105,14 @@
                         <label for="address" class="block text-sm font-medium text-text-heading mb-2">Street Address</label>
                         <textarea id="address" name="address" rows="2" 
                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
-                                  placeholder="123 Main Street, Apartment 4B">{{ old('address', $customer->address) }}</textarea>
+                                  placeholder="123 Main Street, Apartment 4B">{{ old('address', $customer->addresses->where('is_default', true)->first()->address ?? '') }}</textarea>
                         @error('address')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                     <div>
                         <label for="city" class="block text-sm font-medium text-text-heading mb-2">City</label>
-                        <input type="text" id="city" name="city" value="{{ old('city', $customer->city) }}"
+                        <input type="text" id="city" name="city" value="{{ old('city', $customer->addresses->where('is_default', true)->first()->city ?? '') }}"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
                                placeholder="Mumbai">
                         @error('city')
@@ -103,7 +121,7 @@
                     </div>
                     <div>
                         <label for="state" class="block text-sm font-medium text-text-heading mb-2">State</label>
-                        <input type="text" id="state" name="state" value="{{ old('state', $customer->state) }}"
+                        <input type="text" id="state" name="state" value="{{ old('state', $customer->addresses->where('is_default', true)->first()->state ?? '') }}"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
                                placeholder="Maharashtra">
                         @error('state')
@@ -112,7 +130,7 @@
                     </div>
                     <div>
                         <label for="postal_code" class="block text-sm font-medium text-text-heading mb-2">Postal Code</label>
-                        <input type="text" id="postal_code" name="postal_code" value="{{ old('postal_code', $customer->postal_code) }}"
+                        <input type="text" id="postal_code" name="postal_code" value="{{ old('postal_code', $customer->addresses->where('is_default', true)->first()->postal_code ?? '') }}"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
                                placeholder="400001">
                         @error('postal_code')
@@ -121,7 +139,7 @@
                     </div>
                     <div>
                         <label for="country" class="block text-sm font-medium text-text-heading mb-2">Country</label>
-                        <input type="text" id="country" name="country" value="{{ old('country', $customer->country ?? 'India') }}"
+                        <input type="text" id="country" name="country" value="{{ old('country', $customer->addresses->where('is_default', true)->first()->country ?? 'India') }}"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
                                placeholder="India">
                         @error('country')
@@ -156,15 +174,20 @@
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div class="bg-white rounded-lg p-4 border border-gray-200">
                         <div class="text-sm text-text-muted">Total Orders</div>
-                        <div class="text-2xl font-bold text-brand-gold">{{ $customer->total_orders }}</div>
+                        <div class="text-2xl font-bold text-brand-gold">{{ $customer->orders()->count() }}</div>
                     </div>
                     <div class="bg-white rounded-lg p-4 border border-gray-200">
                         <div class="text-sm text-text-muted">Total Spent</div>
-                        <div class="text-2xl font-bold text-brand-gold">{{ $customer->formatted_total_spent }}</div>
+                        <div class="text-2xl font-bold text-brand-gold">₹{{ number_format($customer->orders()->sum('total_amount'), 2) }}</div>
                     </div>
                     <div class="bg-white rounded-lg p-4 border border-gray-200">
                         <div class="text-sm text-text-muted">Last Order</div>
-                        <div class="text-sm font-semibold text-text-heading">{{ $customer->formatted_last_order }}</div>
+                        <div class="text-sm font-semibold text-text-heading">
+                            @php
+                                $lastOrder = $customer->orders()->max('created_at');
+                            @endphp
+                            {{ $lastOrder ? $lastOrder->format('M d, Y') : 'No orders' }}
+                        </div>
                     </div>
                     <div class="bg-white rounded-lg p-4 border border-gray-200">
                         <div class="text-sm text-text-muted">Customer Since</div>

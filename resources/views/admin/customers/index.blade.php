@@ -104,29 +104,38 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="text-sm text-text-heading">
-                                    {{ $customer->city ? $customer->city : 'N/A' }}
-                                    @if($customer->state)
-                                        , {{ $customer->state }}
+                                    @if($customer->addresses()->where('is_default', true)->first())
+                                        {{ $customer->addresses()->where('is_default', true)->first()->city }}
+                                        @if($customer->addresses()->where('is_default', true)->first()->state)
+                                            , {{ $customer->addresses()->where('is_default', true)->first()->state }}
+                                        @endif
+                                    @else
+                                        N/A
                                     @endif
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="text-sm font-medium text-text-heading">{{ $customer->total_orders }}</div>
+                                <div class="text-sm font-medium text-text-heading">{{ $customer->orders()->count() }}</div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="text-sm font-medium text-brand-gold">{{ $customer->formatted_total_spent }}</div>
+                                <div class="text-sm font-medium text-brand-gold">₹{{ number_format($customer->orders()->sum('total_amount'), 2) }}</div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="text-sm text-text-heading">{{ $customer->formatted_last_order }}</div>
+                                <div class="text-sm text-text-heading">
+                                    @php
+                                        $lastOrder = $customer->orders()->max('created_at');
+                                    @endphp
+                                    {{ $lastOrder ? $lastOrder->format('M d, Y') : 'No orders' }}
+                                </div>
                             </td>
                             <td class="px-6 py-4">
-                                @if($customer->is_active)
+                                @if($customer->is_verified)
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        Active
+                                        Verified
                                     </span>
                                 @else
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                        Inactive
+                                        Unverified
                                     </span>
                                 @endif
                             </td>
@@ -149,9 +158,9 @@
                                         @csrf
                                         <button type="submit" 
                                                 class="text-brand-gold hover:text-brand-amber transition-colors" 
-                                                title="{{ $customer->is_active ? 'Deactivate' : 'Activate' }}"
-                                                onclick="return confirm('Are you sure you want to {{ $customer->is_active ? 'deactivate' : 'activate' }} this customer?')">
-                                            @if($customer->is_active)
+                                                title="{{ $customer->is_verified ? 'Unverify' : 'Verify' }}"
+                                                onclick="return confirm('Are you sure you want to {{ $customer->is_verified ? 'unverify' : 'verify' }} this customer?')">
+                                            @if($customer->is_verified)
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
                                                 </svg>

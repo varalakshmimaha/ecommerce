@@ -117,7 +117,7 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::post('/orders/{order}/payment', [OrderController::class, 'verifyPayment'])->name('orders.verify-payment');
     Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
     
-    // Customers
+    // Customers (non-admin users)
     Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
     Route::get('/customers/create', [CustomerController::class, 'create'])->name('customers.create');
     Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');

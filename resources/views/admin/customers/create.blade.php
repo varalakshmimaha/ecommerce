@@ -61,11 +61,29 @@
                         @enderror
                     </div>
                     <div>
+                        <label for="password" class="block text-sm font-medium text-text-heading mb-2">Password *</label>
+                        <input type="password" id="password" name="password" required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
+                               placeholder="Enter password">
+                        @error('password')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="password_confirmation" class="block text-sm font-medium text-text-heading mb-2">Confirm Password *</label>
+                        <input type="password" id="password_confirmation" name="password_confirmation" required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
+                               placeholder="Confirm password">
+                        @error('password_confirmation')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
                         <label class="block text-sm font-medium text-text-heading mb-2">Status</label>
                         <div class="flex items-center">
-                            <input type="checkbox" id="is_active" name="is_active" value="1" checked
+                            <input type="checkbox" id="is_verified" name="is_verified" value="1" checked
                                    class="w-4 h-4 text-brand-gold border-gray-300 rounded focus:ring-brand-gold">
-                            <label for="is_active" class="ml-2 text-sm text-text-heading">Active Customer</label>
+                            <label for="is_verified" class="ml-2 text-sm text-text-heading">Verified Customer</label>
                         </div>
                     </div>
                 </div>

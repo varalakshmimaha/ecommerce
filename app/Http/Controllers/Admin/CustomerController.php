@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Customer;
+use App\Models\User;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -11,22 +11,28 @@ use Illuminate\Validation\Rule;
 class CustomerController extends Controller
 {
     /**
-     * Display a listing of customers.
+     * Display a listing of customers (non-admin users).
      */
     public function index(Request $request)
     {
-        $query = Customer::with(['orders' => function($query) {
-            $query->latest()->take(5);
-        }]);
+        $query = User::where('is_admin', false)
+            ->with(['orders' => function($query) {
+                $query->latest()->take(5);
+            }, 'addresses']);
 
         // Search functionality
         if ($request->has('search')) {
-            $query->search($request->search);
+            $query->where(function($q) use ($request) {
+                $search = $request->search;
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('mobile', 'like', "%{$search}%");
+            });
         }
 
         // Filter by status
         if ($request->has('status') && $request->status !== '') {
-            $query->where('is_active', $request->status === 'active');
+            $query->where('is_verified', $request->status === 'active');
         }
 
         // Sort by
@@ -54,35 +60,64 @@ class CustomerController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:customers,email',
-            'mobile' => 'required|string|max:20|unique:customers,mobile',
+            'email' => 'required|email|unique:users,email',
+            'mobile' => 'required|string|max:20|unique:users,mobile',
+            'password' => 'required|string|min:8|confirmed',
             'address' => 'nullable|string|max:500',
             'city' => 'nullable|string|max:100',
             'state' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:20',
             'country' => 'nullable|string|max:100',
             'notes' => 'nullable|string|max:1000',
-            'is_active' => 'boolean',
+            'is_verified' => 'boolean',
         ]);
 
-        $customer = Customer::create($validated);
+        // Create user as customer (non-admin)
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'mobile' => $validated['mobile'],
+            'password' => bcrypt($validated['password']),
+            'is_admin' => false,
+            'is_verified' => $validated['is_verified'] ?? true,
+        ]);
+
+        // Create address if provided
+        if (!empty($validated['address']) || !empty($validated['city']) || !empty($validated['state'])) {
+            $user->addresses()->create([
+                'address' => $validated['address'] ?? '',
+                'city' => $validated['city'] ?? '',
+                'state' => $validated['state'] ?? '',
+                'postal_code' => $validated['postal_code'] ?? '',
+                'country' => $validated['country'] ?? 'India',
+                'is_default' => true,
+            ]);
+        }
 
         return redirect()
-            ->route('admin.customers.show', $customer)
+            ->route('admin.customers.show', $user)
             ->with('success', 'Customer created successfully!');
     }
 
     /**
      * Display the specified customer.
      */
-    public function show(Customer $customer)
+    public function show(User $customer)
     {
+        // Ensure we're only showing non-admin users
+        if ($customer->is_admin) {
+            abort(403, 'Cannot view admin users as customers');
+        }
+
         $customer->load([
             'orders' => function($query) {
                 $query->with(['items.product'])->latest();
             },
             'queries' => function($query) {
                 $query->latest();
+            },
+            'addresses' => function($query) {
+                $query->orderBy('is_default', 'desc');
             }
         ]);
 
@@ -103,39 +138,80 @@ class CustomerController extends Controller
     /**
      * Show the form for editing the specified customer.
      */
-    public function edit(Customer $customer)
+    public function edit(User $customer)
     {
+        // Ensure we're only editing non-admin users
+        if ($customer->is_admin) {
+            abort(403, 'Cannot edit admin users as customers');
+        }
+
+        $customer->load('addresses');
         return view('admin.customers.edit', compact('customer'));
     }
 
     /**
      * Update the specified customer in storage.
      */
-    public function update(Request $request, Customer $customer)
+    public function update(Request $request, User $customer)
     {
+        // Ensure we're only updating non-admin users
+        if ($customer->is_admin) {
+            abort(403, 'Cannot update admin users as customers');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => [
                 'required',
                 'email',
-                Rule::unique('customers', 'email')->ignore($customer->id),
+                Rule::unique('users', 'email')->ignore($customer->id),
             ],
             'mobile' => [
                 'required',
                 'string',
                 'max:20',
-                Rule::unique('customers', 'mobile')->ignore($customer->id),
+                Rule::unique('users', 'mobile')->ignore($customer->id),
             ],
+            'password' => 'nullable|string|min:8|confirmed',
             'address' => 'nullable|string|max:500',
             'city' => 'nullable|string|max:100',
             'state' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:20',
             'country' => 'nullable|string|max:100',
             'notes' => 'nullable|string|max:1000',
-            'is_active' => 'boolean',
+            'is_verified' => 'boolean',
         ]);
 
-        $customer->update($validated);
+        // Update user information
+        $updateData = [
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'mobile' => $validated['mobile'],
+            'is_verified' => $validated['is_verified'] ?? $customer->is_verified,
+        ];
+
+        // Update password if provided
+        if (!empty($validated['password'])) {
+            $updateData['password'] = bcrypt($validated['password']);
+        }
+
+        $customer->update($updateData);
+
+        // Update or create address
+        $defaultAddress = $customer->addresses()->where('is_default', true)->first();
+        $addressData = [
+            'address' => $validated['address'] ?? '',
+            'city' => $validated['city'] ?? '',
+            'state' => $validated['state'] ?? '',
+            'postal_code' => $validated['postal_code'] ?? '',
+            'country' => $validated['country'] ?? 'India',
+        ];
+
+        if ($defaultAddress) {
+            $defaultAddress->update($addressData);
+        } elseif (!empty($validated['address']) || !empty($validated['city']) || !empty($validated['state'])) {
+            $customer->addresses()->create(array_merge($addressData, ['is_default' => true]));
+        }
 
         return redirect()
             ->route('admin.customers.show', $customer)
@@ -145,8 +221,13 @@ class CustomerController extends Controller
     /**
      * Remove the specified customer from storage.
      */
-    public function destroy(Customer $customer)
+    public function destroy(User $customer)
     {
+        // Ensure we're only deleting non-admin users
+        if ($customer->is_admin) {
+            abort(403, 'Cannot delete admin users');
+        }
+
         // Check if customer has orders
         if ($customer->orders()->exists()) {
             return redirect()
@@ -164,13 +245,18 @@ class CustomerController extends Controller
     /**
      * Toggle customer status (activate/deactivate).
      */
-    public function toggleStatus(Customer $customer)
+    public function toggleStatus(User $customer)
     {
+        // Ensure we're only toggling non-admin users
+        if ($customer->is_admin) {
+            abort(403, 'Cannot toggle admin user status');
+        }
+
         $customer->update([
-            'is_active' => !$customer->is_active
+            'is_verified' => !$customer->is_verified
         ]);
 
-        $status = $customer->is_active ? 'activated' : 'deactivated';
+        $status = $customer->is_verified ? 'verified' : 'unverified';
 
         return redirect()
             ->route('admin.customers.show', $customer)
@@ -182,14 +268,19 @@ class CustomerController extends Controller
      */
     public function export(Request $request)
     {
-        $query = Customer::query();
+        $query = User::where('is_admin', false);
 
         if ($request->has('search')) {
-            $query->search($request->search);
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('mobile', 'like', "%{$search}%");
+            });
         }
 
         if ($request->has('status') && $request->status !== '') {
-            $query->where('is_active', $request->status === 'active');
+            $query->where('is_verified', $request->status === 'active');
         }
 
         $customers = $query->get();
@@ -224,20 +315,25 @@ class CustomerController extends Controller
 
             // CSV Data
             foreach ($customers as $customer) {
+                $address = $customer->addresses()->where('is_default', true)->first();
+                $totalOrders = $customer->orders()->count();
+                $totalSpent = $customer->orders()->sum('total_amount');
+                $lastOrder = $customer->orders()->max('created_at');
+
                 fputcsv($file, [
                     $customer->id,
                     $customer->name,
                     $customer->email,
                     $customer->mobile,
-                    $customer->address,
-                    $customer->city,
-                    $customer->state,
-                    $customer->postal_code,
-                    $customer->country,
-                    $customer->total_orders,
-                    $customer->formatted_total_spent,
-                    $customer->formatted_last_order,
-                    $customer->is_active ? 'Active' : 'Inactive',
+                    $address ? $address->address : '',
+                    $address ? $address->city : '',
+                    $address ? $address->state : '',
+                    $address ? $address->postal_code : '',
+                    $address ? $address->country : '',
+                    $totalOrders,
+                    '₹' . number_format($totalSpent, 2),
+                    $lastOrder ? $lastOrder->format('M d, Y') : 'No orders',
+                    $customer->is_verified ? 'Verified' : 'Unverified',
                     $customer->created_at->format('Y-m-d H:i:s')
                 ]);
             }
