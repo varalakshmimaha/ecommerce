@@ -110,7 +110,9 @@ class CheckoutController extends Controller
             $isNewUser = false;
 
             if (!$userId) {
-                $existing = User::where('email', $request->email)->orwhere('mobile', $request->mobile)->first();
+                if ($request->mobile) {
+                    $existing = User::where('mobile', $request->mobile)->first();
+                }
                 if ($existing) {
                     $userId = $existing->id;
                 } else {
