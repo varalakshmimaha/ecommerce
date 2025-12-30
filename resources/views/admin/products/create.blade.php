@@ -409,7 +409,7 @@
         // Show loading state
         document.getElementById('suvee-search-results-list').innerHTML = `
             <div class="text-center py-10">
-                <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#D4AF37] border-t-transparent"></div>
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-4 border-brand-gold border-t-transparent"></div>
                 <p class="text-gray-500 font-medium mt-4">Searching products...</p>
             </div>
         `;
@@ -449,7 +449,7 @@
                         : '/images/placeholder-product.png';
                     
                     html += `
-                        <div class="suvee-product-item group flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover:border-[#D4AF37] hover:shadow-md transition-all duration-300 cursor-pointer" onclick="toggleSuveeProductCheckbox(${product.id})">
+                        <div class="suvee-product-item group flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover:border-brand-gold hover:shadow-md transition-all duration-300 cursor-pointer" onclick="toggleSuveeProductCheckbox(${product.id})">
                             <div class="flex items-center space-x-4">
                                 <input type="checkbox" 
                                        id="suvee-product-${product.id}" 
@@ -466,7 +466,7 @@
                                      alt="${product.name}" 
                                      class="w-14 h-14 object-cover rounded-lg border border-gray-300">
                                 <div class="flex-1 min-w-0">
-                                    <label for="suvee-product-${product.id}" class="block font-semibold text-gray-900 truncate cursor-pointer hover:text-[#D4AF37] transition-colors" onclick="event.stopPropagation()">${product.name}</label>
+                                    <label for="suvee-product-${product.id}" class="block font-semibold text-gray-900 truncate cursor-pointer hover:text-brand-gold transition-colors" onclick="event.stopPropagation()">${product.name}</label>
                                     <div class="flex items-center space-x-3 mt-1.5">
                                         ${product.sku ? `<span class="text-sm text-gray-600 bg-gray-100 px-2.5 py-1 rounded">SKU: ${product.sku}</span>` : ''}
                                         <span class="text-xs text-gray-500">${product.category_name}</span>
@@ -551,7 +551,7 @@
             <div class="flex items-center space-x-4">
                 <div class="relative">
                     <img src="${imageUrl}" alt="${name}" class="w-14 h-14 object-cover rounded-lg border border-gray-300">
-                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-[#D4AF37] rounded-full flex items-center justify-center">
+                    <div class="absolute -top-1 -right-1 w-6 h-6 bg-brand-gold rounded-full flex items-center justify-center">
                         <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                         </svg>
@@ -561,7 +561,7 @@
                     <p class="font-semibold text-gray-900">${name}</p>
                     <div class="flex items-center space-x-3 mt-1">
                         <span class="text-sm text-gray-600 bg-gray-100 px-2 py-0.5 rounded">SKU: ${sku}</span>
-                        <span class="text-xs text-[#D4AF37] bg-[#D4AF37]/10 px-2 py-0.5 rounded">₹0.00</span>
+                        <span class="text-xs text-brand-gold bg-brand-gold/10 px-2 py-0.5 rounded">₹0.00</span>
                     </div>
                 </div>
             </div>
@@ -827,7 +827,7 @@
     }
     
     .suvee-search-input:focus {
-        border-color: #d4af37 !important;
+        border-color: var(--brand-gold) !important;
         box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1) !important;
         outline: none !important;
     }
@@ -889,12 +889,12 @@
     }
     
     .suvee-results-list::-webkit-scrollbar-thumb {
-        background: #d4af37;
+        background: var(--brand-gold);
         border-radius: 10px;
     }
     
     .suvee-results-list::-webkit-scrollbar-thumb:hover {
-        background: #b8962e;
+        background: var(--brand-amber);
     }
     
     /* Product item styles */
@@ -909,7 +909,7 @@
     }
     
     .suvee-product-item:hover {
-        border-color: #d4af37;
+        border-color: var(--brand-gold);
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
     
@@ -942,8 +942,8 @@
     }
     
     .suvee-product-item input[type="checkbox"]:checked + div {
-        background: #d4af37 !important;
-        border-color: #d4af37 !important;
+        background: var(--brand-gold) !important;
+        border-color: var(--brand-gold) !important;
     }
     
     .suvee-product-item input[type="checkbox"]:checked + div svg {
@@ -1080,7 +1080,7 @@
     }
     
     .suvee-add-btn {
-        background: linear-gradient(to right, #d4af37, #b8962e) !important;
+        background: linear-gradient(to right, var(--brand-gold), var(--brand-amber)) !important;
         color: white !important;
         border: none !important;
         padding: 0.625rem 1.25rem !important;
@@ -1111,7 +1111,7 @@
     
     /* Add Related Products button - FIXED Z-INDEX */
     .suvee-add-related-btn {
-        background: linear-gradient(to right, #d4af37, #b8962e) !important;
+        background: linear-gradient(to right, var(--brand-gold), var(--brand-amber)) !important;
         color: white !important;
         border: none !important;
         padding: 0.625rem 1.25rem !important;
