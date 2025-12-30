@@ -12,6 +12,7 @@ class Setting extends Model
     protected $fillable = [
         'key',
         'value',
+        'company_name',
     ];
 
     public static function get($key, $default = null)
