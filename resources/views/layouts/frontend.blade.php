@@ -281,7 +281,7 @@
                     <ul class="space-y-2">
                         @foreach($section->links->where('is_active', true) as $link)
                         <li>
-                            <a href="{{ $link->url ?? '#' }}" class="text-[#6B6B6B] hover:text-[#D4AF37] transition-all duration-300 text-sm">{{ $link->title }}</a>
+                            <a href="{{ $link->url ?? '#' }}" class="text-text-muted hover:text-brand-gold transition-all duration-300 text-sm">{{ $link->title }}</a>
                         </li>
                         @endforeach
                     </ul>

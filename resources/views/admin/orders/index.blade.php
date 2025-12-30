@@ -5,11 +5,11 @@
 @section('content')
 <div class="admin-card">
     <div class="mb-4 flex space-x-4">
-        <a href="{{ route('admin.orders.index') }}" class="px-4 py-2 rounded-lg {{ !request('status') ? 'bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white' : 'bg-gray-200 text-gray-700' }}">All</a>
-        <a href="{{ route('admin.orders.index', ['status' => 'pending']) }}" class="px-4 py-2 rounded-lg {{ request('status') == 'pending' ? 'bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white' : 'bg-gray-200 text-gray-700' }}">Pending</a>
-        <a href="{{ route('admin.orders.index', ['status' => 'confirmed']) }}" class="px-4 py-2 rounded-lg {{ request('status') == 'confirmed' ? 'bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white' : 'bg-gray-200 text-gray-700' }}">Confirmed</a>
-        <a href="{{ route('admin.orders.index', ['status' => 'shipped']) }}" class="px-4 py-2 rounded-lg {{ request('status') == 'shipped' ? 'bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white' : 'bg-gray-200 text-gray-700' }}">Shipped</a>
-        <a href="{{ route('admin.orders.index', ['status' => 'delivered']) }}" class="px-4 py-2 rounded-lg {{ request('status') == 'delivered' ? 'bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white' : 'bg-gray-200 text-gray-700' }}">Delivered</a>
+        <a href="{{ route('admin.orders.index') }}" class="px-4 py-2 rounded-lg {{ !request('status') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white' : 'bg-gray-200 text-gray-700' }}">All</a>
+        <a href="{{ route('admin.orders.index', ['status' => 'pending']) }}" class="px-4 py-2 rounded-lg {{ request('status') == 'pending' ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white' : 'bg-gray-200 text-gray-700' }}">Pending</a>
+        <a href="{{ route('admin.orders.index', ['status' => 'confirmed']) }}" class="px-4 py-2 rounded-lg {{ request('status') == 'confirmed' ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white' : 'bg-gray-200 text-gray-700' }}">Confirmed</a>
+        <a href="{{ route('admin.orders.index', ['status' => 'shipped']) }}" class="px-4 py-2 rounded-lg {{ request('status') == 'shipped' ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white' : 'bg-gray-200 text-gray-700' }}">Shipped</a>
+        <a href="{{ route('admin.orders.index', ['status' => 'delivered']) }}" class="px-4 py-2 rounded-lg {{ request('status') == 'delivered' ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white' : 'bg-gray-200 text-gray-700' }}">Delivered</a>
     </div>
     
     <div class="overflow-x-auto">
