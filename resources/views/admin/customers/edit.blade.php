@@ -184,9 +184,9 @@
                         <div class="text-sm text-text-muted">Last Order</div>
                         <div class="text-sm font-semibold text-text-heading">
                             @php
-                                $lastOrder = $customer->orders()->max('created_at');
+                                $lastOrder = $customer->orders()->latest()->first();
                             @endphp
-                            {{ $lastOrder ? $lastOrder->format('M d, Y') : 'No orders' }}
+                            {{ $lastOrder ? $lastOrder->created_at->format('M d, Y') : 'No orders' }}
                         </div>
                     </div>
                     <div class="bg-white rounded-lg p-4 border border-gray-200">

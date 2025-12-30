@@ -123,9 +123,9 @@
                             <td class="px-6 py-4">
                                 <div class="text-sm text-text-heading">
                                     @php
-                                        $lastOrder = $customer->orders()->max('created_at');
+                                        $lastOrder = $customer->orders()->latest()->first();
                                     @endphp
-                                    {{ $lastOrder ? $lastOrder->format('M d, Y') : 'No orders' }}
+                                    {{ $lastOrder ? $lastOrder->created_at->format('M d, Y') : 'No orders' }}
                                 </div>
                             </td>
                             <td class="px-6 py-4">
