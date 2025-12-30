@@ -454,7 +454,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const grid = document.getElementById('products-grid');
 
                 if (!data.data || data.data.length === 0) {
-                    grid.innerHTML = '<div class="col-span-full text-center py-12"><p class="text-[#6B6B6B] text-lg">No products found</p></div>';
+                    grid.innerHTML = '<div class="col-span-full text-center py-12"><p class="text-text-muted text-lg">No products found</p></div>';
                     return;
                 }
 
@@ -466,12 +466,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                 ${product.discounted_price ? `<span class="absolute top-2 right-2 bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-lg text-sm font-semibold shadow-lg">Sale</span>` : ''}
                             </div>
                             <div class="p-4">
-                                <h3 class="font-semibold text-[#1A1A1A] mb-2 line-clamp-2 group-hover:text-[#D4AF37] transition-colors break-words">${product.name}</h3>
+                                <h3 class="font-semibold text-text-heading mb-2 line-clamp-2 group-hover:text-brand-gold transition-colors break-words">${product.name}</h3>
                                 <div class="flex items-center space-x-2 mb-4 flex-wrap">
-                                    <span class="text-lg font-bold text-[#D4AF37]">₹${parseFloat(product.discounted_price || product.selling_price).toFixed(2)}</span>
-                                    ${product.discounted_price ? `<span class="text-sm text-[#6B6B6B] line-through">₹${parseFloat(product.selling_price).toFixed(2)}</span>` : ''}
+                                    <span class="text-lg font-bold text-brand-gold">₹${parseFloat(product.discounted_price || product.selling_price).toFixed(2)}</span>
+                                    ${product.discounted_price ? `<span class="text-sm text-text-muted line-through">₹${parseFloat(product.selling_price).toFixed(2)}</span>` : ''}
                                 </div>
-                                <button onclick="addToCart(${product.id}, 1); event.preventDefault();" class="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white py-2 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Add to Cart</button>
+                                <button onclick="addToCart(${product.id}, 1); event.preventDefault();" class="w-full bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white py-2 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Add to Cart</button>
                             </div>
                         </a>
                     </div>
@@ -482,17 +482,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.last_page > 1) {
                     let paginationHTML = '<div class="flex flex-wrap justify-center gap-2">';
                     if (data.current_page > 1) {
-                        paginationHTML += `<button onclick="changePage(${data.current_page - 1})" class="px-4 py-2 bg-white border border-gray-200 text-[#6B6B6B] rounded-lg hover:bg-[#D4AF37] hover:text-white transition-all duration-300">Previous</button>`;
+                        paginationHTML += `<button onclick="changePage(${data.current_page - 1})" class="px-4 py-2 bg-white border border-gray-200 text-text-muted rounded-lg hover:bg-brand-gold hover:text-white transition-all duration-300">Previous</button>`;
                     }
                     for (let i = 1; i <= data.last_page; i++) {
                         if (i === data.current_page) {
-                            paginationHTML += `<button class="px-4 py-2 bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white rounded-lg font-semibold shadow-lg">${i}</button>`;
+                            paginationHTML += `<button class="px-4 py-2 bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white rounded-lg font-semibold shadow-lg">${i}</button>`;
                         } else {
-                            paginationHTML += `<button onclick="changePage(${i})" class="px-4 py-2 bg-white border border-gray-200 text-[#6B6B6B] rounded-lg hover:bg-[#D4AF37] hover:text-white transition-all duration-300">${i}</button>`;
+                            paginationHTML += `<button onclick="changePage(${i})" class="px-4 py-2 bg-white border border-gray-200 text-text-muted rounded-lg hover:bg-brand-gold hover:text-white transition-all duration-300">${i}</button>`;
                         }
                     }
                     if (data.current_page < data.last_page) {
-                        paginationHTML += `<button onclick="changePage(${data.current_page + 1})" class="px-4 py-2 bg-white border border-gray-200 text-[#6B6B6B] rounded-lg hover:bg-[#D4AF37] hover:text-white transition-all duration-300">Next</button>`;
+                        paginationHTML += `<button onclick="changePage(${data.current_page + 1})" class="px-4 py-2 bg-white border border-gray-200 text-text-muted rounded-lg hover:bg-brand-gold hover:text-white transition-all duration-300">Next</button>`;
                     }
                     paginationHTML += '</div>';
                     pagination.innerHTML = paginationHTML;
