@@ -33,6 +33,7 @@ class Product extends Model
         'is_trending',
         'is_top_rated',
         'status',
+        'has_variations',
     ];
 
     protected $casts = [
@@ -44,6 +45,7 @@ class Product extends Model
         'is_featured' => 'boolean',
         'is_trending' => 'boolean',
         'is_top_rated' => 'boolean',
+        'has_variations' => 'boolean',
     ];
 
     protected static function boot()
@@ -82,6 +84,26 @@ class Product extends Model
         return $this->hasMany(ProductAttribute::class);
     }
 
+    public function variations()
+    {
+        return $this->hasMany(ProductVariation::class)->orderBy('sort_order');
+    }
+
+    public function activeVariations()
+    {
+        return $this->variations()->where('is_active', true);
+    }
+
+    public function variationAttributeValues()
+    {
+        return $this->hasManyThrough(
+            VariationAttributeValue::class,
+            ProductVariation::class,
+            'product_id',
+            'variation_id'
+        );
+    }
+
     // Product.php model
     public function relatedProducts()
     {
@@ -104,6 +126,128 @@ class Product extends Model
     public function getFinalPriceAttribute()
     {
         return $this->discounted_price ?? $this->selling_price;
+    }
+
+    /**
+     * Check if product has variations
+     */
+    public function hasVariations()
+    {
+        return $this->has_variations && $this->activeVariations()->exists();
+    }
+
+    /**
+     * Get effective price considering variations
+     */
+    public function getEffectivePriceAttribute()
+    {
+        if ($this->hasVariations()) {
+            $minPriceVariation = $this->activeVariations()
+                ->orderBy('price', 'asc')
+                ->first();
+                
+            return $minPriceVariation ? $minPriceVariation->price : $this->final_price;
+        }
+        
+        return $this->final_price;
+    }
+
+    /**
+     * Get effective stock considering variations
+     */
+    public function getEffectiveStockAttribute()
+    {
+        if ($this->hasVariations()) {
+            return $this->activeVariations()->sum('stock');
+        }
+        
+        return $this->stock_quantity;
+    }
+
+    /**
+     * Get variation options for frontend
+     */
+    public function getVariationOptionsAttribute()
+    {
+        if (!$this->hasVariations()) {
+            return [];
+        }
+
+        $options = [];
+        
+        // Get all attributes used by this product's variations
+        $attributeValues = $this->variationAttributeValues()
+            ->with('attribute', 'attributeValue')
+            ->get();
+
+        foreach ($attributeValues as $attributeValue) {
+            $attributeName = $attributeValue->attribute->name;
+            $attributeValueData = [
+                'id' => $attributeValue->attribute_value_id,
+                'value' => $attributeValue->attributeValue->value,
+                'slug' => $attributeValue->attributeValue->slug,
+            ];
+            
+            // Add hex code for colors if available
+            if ($attributeValue->attributeValue->hex_code) {
+                $attributeValueData['hex_code'] = $attributeValue->attributeValue->hex_code;
+            }
+            
+            if (!isset($options[$attributeName])) {
+                $options[$attributeName] = [];
+            }
+            
+            if (!in_array($attributeValueData, $options[$attributeName])) {
+                $options[$attributeName][] = $attributeValueData;
+            }
+        }
+
+        return $options;
+    }
+
+    /**
+     * Find variation by attribute values
+     */
+    public function findVariationByAttributes(array $attributeValueIds)
+    {
+        return $this->activeVariations()
+            ->whereHas('attributeValues', function ($query) use ($attributeValueIds) {
+                $query->whereIn('attribute_value_id', $attributeValueIds);
+            }, '=', count($attributeValueIds))
+            ->first();
+    }
+
+    /**
+     * Get price range for variations
+     */
+    public function getPriceRangeAttribute()
+    {
+        if (!$this->hasVariations()) {
+            return null;
+        }
+
+        $prices = $this->activeVariations()->pluck('price');
+        
+        if ($prices->isEmpty()) {
+            return null;
+        }
+
+        $minPrice = $prices->min();
+        $maxPrice = $prices->max();
+        
+        if ($minPrice == $maxPrice) {
+            return [
+                'min' => $minPrice,
+                'max' => $maxPrice,
+                'display' => '₹' . number_format($minPrice, 2)
+            ];
+        }
+        
+        return [
+            'min' => $minPrice,
+            'max' => $maxPrice,
+            'display' => '₹' . number_format($minPrice, 2) . ' – ₹' . number_format($maxPrice, 2)
+        ];
     }
 }
 

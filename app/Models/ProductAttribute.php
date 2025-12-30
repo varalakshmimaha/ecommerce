@@ -4,26 +4,54 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class ProductAttribute extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'product_id',
-        'attribute_name',
-        'attribute_value',
-        'price_adjustment',
-        'stock_adjustment',
+        'name',
+        'slug',
+        'description',
+        'is_active',
+        'sort_order',
     ];
 
     protected $casts = [
-        'price_adjustment' => 'decimal:2',
+        'is_active' => 'boolean',
     ];
 
-    public function product()
+    public function values()
     {
-        return $this->belongsTo(Product::class);
+        return $this->hasMany(ProductAttributeValue::class)->orderBy('sort_order');
+    }
+
+    public function activeValues()
+    {
+        return $this->values()->where('is_active', true);
+    }
+
+    public function variationAttributeValues()
+    {
+        return $this->hasMany(VariationAttributeValue::class);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($attribute) {
+            if (empty($attribute->slug)) {
+                $attribute->slug = Str::slug($attribute->name);
+            }
+        });
+
+        static::updating(function ($attribute) {
+            if (empty($attribute->slug)) {
+                $attribute->slug = Str::slug($attribute->name);
+            }
+        });
     }
 }
 

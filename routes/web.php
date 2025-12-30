@@ -108,7 +108,10 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     
     // Products
     Route::resource('products', ProductController::class);
-    // web.php
+    Route::resource('products.variations', ProductVariationController::class);
+    Route::post('products/{product}/variations/bulk-update', [ProductVariationController::class, 'bulkUpdate'])->name('products.variations.bulk-update');
+    Route::post('products/{product}/variations/{variation}/toggle-status', [ProductVariationController::class, 'toggleStatus'])->name('products.variations.toggle-status');
+    Route::post('products/{product}/variations/{variation}/set-default', [ProductVariationController::class, 'setDefault'])->name('products.variations.set-default');
     
     // Orders
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
