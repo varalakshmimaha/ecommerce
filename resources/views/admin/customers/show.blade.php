@@ -61,24 +61,32 @@
                         <div class="text-sm text-text-muted">Mobile</div>
                         <div class="font-medium text-text-heading">{{ $customer->mobile }}</div>
                     </div>
-                    @if($customer->addresses->where('is_default', true)->first())
+                    @if($customer->addresses->count() > 0)
+                        <div>
+                            <div class="text-sm text-text-muted mb-2">Addresses ({{ $customer->addresses->count() }})</div>
+                            <div class="space-y-2">
+                                @foreach($customer->addresses as $address)
+                                    <div class="p-3 bg-gray-50 rounded-lg border @if($address->is_default) border-brand-gold @else border-gray-200 @endif">
+                                        @if($address->is_default)
+                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-brand-gold text-white mb-1">
+                                                Default
+                                            </span>
+                                        @endif
+                                        <div class="font-medium text-text-heading text-sm">
+                                            {{ $address->address }}
+                                            @if($address->city){{ $address->city }},@endif
+                                            @if($address->state){{ $address->state }}@endif
+                                            @if($address->pincode)-{{ $address->pincode }}@endif
+                                            @if($address->country){{ $address->country }}@endif
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @else
                         <div>
                             <div class="text-sm text-text-muted">Address</div>
-                            <div class="font-medium text-text-heading">
-                                {{ $customer->addresses->where('is_default', true)->first()->address }}
-                                @if($customer->addresses->where('is_default', true)->first()->city)
-                                    {{ $customer->addresses->where('is_default', true)->first()->city }},
-                                @endif
-                                @if($customer->addresses->where('is_default', true)->first()->state)
-                                    {{ $customer->addresses->where('is_default', true)->first()->state }}
-                                @endif
-                                @if($customer->addresses->where('is_default', true)->first()->pincode)
-                                    - {{ $customer->addresses->where('is_default', true)->first()->pincode }}
-                                @endif
-                                @if($customer->addresses->where('is_default', true)->first()->country)
-                                    {{ $customer->addresses->where('is_default', true)->first()->country }}
-                                @endif
-                            </div>
+                            <div class="font-medium text-text-heading text-gray-400">No addresses added</div>
                         </div>
                     @endif
                     <div>
@@ -194,17 +202,10 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex space-x-2">
-                                        <a href="{{ route('admin.orders.show', $order) }}" 
+                                        <a href="{{ route('admin.orders.show', $order->id) }}" 
                                            class="text-brand-gold hover:text-brand-amber transition-colors" title="View Order">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                            </svg>
-                                        </a>
-                                        <a href="{{ route('admin.orders.invoice', $order->order_number) }}" 
-                                           class="text-brand-gold hover:text-brand-amber transition-colors" title="View Invoice" target="_blank">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                                             </svg>
                                         </a>
                                     </div>

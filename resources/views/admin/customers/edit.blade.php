@@ -93,58 +93,110 @@
 
             <!-- Address Information -->
             <div>
-                <h3 class="text-lg font-semibold text-text-heading mb-4 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    Address Information
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="md:col-span-2">
-                        <label for="address" class="block text-sm font-medium text-text-heading mb-2">Street Address</label>
-                        <textarea id="address" name="address" rows="2" 
-                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
-                                  placeholder="123 Main Street, Apartment 4B">{{ old('address', $customer->addresses->where('is_default', true)->first()->address ?? '') }}</textarea>
-                        @error('address')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-text-heading flex items-center gap-2">
+                        <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        Addresses ({{ $customer->addresses->count() }})
+                    </h3>
+                    <button type="button" onclick="addNewAddress()" class="bg-brand-gold text-white px-4 py-2 rounded-lg font-semibold hover:bg-brand-amber transition-all duration-300 text-sm">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Add Address
+                    </button>
+                </div>
+                
+                <!-- Existing Addresses -->
+                <div id="addresses-container" class="space-y-4 mb-4">
+                    @foreach($customer->addresses as $index => $address)
+                        <div class="address-item border border-gray-200 rounded-lg p-4 @if($address->is_default) border-brand-gold @endif" data-index="{{ $index }}">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-2">
+                                    @if($address->is_default)
+                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-brand-gold text-white">
+                                            Default
+                                        </span>
+                                    @endif
+                                    <span class="text-sm font-medium text-text-heading">Address {{ $index + 1 }}</span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button type="button" onclick="setDefaultAddress({{ $index }})" class="text-brand-gold hover:text-brand-amber text-sm font-medium" @if($address->is_default) disabled @endif>
+                                        Set as Default
+                                    </button>
+                                    <button type="button" onclick="removeAddress({{ $index }})" class="text-red-600 hover:text-red-700 text-sm font-medium">
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-text-heading mb-1">Street Address</label>
+                                    <textarea name="addresses[{{ $index }}][address]" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent text-sm" placeholder="123 Main Street, Apartment 4B">{{ $address->address }}</textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-text-heading mb-1">City</label>
+                                    <input type="text" name="addresses[{{ $index }}][city]" value="{{ $address->city }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent text-sm" placeholder="Mumbai">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-text-heading mb-1">State</label>
+                                    <input type="text" name="addresses[{{ $index }}][state]" value="{{ $address->state }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent text-sm" placeholder="Maharashtra">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-text-heading mb-1">Postal Code</label>
+                                    <input type="text" name="addresses[{{ $index }}][pincode]" value="{{ $address->pincode }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent text-sm" placeholder="400001">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-text-heading mb-1">Country</label>
+                                    <input type="text" name="addresses[{{ $index }}][country]" value="{{ $address->country ?? 'India' }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent text-sm" placeholder="India">
+                                </div>
+                                <div class="flex items-center">
+                                    <input type="checkbox" name="addresses[{{ $index }}][is_default]" value="1" {{ $address->is_default ? 'checked' : '' }} class="w-4 h-4 text-brand-gold border-gray-300 rounded focus:ring-brand-gold">
+                                    <label class="ml-2 text-sm text-text-heading">Default Address</label>
+                                </div>
+                            </div>
+                            <input type="hidden" name="addresses[{{ $index }}][id]" value="{{ $address->id }}">
+                        </div>
+                    @endforeach
+                </div>
+                
+                <!-- New Address Template (hidden) -->
+                <div id="new-address-template" class="address-item border border-gray-200 rounded-lg p-4 hidden">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-medium text-text-heading">New Address</span>
+                        </div>
+                        <button type="button" onclick="removeNewAddress(this)" class="text-red-600 hover:text-red-700 text-sm font-medium">
+                            Remove
+                        </button>
                     </div>
-                    <div>
-                        <label for="city" class="block text-sm font-medium text-text-heading mb-2">City</label>
-                        <input type="text" id="city" name="city" value="{{ old('city', $customer->addresses->where('is_default', true)->first()->city ?? '') }}"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
-                               placeholder="Mumbai">
-                        @error('city')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
-                        <label for="state" class="block text-sm font-medium text-text-heading mb-2">State</label>
-                        <input type="text" id="state" name="state" value="{{ old('state', $customer->addresses->where('is_default', true)->first()->state ?? '') }}"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
-                               placeholder="Maharashtra">
-                        @error('state')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
-                        <label for="postal_code" class="block text-sm font-medium text-text-heading mb-2">Postal Code</label>
-                        <input type="text" id="postal_code" name="postal_code" value="{{ old('postal_code', $customer->addresses->where('is_default', true)->first()->pincode ?? '') }}"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
-                               placeholder="400001">
-                        @error('postal_code')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div>
-                        <label for="country" class="block text-sm font-medium text-text-heading mb-2">Country</label>
-                        <input type="text" id="country" name="country" value="{{ old('country', $customer->addresses->where('is_default', true)->first()->country ?? 'India') }}"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
-                               placeholder="India">
-                        @error('country')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-text-heading mb-1">Street Address</label>
+                            <textarea name="addresses[new_0][address]" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent text-sm" placeholder="123 Main Street, Apartment 4B"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-text-heading mb-1">City</label>
+                            <input type="text" name="addresses[new_0][city]" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent text-sm" placeholder="Mumbai">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-text-heading mb-1">State</label>
+                            <input type="text" name="addresses[new_0][state]" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent text-sm" placeholder="Maharashtra">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-text-heading mb-1">Postal Code</label>
+                            <input type="text" name="addresses[new_0][pincode]" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent text-sm" placeholder="400001">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-text-heading mb-1">Country</label>
+                            <input type="text" name="addresses[new_0][country]" value="India" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent text-sm" placeholder="India">
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" name="addresses[new_0][is_default]" value="1" class="w-4 h-4 text-brand-gold border-gray-300 rounded focus:ring-brand-gold">
+                            <label class="ml-2 text-sm text-text-heading">Default Address</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -171,4 +223,94 @@
         </form>
     </div>
 </div>
+
+<script>
+let newAddressCounter = 0;
+
+function addNewAddress() {
+    newAddressCounter++;
+    const template = document.getElementById('new-address-template');
+    const clone = template.cloneNode(true);
+    clone.id = '';
+    clone.classList.remove('hidden');
+    
+    // Update all input names to use the new counter
+    const inputs = clone.querySelectorAll('input, textarea');
+    inputs.forEach(input => {
+        const name = input.getAttribute('name');
+        if (name) {
+            input.setAttribute('name', name.replace('new_0', 'new_' + newAddressCounter));
+        }
+    });
+    
+    // Update the label text
+    const label = clone.querySelector('.text-sm.font-medium');
+    if (label) {
+        label.textContent = 'New Address ' + (newAddressCounter + 1);
+    }
+    
+    document.getElementById('addresses-container').appendChild(clone);
+}
+
+function removeAddress(index) {
+    if (confirm('Are you sure you want to remove this address?')) {
+        const addressItem = document.querySelector(`[data-index="${index}"]`);
+        if (addressItem) {
+            // Add a hidden input to mark for deletion
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = `addresses[${index}][delete]`;
+            hiddenInput.value = '1';
+            addressItem.appendChild(hiddenInput);
+            addressItem.style.display = 'none';
+        }
+    }
+}
+
+function removeNewAddress(button) {
+    if (confirm('Are you sure you want to remove this address?')) {
+        const addressItem = button.closest('.address-item');
+        addressItem.remove();
+    }
+}
+
+function setDefaultAddress(index) {
+    // Uncheck all default checkboxes
+    const checkboxes = document.querySelectorAll('input[name*="[is_default]"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    
+    // Check the selected one
+    const selectedCheckbox = document.querySelector(`input[name="addresses[${index}][is_default]"]`);
+    if (selectedCheckbox) {
+        selectedCheckbox.checked = true;
+    }
+    
+    // Disable all set default buttons
+    const buttons = document.querySelectorAll('button[onclick^="setDefaultAddress"]');
+    buttons.forEach(button => {
+        button.disabled = true;
+    });
+}
+
+// Handle default checkbox changes
+document.addEventListener('change', function(e) {
+    if (e.target.name && e.target.name.includes('[is_default]') && e.target.checked) {
+        // Uncheck all other default checkboxes
+        const checkboxes = document.querySelectorAll('input[name*="[is_default]"]');
+        checkboxes.forEach(checkbox => {
+            if (checkbox !== e.target) {
+                checkbox.checked = false;
+            }
+        });
+        
+        // Disable all set default buttons
+        const buttons = document.querySelectorAll('button[onclick^="setDefaultAddress"]');
+        buttons.forEach(button => {
+            button.disabled = true;
+        });
+    }
+});
+</script>
 @endsection

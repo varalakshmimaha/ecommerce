@@ -174,11 +174,13 @@ class CustomerController extends Controller
                 Rule::unique('users', 'mobile')->ignore($customer->id),
             ],
             'password' => 'nullable|string|min:8|confirmed',
-            'address' => 'nullable|string|max:500',
-            'city' => 'nullable|string|max:100',
-            'state' => 'nullable|string|max:100',
-            'postal_code' => 'nullable|string|max:20',
-            'country' => 'nullable|string|max:100',
+            'addresses' => 'nullable|array',
+            'addresses.*.address' => 'nullable|string|max:500',
+            'addresses.*.city' => 'nullable|string|max:100',
+            'addresses.*.state' => 'nullable|string|max:100',
+            'addresses.*.pincode' => 'nullable|string|max:20',
+            'addresses.*.country' => 'nullable|string|max:100',
+            'addresses.*.is_default' => 'boolean',
             'is_verified' => 'boolean',
         ]);
 
@@ -197,22 +199,54 @@ class CustomerController extends Controller
 
         $customer->update($updateData);
 
-        // Update or create address
-        $defaultAddress = $customer->addresses()->where('is_default', true)->first();
-        $addressData = [
-            'name' => $validated['name'],
-            'phone' => $validated['mobile'],
-            'address' => $validated['address'] ?? '',
-            'city' => $validated['city'] ?? '',
-            'state' => $validated['state'] ?? '',
-            'pincode' => $validated['postal_code'] ?? '',
-            'country' => $validated['country'] ?? 'India',
-        ];
-
-        if ($defaultAddress) {
-            $defaultAddress->update($addressData);
-        } elseif (!empty($validated['address']) || !empty($validated['city']) || !empty($validated['state'])) {
-            $customer->addresses()->create(array_merge($addressData, ['is_default' => true]));
+        // Handle multiple addresses
+        if (isset($validated['addresses'])) {
+            $hasDefault = false;
+            
+            foreach ($validated['addresses'] as $key => $addressData) {
+                // Skip if marked for deletion
+                if (isset($addressData['delete']) && $addressData['delete']) {
+                    if (isset($addressData['id'])) {
+                        $customer->addresses()->where('id', $addressData['id'])->delete();
+                    }
+                    continue;
+                }
+                
+                // Skip if no address data provided
+                if (empty($addressData['address']) && empty($addressData['city']) && empty($addressData['state'])) {
+                    continue;
+                }
+                
+                $addressPayload = [
+                    'name' => $validated['name'],
+                    'phone' => $validated['mobile'],
+                    'address' => $addressData['address'] ?? '',
+                    'city' => $addressData['city'] ?? '',
+                    'state' => $addressData['state'] ?? '',
+                    'pincode' => $addressData['pincode'] ?? '',
+                    'country' => $addressData['country'] ?? 'India',
+                    'is_default' => $addressData['is_default'] ?? false,
+                ];
+                
+                if ($addressPayload['is_default']) {
+                    $hasDefault = true;
+                }
+                
+                // Update existing address
+                if (isset($addressData['id'])) {
+                    $customer->addresses()->where('id', $addressData['id'])->update($addressPayload);
+                } 
+                // Create new address (for new_* keys)
+                elseif (str_starts_with($key, 'new_')) {
+                    $customer->addresses()->create($addressPayload);
+                }
+            }
+            
+            // If no default address is set, set the first one as default
+            if (!$hasDefault && $customer->addresses()->count() > 0) {
+                $firstAddress = $customer->addresses()->first();
+                $firstAddress->update(['is_default' => true]);
+            }
         }
 
         return redirect()
@@ -270,7 +304,7 @@ class CustomerController extends Controller
      */
     public function export(Request $request)
     {
-        $query = User::where('is_admin', false);
+        $query = User::where('is_admin', false)->with(['addresses', 'orders']);
 
         if ($request->has('search')) {
             $search = $request->search;
@@ -287,15 +321,21 @@ class CustomerController extends Controller
 
         $customers = $query->get();
 
-        $filename = 'customers_' . date('Y-m-d') . '.csv';
+        $filename = 'customers_' . date('Y-m-d_H-i-s') . '.csv';
         
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            'Pragma' => 'no-cache',
+            'Expires' => '0'
         ];
 
         $callback = function() use ($customers) {
             $file = fopen('php://output', 'w');
+            
+            // Add BOM for proper UTF-8 encoding in Excel
+            fwrite($file, "\xEF\xBB\xBF");
             
             // CSV Header
             fputcsv($file, [
@@ -324,9 +364,9 @@ class CustomerController extends Controller
 
                 fputcsv($file, [
                     $customer->id,
-                    $customer->name,
-                    $customer->email,
-                    $customer->mobile,
+                    $customer->name ?? '',
+                    $customer->email ?? '',
+                    $customer->mobile ?? '',
                     $address ? $address->address : '',
                     $address ? $address->city : '',
                     $address ? $address->state : '',
