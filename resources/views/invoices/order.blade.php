@@ -37,6 +37,11 @@
                 {{ $variable }}: {{ $value }};
             @endforeach
         }
+        
+        /* Debug: Ensure colors are applied */
+        .bg-gradient-to-r {
+            background: linear-gradient(to right, var(--brand-gold), var(--brand-amber), var(--brand-crimson)) !important;
+        }
     </style>
 </head>
 <body class="min-h-screen py-12 px-4">
@@ -46,7 +51,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold text-white">INVOICE</h1>
-                    <p class="text-white/90 mt-1">{{ \App\Models\Setting::get('company_name', config('app.name', 'Suvee')) }}</p>
+                    <p class="text-white/90 mt-1">{{ \App\Models\Setting::get('company_name', 'Suwish') }}</p>
                 </div>
                 <div class="text-right">
                     <p class="text-2xl font-bold text-white">#{{ $order->order_number }}</p>
