@@ -306,7 +306,7 @@
                 </div>
             </div>
             <div class="border-t border-gray-200 mt-8 pt-8 text-center text-text-muted text-sm">
-                <p>&copy; {{ date('Y') }} Suwish. All rights reserved.</p>
+                <p>&copy; {{ date('Y') }} {{ \App\Models\Setting::get('company_name', 'Suwish') }}. All rights reserved.</p>
             </div>
         </div>
     </footer>

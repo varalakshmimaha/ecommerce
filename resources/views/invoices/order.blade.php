@@ -230,8 +230,8 @@
             <!-- Footer -->
             <div class="border-t-2 border-gray-200 pt-6 text-center">
                 <p class="text-lg font-semibold text-gray-800 mb-2">Thank you for your business!</p>
-                <p class="text-sm text-gray-600">For any queries, please contact us at: <span class="text-brand-gold font-medium">{{ \App\Models\Setting::get('email', 'support@suvee.com') }}</span></p>
-                <p class="text-xs text-gray-500 mt-3">{{ parse_url(config('app.url', 'https://suvee.com'), PHP_URL_HOST) }}</p>
+                <p class="text-sm text-gray-600">For any queries, please contact us at: <span class="text-brand-gold font-medium">{{ \App\Models\Setting::get('email', 'support@' . strtolower(str_replace(' ', '', \App\Models\Setting::get('company_name', 'suvee'))) . '.com') }}</span></p>
+                <p class="text-xs text-gray-500 mt-3">{{ parse_url(config('app.url', 'https://' . strtolower(str_replace(' ', '', \App\Models\Setting::get('company_name', 'suvee'))) . '.com'), PHP_URL_HOST) }}</p>
             </div>
         </div>
 

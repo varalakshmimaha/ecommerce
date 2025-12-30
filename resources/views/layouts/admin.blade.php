@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Admin Panel') - Suwish</title>
+    <title>@yield('title', 'Admin Panel') - {{ \App\Models\Setting::get('company_name', 'Suwish') }}</title>
   <!--<title>Suwish Admin</title>-->
     @vite(['resources/css/admin.css', 'resources/js/admin.js'])
     
@@ -48,7 +48,7 @@
         <!-- Sidebar -->
         <aside class="bg-gradient-to-b from-surface-main to-surface-alt border-r border-ui-border shadow-lg w-full md:w-64 md:flex-shrink-0 overflow-y-auto hidden md:flex md:flex-col" id="adminSidebar">
             <div class="p-6 flex-1">
-                <h1 class="text-2xl font-bold bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson bg-clip-text text-transparent mb-8">Suwish Admin</h1>
+                <h1 class="text-2xl font-bold bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson bg-clip-text text-transparent mb-8">{{ \App\Models\Setting::get('company_name', 'Suwish') }} Admin</h1>
                 <nav class="space-y-2">
                     <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.dashboard') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
