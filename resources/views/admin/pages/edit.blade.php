@@ -31,7 +31,7 @@
             @method('PUT')
 
             <div>
-                <label class="block text-sm font-semibold text-[#1A1A1A] mb-2">Title *</label>
+                <label class="block text-sm font-semibold text-text-heading mb-2">Title *</label>
                 <input type="text" name="title" value="{{ old('title', $page->title) }}" required class="input-field" placeholder="e.g., About Us">
                 @error('title')
                     <span class="text-red-600 text-sm">{{ $message }}</span>
@@ -39,7 +39,7 @@
             </div>
 
             <div>
-                <label class="block text-sm font-semibold text-[#1A1A1A] mb-2">Content *</label>
+                <label class="block text-sm font-semibold text-text-heading mb-2">Content *</label>
                 <textarea name="content" id="editor" class="input-field" rows="10">{{ old('content', $page->content) }}</textarea>
                 <input type="hidden" name="content_required" id="content_required" required value="{{ old('content', $page->content) }}">
                 @error('content')
@@ -49,7 +49,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                    <label class="block text-sm font-semibold text-[#1A1A1A] mb-2">Sort Order</label>
+                    <label class="block text-sm font-semibold text-text-heading mb-2">Sort Order</label>
                     <input type="number" name="sort_order" value="{{ old('sort_order', $page->sort_order) }}" class="input-field" placeholder="0">
                     @error('sort_order')
                         <span class="text-red-600 text-sm">{{ $message }}</span>

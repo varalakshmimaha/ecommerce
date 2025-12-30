@@ -11,7 +11,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">Default Shipping Charge (₹)</label>
             <input type="number" name="shipping_charge" step="0.01" value="{{ $shipping }}" class="input-field w-full">
         </div>
-        <button class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Save</button>
+        <button class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Save</button>
     </form>
 </div>
 @endsection

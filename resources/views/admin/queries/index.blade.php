@@ -69,13 +69,13 @@
                                 <p class="text-sm font-semibold text-blue-900 mb-1">Your Response:</p>
                                 <p class="text-blue-800">{{ $query->admin_response }}</p>
                                 @if($query->resolved_at)
-                                    <p class="text-xs text-[#D4AF37] mt-2">Responded on {{ $query->resolved_at->format('M d, Y h:i A') }}</p>
+                                    <p class="text-xs text-brand-gold mt-2">Responded on {{ $query->resolved_at->format('M d, Y h:i A') }}</p>
                                 @endif
                             </div>
                         @endif
 
                         <div class="border-t pt-4">
-                            <button onclick="toggleResponseForm({{ $query->id }})" class="px-4 py-2 bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white rounded-lg hover:bg-blue-700 transition">
+                            <button onclick="toggleResponseForm({{ $query->id }})" class="px-4 py-2 bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white rounded-lg hover:bg-blue-700 transition">
                                 {{ $query->admin_response ? 'Update Response' : 'Respond to Query' }}
                             </button>
                         </div>
@@ -85,10 +85,10 @@
                                 @csrf
                                 <div class="mb-4">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Your Response</label>
-                                    <textarea name="response" rows="4" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-[#D4AF37] transition-all duration-300" placeholder="Type your response here...">{{ $query->admin_response }}</textarea>
+                                    <textarea name="response" rows="4" required class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-brand-gold transition-all duration-300" placeholder="Type your response here...">{{ $query->admin_response }}</textarea>
                                 </div>
                                 <div class="flex items-center gap-3">
-                                    <button type="submit" class="px-6 py-2 bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white rounded-lg font-semibold hover:shadow-lg transition-all duration-300">
+                                    <button type="submit" class="px-6 py-2 bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white rounded-lg font-semibold hover:shadow-lg transition-all duration-300">
                                         Send Response
                                     </button>
                                     <button type="button" onclick="toggleResponseForm({{ $query->id }})" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all duration-300">

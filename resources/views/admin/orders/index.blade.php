@@ -45,7 +45,7 @@
                     </td>
                     <td>{{ $order->created_at->format('M d, Y') }}</td>
                     <td>
-                        <a href="{{ route('admin.orders.show', $order) }}" class="text-[#D4AF37] hover:text-primary-800">View</a>
+                        <a href="{{ route('admin.orders.show', $order) }}" class="text-brand-gold hover:text-primary-800">View</a>
                     </td>
                 </tr>
                 @empty

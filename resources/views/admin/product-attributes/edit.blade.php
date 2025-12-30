@@ -45,7 +45,7 @@
         </div>
 
         <div class="flex gap-4 pt-6">
-            <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Update Attribute</button>
+            <button type="submit" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Update Attribute</button>
             <a href="{{ route('admin.product-attributes.index') }}" class="btn">Cancel</a>
         </div>
     </form>

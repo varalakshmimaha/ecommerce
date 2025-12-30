@@ -6,7 +6,7 @@
 <div>
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-900">Product Attributes</h2>
-        <a href="{{ route('admin.product-attributes.create') }}" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Add Attribute</a>
+        <a href="{{ route('admin.product-attributes.create') }}" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Add Attribute</a>
     </div>
 
     @if(session('success'))

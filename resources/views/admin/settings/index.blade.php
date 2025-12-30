@@ -65,7 +65,7 @@
                     <input type="text" name="bank_account_holder" value="{{ $settings['bank_account_holder'] }}" class="input-field">
                 </div>
             </div>-->
-            <button type="submit" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Save Settings</button>
+            <button type="submit" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Save Settings</button>
         </form>
     </div>
 </div>
