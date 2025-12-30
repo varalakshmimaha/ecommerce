@@ -14,6 +14,15 @@
         body {
             background: linear-gradient(to bottom right, #f9fafb, #ffffff);
         }
+        
+        /* Theme Colors */
+        :root {
+            --brand-gold: {{ \App\Models\ThemeColor::getActiveTheme()->brand_gold ?? '#D4AF37' }};
+            --brand-amber: {{ \App\Models\ThemeColor::getActiveTheme()->brand_amber ?? '#B8962E' }};
+            --brand-crimson: {{ \App\Models\ThemeColor::getActiveTheme()->brand_crimson ?? '#8B0000' }};
+            --text-heading: {{ \App\Models\ThemeColor::getActiveTheme()->text_heading ?? '#1A1A1A' }};
+            --text-muted: {{ \App\Models\ThemeColor::getActiveTheme()->text_muted ?? '#6B6B6B' }};
+        }
     </style>
 </head>
 <body class="min-h-screen py-12 px-4">
@@ -23,7 +32,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold text-white">INVOICE</h1>
-                    <p class="text-white/90 mt-1">{{ config('app.name', 'Suvee') }}</p>
+                    <p class="text-white/90 mt-1">{{ \App\Models\Setting::get('company_name', config('app.name', 'Suvee')) }}</p>
                 </div>
                 <div class="text-right">
                     <p class="text-2xl font-bold text-white">#{{ $order->order_number }}</p>
@@ -207,7 +216,7 @@
             <!-- Footer -->
             <div class="border-t-2 border-gray-200 pt-6 text-center">
                 <p class="text-lg font-semibold text-gray-800 mb-2">Thank you for your business!</p>
-                <p class="text-sm text-gray-600">For any queries, please contact us at: <span class="text-brand-gold font-medium">support@suvee.com</span></p>
+                <p class="text-sm text-gray-600">For any queries, please contact us at: <span class="text-brand-gold font-medium">{{ \App\Models\Setting::get('email', 'support@suvee.com') }}</span></p>
                 <p class="text-xs text-gray-500 mt-3">{{ parse_url(config('app.url', 'https://suvee.com'), PHP_URL_HOST) }}</p>
             </div>
         </div>

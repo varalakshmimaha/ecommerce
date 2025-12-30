@@ -14,6 +14,7 @@ class SettingController extends Controller
     public function index()
     {
         $settings = [
+            'company_name' => Setting::get('company_name'),
             'company_logo' => Setting::get('company_logo'),
             'company_description' => Setting::get('company_description'),
             'whatsapp_number' => Setting::get('whatsapp_number'),
@@ -35,6 +36,7 @@ class SettingController extends Controller
     public function update(Request $request)
     {
         $validated = $request->validate([
+            'company_name' => 'nullable|string|max:255',
             'company_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'company_description' => 'nullable|string',
             'whatsapp_number' => 'nullable|string|max:20',

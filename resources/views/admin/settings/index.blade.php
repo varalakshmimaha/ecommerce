@@ -10,6 +10,10 @@
             @csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+                    <input type="text" name="company_name" value="{{ $settings['company_name'] }}" class="input-field" placeholder="Enter company name">
+                </div>
+                <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Company Logo</label>
                     @if($settings['company_logo'])
                     <img src="{{ asset('storage/' . $settings['company_logo']) }}" alt="Logo" class="w-32 h-32 object-contain mb-2">

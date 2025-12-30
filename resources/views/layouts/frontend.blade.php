@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Suvee - Premium E-commerce')</title>
+    <title>@yield('title', \App\Models\Setting::get('company_name', 'Suvee') . ' - Premium E-commerce')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
@@ -61,7 +61,7 @@
                     @if($logo)
                         <img src="{{ asset('storage/' . $logo) }}" alt="Logo" class="h-10">
                     @else
-                        <span class="text-2xl font-bold bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson bg-clip-text text-transparent">Suvee</span>
+                        <span class="text-2xl font-bold bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson bg-clip-text text-transparent">{{ \App\Models\Setting::get('company_name', 'Suvee') }}</span>
                     @endif
                 </a>
                 <a href="{{ route('cart') }}" class="relative group">
@@ -108,7 +108,7 @@
                         @if($logo)
                             <img src="{{ asset('storage/' . $logo) }}" alt="Logo" class="h-14">
                         @else
-                            <span class="text-3xl font-bold bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson bg-clip-text text-transparent">Suvee</span>
+                            <span class="text-3xl font-bold bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson bg-clip-text text-transparent">{{ \App\Models\Setting::get('company_name', 'Suvee') }}</span>
                         @endif
                     </a>
                 </div>
@@ -257,7 +257,7 @@
                     @if($logo)
                         <img src="{{ asset('storage/' . $logo) }}" alt="Logo" class="h-12 mb-4">
                     @else
-                        <h3 class="text-2xl font-bold bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson bg-clip-text text-transparent mb-4">Suvee</h3>
+                        <h3 class="text-2xl font-bold bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson bg-clip-text text-transparent mb-4">{{ \App\Models\Setting::get('company_name', 'Suvee') }}</h3>
                     @endif
                     <p class="text-text-muted text-sm leading-relaxed">{{ \App\Models\Setting::get('company_description', 'Premium e-commerce platform') }}</p>
                 </div>
