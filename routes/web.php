@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\ThemeColorController;
+use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Webhook\RazorpayWebhookController;
 use App\Http\Controllers\Admin\ProfileController;
@@ -115,6 +116,17 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::post('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
     Route::post('/orders/{order}/payment', [OrderController::class, 'verifyPayment'])->name('orders.verify-payment');
     Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
+    
+    // Customers
+    Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
+    Route::get('/customers/create', [CustomerController::class, 'create'])->name('customers.create');
+    Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
+    Route::get('/customers/{customer}', [CustomerController::class, 'show'])->name('customers.show');
+    Route::get('/customers/{customer}/edit', [CustomerController::class, 'edit'])->name('customers.edit');
+    Route::put('/customers/{customer}', [CustomerController::class, 'update'])->name('customers.update');
+    Route::delete('/customers/{customer}', [CustomerController::class, 'destroy'])->name('customers.destroy');
+    Route::post('/customers/{customer}/toggle-status', [CustomerController::class, 'toggleStatus'])->name('customers.toggle-status');
+    Route::get('/customers/export', [CustomerController::class, 'export'])->name('customers.export');
     
     // Reports
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');

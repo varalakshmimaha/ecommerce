@@ -68,6 +68,12 @@
                         </svg>
                         Orders
                     </a>
+                    <a href="{{ route('admin.customers.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.customers.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        Customers
+                    </a>
                     <a href="{{ route('admin.categories.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.categories.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
