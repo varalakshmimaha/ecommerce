@@ -16,7 +16,7 @@
                 <input type="text" id="profile-mobile" name="mobile" readonly class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed">
             </div>
             <div id="profile-message" class="hidden"></div>
-            <button type="submit" class="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white py-2 rounded-lg hover:bg-blue-700 transition">
+            <button type="submit" class="w-full bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white py-2 rounded-lg hover:bg-blue-700 transition">
                 Update Profile
             </button>
         </form>
@@ -39,7 +39,7 @@
                 <input type="password" id="confirm-password" name="new_password_confirmation" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             </div>
             <div id="password-message" class="hidden"></div>
-            <button type="submit" class="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white py-2 rounded-lg hover:bg-blue-700 transition">
+            <button type="submit" class="w-full bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white py-2 rounded-lg hover:bg-blue-700 transition">
                 Change Password
             </button>
         </form>

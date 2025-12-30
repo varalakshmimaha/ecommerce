@@ -19,7 +19,7 @@
 <body class="min-h-screen py-12 px-4">
     <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden">
         <!-- Invoice Header -->
-        <div class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] px-8 py-6">
+        <div class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson px-8 py-6">
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold text-white">INVOICE</h1>
@@ -38,7 +38,7 @@
             <div class="grid grid-cols-2 gap-8 mb-8">
                 <div class="bg-gradient-to-br from-gray-50 to-white p-6 rounded-lg border border-gray-200">
                     <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
                         Billed From
@@ -76,7 +76,7 @@
                 </div>
                 <div class="bg-gradient-to-br from-gray-50 to-white p-6 rounded-lg border border-gray-200">
                     <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
@@ -151,12 +151,12 @@
                                     <td class="px-6 py-4 text-center">
                                         @if($item->gst_percentage)
                                             <span class="text-sm text-gray-700">{{ $item->gst_percentage }}%</span>
-                                            <span class="block text-xs text-[#D4AF37] font-medium">₹{{ number_format($gstAmount, 2) }}</span>
+                                            <span class="block text-xs text-brand-gold font-medium">₹{{ number_format($gstAmount, 2) }}</span>
                                         @else
                                             <span class="text-sm text-gray-400">-</span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 text-right font-semibold text-[#D4AF37]">₹{{ number_format($item->subtotal + $gstAmount, 2) }}</td>
+                                    <td class="px-6 py-4 text-right font-semibold text-brand-gold">₹{{ number_format($item->subtotal + $gstAmount, 2) }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -176,7 +176,7 @@
 
                             <div class="flex justify-between text-gray-700">
                                 <span class="font-medium">Total GST:</span>
-                                <span class="font-semibold text-[#D4AF37]">₹{{ number_format($totalGST, 2) }}</span>
+                                <span class="font-semibold text-brand-gold">₹{{ number_format($totalGST, 2) }}</span>
                             </div>
 
                             @if($order->shipping_cost > 0)
@@ -196,7 +196,7 @@
                             <div class="border-t-2 border-[#D4AF37]/50 pt-3 mt-3">
                                 <div class="flex justify-between items-center">
                                     <span class="text-xl font-bold text-gray-900">Grand Total:</span>
-                                    <span class="text-2xl font-bold text-[#D4AF37]">₹{{ number_format($order->total_amount, 2) }}</span>
+                                    <span class="text-2xl font-bold text-brand-gold">₹{{ number_format($order->total_amount, 2) }}</span>
                                 </div>
                             </div>
                         </div>
@@ -207,7 +207,7 @@
             <!-- Footer -->
             <div class="border-t-2 border-gray-200 pt-6 text-center">
                 <p class="text-lg font-semibold text-gray-800 mb-2">Thank you for your business!</p>
-                <p class="text-sm text-gray-600">For any queries, please contact us at: <span class="text-[#D4AF37] font-medium">support@suvee.com</span></p>
+                <p class="text-sm text-gray-600">For any queries, please contact us at: <span class="text-brand-gold font-medium">support@suvee.com</span></p>
                 <p class="text-xs text-gray-500 mt-3">{{ parse_url(config('app.url', 'https://suvee.com'), PHP_URL_HOST) }}</p>
             </div>
         </div>
@@ -215,7 +215,7 @@
         <!-- Print Button -->
         <div class="bg-gray-50 px-8 py-4 border-t border-gray-200 no-print">
             <div class="flex gap-4 justify-center">
-                <button onclick="window.print()" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-[#D4AF37]/50 transition-all duration-300">
+                <button onclick="window.print()" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-brand-gold/50 transition-all duration-300">
                     Print Invoice
                 </button>
                 <button onclick="window.close()" class="bg-gray-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-700 transition-all duration-300">

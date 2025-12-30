@@ -287,12 +287,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                                 ${related.discounted_price ? `<span class="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-sm">Sale</span>` : ''}
                                             </div>
                                             <div class="p-4">
-                                                <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-[#D4AF37] transition-colors">${related.name}</h3>
+                                                <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-brand-gold transition-colors">${related.name}</h3>
                                                 <div class="flex items-center space-x-2 mb-3">
-                                                    <span class="text-lg font-bold text-[#D4AF37]">₹${parseFloat(related.discounted_price || related.selling_price).toFixed(2)}</span>
+                                                    <span class="text-lg font-bold text-brand-gold">₹${parseFloat(related.discounted_price || related.selling_price).toFixed(2)}</span>
                                                     ${related.discounted_price ? `<span class="text-sm text-gray-500 line-through">₹${parseFloat(related.selling_price).toFixed(2)}</span>` : ''}
                                                 </div>
-                                                <button onclick="addToCartRelated(${related.id}, 1); event.preventDefault();" class="bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 w-full">Add to Cart</button>
+                                                <button onclick="addToCartRelated(${related.id}, 1); event.preventDefault();" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 w-full">Add to Cart</button>
                                             </div>
                                         </a>
                                     </div>
@@ -319,7 +319,7 @@ document.addEventListener('DOMContentLoaded', function() {
             container.innerHTML = `
                 <div class="text-center py-12">
                     <p class="text-red-400 text-xl">Error loading product details</p>
-                    <a href="/products" class="inline-block mt-4 bg-gradient-to-r from-[#D4AF37] to-[#B8962E] text-white px-8 py-3 rounded-lg font-semibold">
+                    <a href="/products" class="inline-block mt-4 bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-8 py-3 rounded-lg font-semibold">
                         Back to Products
                     </a>
                 </div>

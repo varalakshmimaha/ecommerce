@@ -521,7 +521,7 @@
                                      alt="${product.name}" 
                                      class="w-14 h-14 object-cover rounded-lg border border-gray-300">
                                 <div class="flex-1 min-w-0">
-                                    <label for="suvee-product-${product.id}" class="block font-semibold text-gray-900 truncate cursor-pointer hover:text-[#D4AF37] transition-colors" onclick="event.stopPropagation()">${product.name}</label>
+                                    <label for="suvee-product-${product.id}" class="block font-semibold text-gray-900 truncate cursor-pointer hover:text-brand-gold transition-colors" onclick="event.stopPropagation()">${product.name}</label>
                                     <div class="flex items-center space-x-3 mt-1.5">
                                         ${product.sku ? `<span class="text-sm text-gray-600 bg-gray-100 px-2.5 py-1 rounded">SKU: ${product.sku}</span>` : ''}
                                         <span class="text-xs text-gray-500">${product.category_name}</span>
@@ -616,7 +616,7 @@
                     <p class="font-semibold text-gray-900">${name}</p>
                     <div class="flex items-center space-x-3 mt-1">
                         <span class="text-sm text-gray-600 bg-gray-100 px-2 py-0.5 rounded">SKU: ${sku}</span>
-                        <span class="text-xs text-[#D4AF37] bg-[#D4AF37]/10 px-2 py-0.5 rounded">₹0.00</span>
+                        <span class="text-xs text-brand-gold bg-brand-gold/10 px-2 py-0.5 rounded">₹0.00</span>
                     </div>
                 </div>
             </div>

@@ -38,7 +38,7 @@
             <div class="grid grid-cols-2 gap-8 mb-8">
                 <div class="bg-gradient-to-br from-gray-50 to-white p-6 rounded-lg border border-gray-200">
                     <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
                         Billed From
