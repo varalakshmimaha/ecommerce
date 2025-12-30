@@ -5,7 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice - {{ $order->order_number }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
+    @php
+    $activeTheme = \App\Models\ThemeColor::getActive();
+    if ($activeTheme) {
+        $cssVariables = $activeTheme->toCssVariables();
+    } else {
+        // Fallback colors
+        $cssVariables = [
+            '--brand-gold' => '#D4AF37',
+            '--brand-amber' => '#B8962E', 
+            '--brand-crimson' => '#8B0000',
+            '--text-heading' => '#1A1A1A',
+            '--text-muted' => '#6B6B6B'
+        ];
+    }
+@endphp
+
+<style>
         @media print {
             .no-print {
                 display: none;
@@ -17,11 +33,9 @@
         
         /* Theme Colors */
         :root {
-            --brand-gold: {{ \App\Models\ThemeColor::getActiveTheme()->brand_gold ?? '#D4AF37' }};
-            --brand-amber: {{ \App\Models\ThemeColor::getActiveTheme()->brand_amber ?? '#B8962E' }};
-            --brand-crimson: {{ \App\Models\ThemeColor::getActiveTheme()->brand_crimson ?? '#8B0000' }};
-            --text-heading: {{ \App\Models\ThemeColor::getActiveTheme()->text_heading ?? '#1A1A1A' }};
-            --text-muted: {{ \App\Models\ThemeColor::getActiveTheme()->text_muted ?? '#6B6B6B' }};
+            @foreach($cssVariables as $variable => $value)
+                {{ $variable }}: {{ $value }};
+            @endforeach
         }
     </style>
 </head>
