@@ -51,7 +51,7 @@
 
 <!-- Product Sections -->
 <section class="container mx-auto px-4 py-6 bg-white">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-8">
         
         <!-- Featured Products Column -->
         <div class="space-y-6">
@@ -64,7 +64,7 @@
                     View All →
                 </a>
             </div>
-            <div id="featured-products" class="space-y-4">
+            <div id="featured-products" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <!-- Featured products will be loaded here -->
             </div>
         </div>
@@ -80,7 +80,7 @@
                     View All →
                 </a>
             </div>
-            <div id="trending-products" class="space-y-4">
+            <div id="trending-products" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <!-- Trending products will be loaded here -->
             </div>
         </div>
@@ -96,27 +96,27 @@
                     View All →
                 </a>
             </div>
-            <div id="new-arrival-products" class="space-y-4">
+            <div id="new-arrival-products" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <!-- New arrival products will be loaded here -->
             </div>
         </div>
         
-    </div>
-    
-    <!-- Top Rated Section (Full Width) -->
-    <div class="mt-12 pt-8 border-t border-gray-200">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-text-heading flex items-center gap-3">
-                <span class="w-2 h-8 bg-brand-crimson rounded"></span>
-                Top Rated Products
-            </h2>
-            <a href="{{ route('products.index') }}?type=top-rated" class="text-brand-crimson hover:text-brand-gold text-sm font-medium transition-colors">
-                View All →
-            </a>
+        <!-- Top Rated Products Column -->
+        <div class="space-y-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-text-heading flex items-center gap-3">
+                    <span class="w-2 h-8 bg-brand-crimson rounded"></span>
+                    Top Rated Products
+                </h2>
+                <a href="{{ route('products.index') }}?type=top-rated" class="text-brand-crimson hover:text-brand-gold text-sm font-medium transition-colors">
+                    View All →
+                </a>
+            </div>
+            <div id="top-rated-products" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Top rated products will be loaded here -->
+            </div>
         </div>
-        <div id="top-rated-products" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Top rated products will be loaded here -->
-        </div>
+        
     </div>
     
     <div class="text-center mt-12">
@@ -185,13 +185,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const container = document.getElementById(containerId || `${type}-products`);
                 if (!container) return;
                 
-                if (type === 'top-rated') {
-                    // Top rated uses grid layout
-                    container.innerHTML = data.data.map(product => createProductCard(product)).join('');
-                } else {
-                    // Featured, Trending, New Arrival use vertical list layout
-                    container.innerHTML = data.data.map(product => createProductCardVertical(product)).join('');
-                }
+                // Use the same product card design for all sections
+                container.innerHTML = data.data.map(product => createProductCard(product)).join('');
             })
             .catch(error => {
                 console.error(`Error loading ${type} products:`, error);
@@ -202,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
     
-    // Product card for grid layout (Top Rated)
+    // Product card - same design as original
     function createProductCard(product) {
         return `
             <div class="card overflow-hidden group">
@@ -218,28 +213,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             ${product.discounted_price ? `<span class="text-sm text-gray-500 line-through">₹${parseFloat(product.selling_price).toFixed(2)}</span>` : ''}
                         </div>
                         <button onclick="addToCart(${product.id}, 1); event.preventDefault();" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 w-full mt-4">Add to Cart</button>
-                    </div>
-                </a>
-            </div>
-        `;
-    }
-    
-    // Product card for vertical layout (Featured, Trending, New Arrival)
-    function createProductCardVertical(product) {
-        return `
-            <div class="card overflow-hidden group">
-                <a href="/products/${product.slug}" class="flex gap-4 p-4">
-                    <div class="relative overflow-hidden flex-shrink-0 w-24 h-24 rounded-lg">
-                        <img src="/storage/${product.main_image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                        ${product.discounted_price ? `<span class="absolute top-1 right-1 bg-red-500 text-white px-1 py-0.5 rounded text-xs">Sale</span>` : ''}
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <h3 class="font-semibold text-text-heading mb-2 line-clamp-2 text-sm">${product.name}</h3>
-                        <div class="flex items-center space-x-2">
-                            <span class="text-base font-bold text-brand-gold">₹${parseFloat(product.discounted_price || product.selling_price).toFixed(2)}</span>
-                            ${product.discounted_price ? `<span class="text-xs text-gray-500 line-through">₹${parseFloat(product.selling_price).toFixed(2)}</span>` : ''}
-                        </div>
-                        <button onclick="addToCart(${product.id}, 1); event.preventDefault();" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 text-sm mt-2">Add to Cart</button>
                     </div>
                 </a>
             </div>
