@@ -50,76 +50,73 @@
 </section>
 
 <!-- Product Sections -->
-<section class="container mx-auto px-4 py-6 bg-white">
-    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-8">
-        
-        <!-- Featured Products Column -->
-        <div class="space-y-6">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold text-text-heading flex items-center gap-3">
-                    <span class="w-2 h-8 bg-brand-gold rounded"></span>
-                    Featured Products
-                </h2>
-                <a href="{{ route('products.index') }}?type=featured" class="text-brand-gold hover:text-brand-amber text-sm font-medium transition-colors">
-                    View All →
-                </a>
-            </div>
-            <div id="featured-products" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- Featured products will be loaded here -->
-            </div>
+<section class="container mx-auto px-4 py-6 bg-white space-y-12">
+    
+    <!-- Featured Products Section -->
+    <div class="space-y-6">
+        <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-text-heading flex items-center gap-3">
+                <span class="w-2 h-8 bg-brand-gold rounded"></span>
+                Featured Products
+            </h2>
+            <a href="{{ route('products.index') }}?type=featured" class="text-brand-gold hover:text-brand-amber text-sm font-medium transition-colors">
+                View All →
+            </a>
         </div>
-        
-        <!-- Trending Products Column -->
-        <div class="space-y-6">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold text-text-heading flex items-center gap-3">
-                    <span class="w-2 h-8 bg-brand-amber rounded"></span>
-                    Trending Products
-                </h2>
-                <a href="{{ route('products.index') }}?type=trending" class="text-brand-amber hover:text-brand-burnt text-sm font-medium transition-colors">
-                    View All →
-                </a>
-            </div>
-            <div id="trending-products" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- Trending products will be loaded here -->
-            </div>
+        <div id="featured-products" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Featured products will be loaded here -->
         </div>
-        
-        <!-- New Arrival Products Column -->
-        <div class="space-y-6">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold text-text-heading flex items-center gap-3">
-                    <span class="w-2 h-8 bg-brand-burnt rounded"></span>
-                    New Arrivals
-                </h2>
-                <a href="{{ route('products.index') }}?type=new-arrival" class="text-brand-burnt hover:text-brand-crimson text-sm font-medium transition-colors">
-                    View All →
-                </a>
-            </div>
-            <div id="new-arrival-products" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- New arrival products will be loaded here -->
-            </div>
-        </div>
-        
-        <!-- Top Rated Products Column -->
-        <div class="space-y-6">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold text-text-heading flex items-center gap-3">
-                    <span class="w-2 h-8 bg-brand-crimson rounded"></span>
-                    Top Rated Products
-                </h2>
-                <a href="{{ route('products.index') }}?type=top-rated" class="text-brand-crimson hover:text-brand-gold text-sm font-medium transition-colors">
-                    View All →
-                </a>
-            </div>
-            <div id="top-rated-products" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- Top rated products will be loaded here -->
-            </div>
-        </div>
-        
     </div>
     
-    <div class="text-center mt-12">
+    <!-- Trending Products Section -->
+    <div class="space-y-6">
+        <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-text-heading flex items-center gap-3">
+                <span class="w-2 h-8 bg-brand-amber rounded"></span>
+                Trending Products
+            </h2>
+            <a href="{{ route('products.index') }}?type=trending" class="text-brand-amber hover:text-brand-burnt text-sm font-medium transition-colors">
+                View All →
+            </a>
+        </div>
+        <div id="trending-products" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Trending products will be loaded here -->
+        </div>
+    </div>
+    
+    <!-- New Arrival Products Section -->
+    <div class="space-y-6">
+        <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-text-heading flex items-center gap-3">
+                <span class="w-2 h-8 bg-brand-burnt rounded"></span>
+                New Arrivals
+            </h2>
+            <a href="{{ route('products.index') }}?type=new-arrival" class="text-brand-burnt hover:text-brand-crimson text-sm font-medium transition-colors">
+                View All →
+            </a>
+        </div>
+        <div id="new-arrival-products" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- New arrival products will be loaded here -->
+        </div>
+    </div>
+    
+    <!-- Top Rated Products Section -->
+    <div class="space-y-6">
+        <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-text-heading flex items-center gap-3">
+                <span class="w-2 h-8 bg-brand-crimson rounded"></span>
+                Top Rated Products
+            </h2>
+            <a href="{{ route('products.index') }}?type=top-rated" class="text-brand-crimson hover:text-brand-gold text-sm font-medium transition-colors">
+                View All →
+            </a>
+        </div>
+        <div id="top-rated-products" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Top rated products will be loaded here -->
+        </div>
+    </div>
+    
+    <div class="text-center pt-8 border-t border-gray-200">
         <a href="{{ route('products.index') }}" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-8 py-4 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 text-lg">View All Products</a>
     </div>
 </section>
