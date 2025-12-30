@@ -6,8 +6,19 @@
     <title>@yield('title', 'Suvee - Premium E-commerce')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    <!-- Dynamic Theme Colors -->
+    @if(isset($themeColors))
+        <style>
+            :root {
+                @foreach($themeColors as $variable => $value)
+                    {{ $variable }}: {{ $value }};
+                @endforeach
+            }
+        </style>
+    @endif
 </head>
-<body class="bg-surface-main text-text-body">
+<body class="bg-surface-primary text-text-body">
     <!-- Header -->
     <header class="bg-white shadow-md sticky top-0 z-50 border-b border-gray-100">
         <div class="container mx-auto px-4 relative">

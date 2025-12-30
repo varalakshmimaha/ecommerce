@@ -22,6 +22,7 @@ return [
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        App\Providers\ThemeServiceProvider::class,
     ])->toArray(),
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,

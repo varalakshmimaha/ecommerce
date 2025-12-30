@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Admin\ThemeColorController;
 use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Webhook\RazorpayWebhookController;
 use App\Http\Controllers\Admin\ProfileController;
@@ -154,6 +155,16 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::get('/pages/{page}/edit', [\App\Http\Controllers\Admin\PageController::class, 'edit'])->name('pages.edit');
     Route::put('/pages/{page}', [\App\Http\Controllers\Admin\PageController::class, 'update'])->name('pages.update');
     Route::delete('/pages/{page}', [\App\Http\Controllers\Admin\PageController::class, 'destroy'])->name('pages.destroy');
+
+    // Theme Colors
+    Route::get('/theme-colors', [\App\Http\Controllers\Admin\ThemeColorController::class, 'index'])->name('theme-colors.index');
+    Route::get('/theme-colors/create', [\App\Http\Controllers\Admin\ThemeColorController::class, 'create'])->name('theme-colors.create');
+    Route::post('/theme-colors', [\App\Http\Controllers\Admin\ThemeColorController::class, 'store'])->name('theme-colors.store');
+    Route::get('/theme-colors/{themeColor}/edit', [\App\Http\Controllers\Admin\ThemeColorController::class, 'edit'])->name('theme-colors.edit');
+    Route::put('/theme-colors/{themeColor}', [\App\Http\Controllers\Admin\ThemeColorController::class, 'update'])->name('theme-colors.update');
+    Route::delete('/theme-colors/{themeColor}', [\App\Http\Controllers\Admin\ThemeColorController::class, 'destroy'])->name('theme-colors.destroy');
+    Route::post('/theme-colors/{themeColor}/activate', [\App\Http\Controllers\Admin\ThemeColorController::class, 'activate'])->name('theme-colors.activate');
+    Route::get('/theme-colors/{themeColor}/preview', [\App\Http\Controllers\Admin\ThemeColorController::class, 'preview'])->name('theme-colors.preview');
 
     // Banners
     Route::get('/banners', [BannerController::class, 'index'])->name('banners.index');
