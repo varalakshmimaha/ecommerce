@@ -5,14 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice - {{ $order->order_number }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
+    @php
+    $activeTheme = \App\Models\ThemeColor::getActive();
+    if ($activeTheme) {
+        $cssVariables = $activeTheme->toCssVariables();
+    } else {
+        // Fallback colors
+        $cssVariables = [
+            '--brand-gold' => '#D4AF37',
+            '--brand-amber' => '#B8962E', 
+            '--brand-crimson' => '#8B0000',
+            '--text-heading' => '#1A1A1A',
+            '--text-muted' => '#6B6B6B'
+        ];
+    }
+@endphp
+
+<style>
         @media print {
             .no-print {
                 display: none;
             }
         }
         body {
-            background: linear-gradient(to bottom right, var(--surface-secondary), var(--surface-primary));
+            background: linear-gradient(to bottom right, #f9fafb, #ffffff);
+        }
+        
+        /* Theme Colors */
+        :root {
+            @foreach($cssVariables as $variable => $value)
+                {{ $variable }}: {{ $value }};
+            @endforeach
+        }
+        
+        /* Debug: Ensure colors are applied */
+        .bg-gradient-to-r {
+            background: linear-gradient(to right, var(--brand-gold), var(--brand-amber), var(--brand-crimson)) !important;
         }
     </style>
 </head>
@@ -23,7 +51,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold text-white">INVOICE</h1>
-                    <p class="text-white/90 mt-1">{{ config('app.name', 'Suvee') }}</p>
+                    <p class="text-white/90 mt-1">{{ \App\Models\Setting::get('company_name', 'Suwish') }}</p>
                 </div>
                 <div class="text-right">
                     <p class="text-2xl font-bold text-white">#{{ $order->order_number }}</p>
@@ -207,8 +235,8 @@
             <!-- Footer -->
             <div class="border-t-2 border-gray-200 pt-6 text-center">
                 <p class="text-lg font-semibold text-gray-800 mb-2">Thank you for your business!</p>
-                <p class="text-sm text-gray-600">For any queries, please contact us at: <span class="text-brand-gold font-medium">support@suvee.com</span></p>
-                <p class="text-xs text-gray-500 mt-3">{{ parse_url(config('app.url', 'https://suvee.com'), PHP_URL_HOST) }}</p>
+                <p class="text-sm text-gray-600">For any queries, please contact us at: <span class="text-brand-gold font-medium">{{ \App\Models\Setting::get('email', 'support@' . strtolower(str_replace(' ', '', \App\Models\Setting::get('company_name', 'suwish'))) . '.com') }}</span></p>
+                <p class="text-xs text-gray-500 mt-3">{{ parse_url(config('app.url', 'https://' . strtolower(str_replace(' ', '', \App\Models\Setting::get('company_name', 'suwish'))) . '.com'), PHP_URL_HOST) }}</p>
             </div>
         </div>
 
