@@ -51,7 +51,7 @@
                 <div class="fixed inset-0 bg-black/50 z-50" onclick="toggleMobileFilters()"></div>
                 <div class="fixed top-0 left-0 right-0 h-full max-h-[80vh] overflow-y-auto bg-white z-50 rounded-b-2xl shadow-2xl">
                     <div class="sticky top-0 bg-white border-b border-gray-200 p-4 flex items-center justify-between">
-                        <h3 class="text-lg font-bold text-[#1A1A1A]">Filters</h3>
+                        <h3 class="text-lg font-bold text-text-heading">Filters</h3>
                         <button onclick="toggleMobileFilters()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -119,7 +119,7 @@
                         </svg>
                         Sub-Categories
                     </h3>
-                    <div id="subcategory-filters" class="space-y-2 text-[#6B6B6B]">
+                    <div id="subcategory-filters" class="space-y-2 text-text-muted">
                         <!-- Will load dynamically -->
                     </div>
                 </div>
@@ -132,7 +132,7 @@
                         </svg>
                         Brands
                     </h3>
-                    <div id="brand-filters" class="space-y-2 text-[#6B6B6B]">
+                    <div id="brand-filters" class="space-y-2 text-text-muted">
                         <!-- Will load dynamically -->
                     </div>
                 </div>
@@ -316,25 +316,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 if (subcats.length === 0) {
                     document.getElementById('subcategories-section').style.display = 'none';
-                    filterEl.innerHTML = '<p class="text-sm text-[#6B6B6B]/70">No sub-categories</p>';
+                    filterEl.innerHTML = '<p class="text-sm text-text-muted/70">No sub-categories</p>';
                     return;
                 }
 
                 // Grid display
                 gridEl.innerHTML = subcats.map(subcat => `
                     <button onclick="filterBySubcategory(${subcat.id})" class="flex flex-col items-center group w-full max-w-full bg-transparent border-none outline-none focus:outline-none">
-                        <div class="w-24 h-24 mb-3 rounded-full overflow-hidden border-4 border-[#fffbe6] group-hover:border-[#D4AF37] bg-gradient-to-tr from-[#fffbe6] to-[#f9e7b3] flex items-center justify-center shadow-md transition-all duration-300">
+                        <div class="w-24 h-24 mb-3 rounded-full overflow-hidden border-4 border-surface-light group-hover:border-brand-gold bg-gradient-to-tr from-surface-light to-surface-medium flex items-center justify-center shadow-md transition-all duration-300">
                             ${subcat.image ? `<img src="/storage/${subcat.image}" alt="${subcat.name}" class="w-full h-full object-cover scale-100 group-hover:scale-110 transition-transform duration-300">` : '<div class="text-4xl">📁</div>'}
                         </div>
-                        <span class="font-semibold text-base md:text-lg text-[#1A1A1A] group-hover:text-[#D4AF37] transition-colors tracking-wide text-center">${subcat.name}</span>
+                        <span class="font-semibold text-base md:text-lg text-text-heading group-hover:text-brand-gold transition-colors tracking-wide text-center">${subcat.name}</span>
                     </button>
                 `).join('');
 
                 // Desktop Filter display (hidden)
-                let filterHTML = `<label class="flex items-center cursor-pointer hover:text-[#D4AF37] transition-colors"><input type="radio" name="subcat" value="" ${!currentSubCategory ? 'checked' : ''} class="mr-2 subcat-radio accent-[#D4AF37]"><span class="font-medium">All</span></label>`;
+                let filterHTML = `<label class="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="radio" name="subcat" value="" ${!currentSubCategory ? 'checked' : ''} class="mr-2 subcat-radio accent-brand-gold"><span class="font-medium">All</span></label>`;
                 filterHTML += subcats.map(subcat => `
-                    <label class="flex items-center cursor-pointer hover:text-[#D4AF37] transition-colors">
-                        <input type="radio" name="subcat" value="${subcat.id}" ${currentSubCategory == subcat.id ? 'checked' : ''} class="mr-2 subcat-radio accent-[#D4AF37]">
+                    <label class="flex items-center cursor-pointer hover:text-brand-gold transition-colors">
+                        <input type="radio" name="subcat" value="${subcat.id}" ${currentSubCategory == subcat.id ? 'checked' : ''} class="mr-2 subcat-radio accent-brand-gold">
                         <span>${subcat.name}</span>
                     </label>
                 `).join('');
@@ -343,10 +343,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Mobile Filter display
                 const mobileFilterEl = document.getElementById('subcategory-filters-mobile');
                 if (mobileFilterEl) {
-                    let mobileFilterHTML = `<label class="flex items-center cursor-pointer hover:text-[#D4AF37] transition-colors"><input type="radio" name="subcat-mobile" value="" ${!currentSubCategory ? 'checked' : ''} class="mr-2 subcat-radio-mobile accent-[#D4AF37]"><span class="font-medium">All</span></label>`;
+                    let mobileFilterHTML = `<label class="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="radio" name="subcat-mobile" value="" ${!currentSubCategory ? 'checked' : ''} class="mr-2 subcat-radio-mobile accent-brand-gold"><span class="font-medium">All</span></label>`;
                     mobileFilterHTML += subcats.map(subcat => `
-                        <label class="flex items-center cursor-pointer hover:text-[#D4AF37] transition-colors">
-                            <input type="radio" name="subcat-mobile" value="${subcat.id}" ${currentSubCategory == subcat.id ? 'checked' : ''} class="mr-2 subcat-radio-mobile accent-[#D4AF37]">
+                        <label class="flex items-center cursor-pointer hover:text-brand-gold transition-colors">
+                            <input type="radio" name="subcat-mobile" value="${subcat.id}" ${currentSubCategory == subcat.id ? 'checked' : ''} class="mr-2 subcat-radio-mobile accent-brand-gold">
                             <span>${subcat.name}</span>
                         </label>
                     `).join('');
@@ -386,19 +386,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 const filterEl = document.getElementById('brand-filters');
 
                 if (brands.length === 0) {
-                    filterEl.innerHTML = '<p class="text-sm text-[#6B6B6B]/70">No brands</p>';
+                    filterEl.innerHTML = '<p class="text-sm text-text-muted/70">No brands</p>';
                     const mobileFilterEl = document.getElementById('brand-filters-mobile');
                     if (mobileFilterEl) {
-                        mobileFilterEl.innerHTML = '<p class="text-sm text-[#6B6B6B]/70">No brands</p>';
+                        mobileFilterEl.innerHTML = '<p class="text-sm text-text-muted/70">No brands</p>';
                     }
                     return;
                 }
 
                 // Desktop Filter display (hidden)
-                let html = `<label class="flex items-center cursor-pointer hover:text-[#D4AF37] transition-colors"><input type="radio" name="brand" value="" ${!currentBrand ? 'checked' : ''} class="mr-2 brand-radio accent-[#D4AF37]"><span class="font-medium">All</span></label>`;
+                let html = `<label class="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="radio" name="brand" value="" ${!currentBrand ? 'checked' : ''} class="mr-2 brand-radio accent-brand-gold"><span class="font-medium">All</span></label>`;
                 html += brands.map(brand => `
-                    <label class="flex items-center cursor-pointer hover:text-[#D4AF37] transition-colors">
-                        <input type="radio" name="brand" value="${brand.id}" ${currentBrand == brand.id ? 'checked' : ''} class="mr-2 brand-radio accent-[#D4AF37]">
+                    <label class="flex items-center cursor-pointer hover:text-brand-gold transition-colors">
+                        <input type="radio" name="brand" value="${brand.id}" ${currentBrand == brand.id ? 'checked' : ''} class="mr-2 brand-radio accent-brand-gold">
                         <span>${brand.name}</span>
                     </label>
                 `).join('');
@@ -407,10 +407,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Mobile Filter display
                 const mobileFilterEl = document.getElementById('brand-filters-mobile');
                 if (mobileFilterEl) {
-                    let mobileFilterHTML = `<label class="flex items-center cursor-pointer hover:text-[#D4AF37] transition-colors"><input type="radio" name="brand-mobile" value="" ${!currentBrand ? 'checked' : ''} class="mr-2 brand-radio-mobile accent-[#D4AF37]"><span class="font-medium">All</span></label>`;
+                    let mobileFilterHTML = `<label class="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="radio" name="brand-mobile" value="" ${!currentBrand ? 'checked' : ''} class="mr-2 brand-radio-mobile accent-brand-gold"><span class="font-medium">All</span></label>`;
                     mobileFilterHTML += brands.map(brand => `
-                        <label class="flex items-center cursor-pointer hover:text-[#D4AF37] transition-colors">
-                            <input type="radio" name="brand-mobile" value="${brand.id}" ${currentBrand == brand.id ? 'checked' : ''} class="mr-2 brand-radio-mobile accent-[#D4AF37]">
+                        <label class="flex items-center cursor-pointer hover:text-brand-gold transition-colors">
+                            <input type="radio" name="brand-mobile" value="${brand.id}" ${currentBrand == brand.id ? 'checked' : ''} class="mr-2 brand-radio-mobile accent-brand-gold">
                             <span>${brand.name}</span>
                         </label>
                     `).join('');

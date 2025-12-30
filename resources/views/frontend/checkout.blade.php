@@ -172,7 +172,7 @@
                               <div class="flex items-center gap-2 mt-2">
                                   <!-- PhonePe -->
                                   <svg width="24" height="24" viewBox="0 0 24 24">
-                                      <circle cx="12" cy="12" r="12" fill="#5F259F"/>
+                                      <circle cx="12" cy="12" r="12" fill="var(--ui-primary)"/>
                                       <text x="12" y="16" text-anchor="middle" fill="white" font-size="12" font-weight="bold">P</text>
                                   </svg>
 
@@ -594,7 +594,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         contact: document.querySelector('input[name="mobile"]')?.value || ''
                     },
                     theme: {
-                        color: '#F4B41A'
+                        color: 'var(--brand-gold)'
                     },
                     modal: {
                         ondismiss: function() {
