@@ -1171,12 +1171,12 @@
     }
     
     #search-results::-webkit-scrollbar-thumb {
-        background: #d4af37;
+        background: var(--brand-gold);
         border-radius: 10px;
     }
     
     #search-results::-webkit-scrollbar-thumb:hover {
-        background: #b8962e;
+        background: var(--brand-amber);
     }
     
     /* Animation for modal */

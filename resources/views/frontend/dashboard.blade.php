@@ -165,7 +165,7 @@
         <div id="content-addresses" class="tab-content hidden">
             <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 animate-fade-in">
                 <div class="flex items-center gap-3 mb-6">
-                    <div class="p-3 bg-gradient-to-br from-[#D4AF37] to-[#B8962E] rounded-lg">
+                    <div class="p-3 bg-gradient-to-br from-brand-gold to-brand-amber rounded-lg">
                         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"/>
                         </svg>
