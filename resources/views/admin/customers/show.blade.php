@@ -65,7 +65,19 @@
                         <div>
                             <div class="text-sm text-text-muted">Address</div>
                             <div class="font-medium text-text-heading">
-                                {{ $customer->addresses->where('is_default', true)->first()->full_address }}
+                                {{ $customer->addresses->where('is_default', true)->first()->address }}
+                                @if($customer->addresses->where('is_default', true)->first()->city)
+                                    {{ $customer->addresses->where('is_default', true)->first()->city }},
+                                @endif
+                                @if($customer->addresses->where('is_default', true)->first()->state)
+                                    {{ $customer->addresses->where('is_default', true)->first()->state }}
+                                @endif
+                                @if($customer->addresses->where('is_default', true)->first()->pincode)
+                                    - {{ $customer->addresses->where('is_default', true)->first()->pincode }}
+                                @endif
+                                @if($customer->addresses->where('is_default', true)->first()->country)
+                                    {{ $customer->addresses->where('is_default', true)->first()->country }}
+                                @endif
                             </div>
                         </div>
                     @endif

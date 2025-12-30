@@ -130,7 +130,7 @@
                     </div>
                     <div>
                         <label for="postal_code" class="block text-sm font-medium text-text-heading mb-2">Postal Code</label>
-                        <input type="text" id="postal_code" name="postal_code" value="{{ old('postal_code', $customer->addresses->where('is_default', true)->first()->postal_code ?? '') }}"
+                        <input type="text" id="postal_code" name="postal_code" value="{{ old('postal_code', $customer->addresses->where('is_default', true)->first()->pincode ?? '') }}"
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
                                placeholder="400001">
                         @error('postal_code')

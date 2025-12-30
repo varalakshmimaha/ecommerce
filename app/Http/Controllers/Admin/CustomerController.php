@@ -85,10 +85,12 @@ class CustomerController extends Controller
         // Create address if provided
         if (!empty($validated['address']) || !empty($validated['city']) || !empty($validated['state'])) {
             $user->addresses()->create([
+                'name' => $validated['name'],
+                'phone' => $validated['mobile'],
                 'address' => $validated['address'] ?? '',
                 'city' => $validated['city'] ?? '',
                 'state' => $validated['state'] ?? '',
-                'postal_code' => $validated['postal_code'] ?? '',
+                'pincode' => $validated['postal_code'] ?? '',
                 'country' => $validated['country'] ?? 'India',
                 'is_default' => true,
             ]);
@@ -200,10 +202,12 @@ class CustomerController extends Controller
         // Update or create address
         $defaultAddress = $customer->addresses()->where('is_default', true)->first();
         $addressData = [
+            'name' => $validated['name'],
+            'phone' => $validated['mobile'],
             'address' => $validated['address'] ?? '',
             'city' => $validated['city'] ?? '',
             'state' => $validated['state'] ?? '',
-            'postal_code' => $validated['postal_code'] ?? '',
+            'pincode' => $validated['postal_code'] ?? '',
             'country' => $validated['country'] ?? 'India',
         ];
 
@@ -328,7 +332,7 @@ class CustomerController extends Controller
                     $address ? $address->address : '',
                     $address ? $address->city : '',
                     $address ? $address->state : '',
-                    $address ? $address->postal_code : '',
+                    $address ? $address->pincode : '',
                     $address ? $address->country : '',
                     $totalOrders,
                     '₹' . number_format($totalSpent, 2),

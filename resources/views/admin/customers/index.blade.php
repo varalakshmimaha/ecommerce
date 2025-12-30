@@ -109,6 +109,9 @@
                                         @if($customer->addresses()->where('is_default', true)->first()->state)
                                             , {{ $customer->addresses()->where('is_default', true)->first()->state }}
                                         @endif
+                                        @if($customer->addresses()->where('is_default', true)->first()->pincode)
+                                            - {{ $customer->addresses()->where('is_default', true)->first()->pincode }}
+                                        @endif
                                     @else
                                         N/A
                                     @endif
