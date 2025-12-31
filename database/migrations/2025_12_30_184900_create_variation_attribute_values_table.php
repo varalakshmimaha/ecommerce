@@ -18,9 +18,9 @@ return new class extends Migration
             $table->foreignId('attribute_value_id')->constrained('product_attribute_values')->onDelete('cascade');
             $table->timestamps();
 
-            $table->unique(['variation_id', 'product_attribute_id', 'attribute_value_id'], 'variation_attr_value_unique');
-            $table->index(['variation_id', 'product_attribute_id']);
-            $table->index(['product_attribute_id', 'attribute_value_id']);
+            $table->unique(['variation_id', 'product_attribute_id', 'attribute_value_id'], 'var_attr_val_unique');
+            $table->index(['variation_id', 'product_attribute_id'], 'var_attr_index');
+            $table->index(['product_attribute_id', 'attribute_value_id'], 'attr_val_index');
         });
     }
 

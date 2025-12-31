@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('sort_order')->default(0);
             $table->timestamps();
             
-            $table->index(['is_active', 'sort_order']);
+            $table->index(['is_active', 'sort_order'], 'attr_active_sort');
         });
     }
 

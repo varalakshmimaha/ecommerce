@@ -21,7 +21,7 @@ return new class extends Migration
             $table->integer('sort_order')->default(0);
             $table->timestamps();
 
-            $table->index(['product_attribute_id', 'is_active', 'sort_order']);
+            $table->index(['product_attribute_id', 'is_active', 'sort_order'], 'prod_attr_active_sort');
         });
     }
 
