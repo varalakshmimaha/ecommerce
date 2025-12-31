@@ -15,9 +15,9 @@ class ProductAttributeValueController extends Controller
         
         if ($attributeId) {
             $attribute = ProductAttribute::findOrFail($attributeId);
-            $values = $attribute->values()->orderBy('sort_order')->paginate(20);
+            $attributeValues = $attribute->values()->orderBy('sort_order')->paginate(20);
         } else {
-            $values = ProductAttributeValue::with('attribute')
+            $attributeValues = ProductAttributeValue::with('attribute')
                 ->orderBy('attribute_id')
                 ->orderBy('sort_order')
                 ->paginate(20);
@@ -25,7 +25,7 @@ class ProductAttributeValueController extends Controller
         
         $attributes = ProductAttribute::where('is_active', true)->get();
         
-        return view('admin.product-attribute-values.index', compact('values', 'attributes', 'attributeId'));
+        return view('admin.product-attribute-values.index', compact('attributeValues', 'attributes', 'attributeId'));
     }
 
     public function create()
