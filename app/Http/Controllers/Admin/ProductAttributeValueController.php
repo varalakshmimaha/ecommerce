@@ -25,7 +25,7 @@ class ProductAttributeValueController extends Controller
         
         $attributes = ProductAttribute::where('is_active', true)->get();
 
-        dd($attributeValues);
+        //dd($attributeValues);
         
         return view('admin.product-attribute-values.index', compact('attributeValues', 'attributes', 'attributeId'));
     }
