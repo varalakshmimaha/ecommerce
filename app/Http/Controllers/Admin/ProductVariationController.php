@@ -35,19 +35,40 @@ class ProductVariationController extends Controller
     {
         $validated = $request->validate([
             'sku' => 'nullable|string|max:255|unique:product_variations,sku',
-            'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
+            'price' => 'nullable|numeric|min:0',
+            'stock_quantity' => 'nullable|integer|min:0',
             'weight' => 'nullable|numeric|min:0',
-            'image' => 'nullable|string|max:255',
+            'variation_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'gallery_image_id' => 'nullable|exists:product_images,id',
             'is_active' => 'boolean',
+            'is_default' => 'boolean',
             'sort_order' => 'integer|min:0',
             'attribute_values' => 'required|array|min:1',
             'attribute_values.*' => 'exists:product_attribute_values,id',
         ]);
 
         $validated['is_active'] = $request->has('is_active');
+        $validated['is_default'] = $request->has('is_default');
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
         $validated['product_id'] = $product->id;
+
+        // Handle image upload or gallery selection
+        if ($request->hasFile('variation_image')) {
+            $validated['image'] = $request->file('variation_image')->store('product_variations', 'public');
+        } elseif ($request->filled('gallery_image_id')) {
+            $galleryImage = $product->images()->findOrFail($request->gallery_image_id);
+            $validated['image'] = $galleryImage->image_path;
+        }
+
+        // Use product price if variation price not provided
+        if (empty($validated['price'])) {
+            $validated['price'] = $product->selling_price;
+        }
+
+        // Use product stock if variation stock not provided
+        if (empty($validated['stock_quantity'])) {
+            $validated['stock_quantity'] = $product->stock_quantity;
+        }
 
         // Check if this combination of attribute values already exists
         $existingVariation = $this->findVariationByAttributeValues($product, $validated['attribute_values']);
@@ -66,9 +87,15 @@ class ProductVariationController extends Controller
             
             VariationAttributeValue::create([
                 'variation_id' => $variation->id,
-                'attribute_id' => $attributeValue->attribute_id,
+                'product_attribute_id' => $attributeValue->product_attribute_id,
                 'attribute_value_id' => $attributeValueId,
             ]);
+        }
+
+        // Set as default variation if requested
+        if ($validated['is_default']) {
+            // Remove default flag from other variations
+            $product->variations()->where('id', '!=', $variation->id)->update(['is_default' => false]);
         }
 
         return redirect()->route('admin.products.variations.index', $product)

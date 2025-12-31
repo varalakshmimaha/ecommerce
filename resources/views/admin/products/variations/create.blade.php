@@ -42,7 +42,7 @@
 
     <!-- Variation Form -->
     <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-        <form method="POST" action="{{ route('admin.products.variations.store', $product) }}" class="space-y-6">
+        <form method="POST" action="{{ route('admin.products.variations.store', $product) }}" enctype="multipart/form-data" class="space-y-6">
             @csrf
             
             <!-- Basic Information -->
@@ -83,37 +83,51 @@
                     </svg>
                     Variation Attributes
                 </h3>
-                <div id="attributes-container" class="space-y-4">
-                    <div class="attribute-row grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-text-heading mb-2">Attribute Name</label>
-                            <input type="text" name="attribute_names[]" placeholder="e.g., Color, Size" 
-                                   class="attribute-name w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-text-heading mb-2">Attribute Value</label>
-                            <input type="text" name="attribute_values[]" placeholder="e.g., Red, Large" 
-                                   class="attribute-value w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent">
-                        </div>
-                        <div class="flex items-end">
-                            <button type="button" onclick="removeAttribute(this)" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg hover:bg-red-200 transition-all duration-300">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                </svg>
-                            </button>
-                        </div>
+                @if($attributes->count() > 0)
+                    <div class="space-y-4">
+                        @foreach($attributes as $attribute)
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <label class="block text-sm font-medium text-text-heading mb-2">
+                                    {{ $attribute->name }}
+                                    @if($attribute->description)
+                                        <span class="text-xs text-gray-500 ml-2">({{ $attribute->description }})</span>
+                                    @endif
+                                </label>
+                                @if($attribute->activeValues->count() > 0)
+                                    <select name="attribute_values[{{ $attribute->id }}]" required 
+                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent">
+                                        <option value="">Select {{ $attribute->name }}</option>
+                                        @foreach($attribute->activeValues as $value)
+                                            <option value="{{ $value->id }}">
+                                                {{ $value->value }}
+                                                @if($value->hex_color)
+                                                    <span class="inline-block w-3 h-3 rounded-full ml-2" style="background-color: {{ $value->hex_color }}"></span>
+                                                @endif
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @else
+                                    <p class="text-sm text-gray-500">No active values available for this attribute.</p>
+                                @endif
+                            </div>
+                        @endforeach
                     </div>
-                </div>
-                <button type="button" onclick="addAttribute()" class="mt-4 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-all duration-300">
-                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    Add Attribute
-                </button>
-                @error('attributes')
-                    <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                @enderror
+                @else
+                    <div class="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                        <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                        </svg>
+                        <p class="text-gray-600 font-medium">No Attributes Available</p>
+                        <p class="text-sm text-gray-500 mt-1">Please create product attributes first from the admin sidebar.</p>
+                        <a href="{{ route('admin.product-attributes.index') }}" class="inline-block mt-3 text-brand-gold hover:text-brand-amber font-medium">
+                            Manage Attributes →
+                        </a>
+                    </div>
+                @endif
             </div>
+            @error('attributes')
+                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+            @enderror
 
             <!-- Pricing -->
             <div>
@@ -191,28 +205,66 @@
                     </svg>
                     Variation Images (Optional)
                 </h3>
-                <div id="variation-images" class="space-y-4">
-                    <div class="image-row grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-text-heading mb-2">Image URL</label>
-                            <input type="text" name="images[]" placeholder="Enter image URL" 
-                                   class="variation-image w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent">
-                        </div>
-                        <div class="flex items-end">
-                            <button type="button" onclick="removeImage(this)" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg hover:bg-red-200 transition-all duration-300">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                </svg>
-                            </button>
-                        </div>
+                
+                <!-- Image Selection Type -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-text-heading mb-2">Image Selection Type</label>
+                    <div class="flex items-center space-x-4">
+                        <label class="flex items-center">
+                            <input type="radio" name="image_type" value="upload" checked class="mr-2" onchange="toggleImageType()">
+                            <span class="text-sm">Upload New Image</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="image_type" value="gallery" class="mr-2" onchange="toggleImageType()">
+                            <span class="text-sm">Select from Gallery</span>
+                        </label>
                     </div>
                 </div>
-                <button type="button" onclick="addImage()" class="mt-4 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-all duration-300">
-                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
-                    Add Image
-                </button>
+
+                <!-- Upload Option -->
+                <div id="upload-section" class="space-y-4">
+                    <div>
+                        <label for="variation_image" class="block text-sm font-medium text-text-heading mb-2">Upload Image</label>
+                        <input type="file" id="variation_image" name="variation_image" accept="image/*" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent">
+                        <p class="mt-1 text-xs text-gray-500">Allowed formats: JPG, PNG, GIF (Max 2MB)</p>
+                    </div>
+                    <div id="image-preview" class="hidden">
+                        <img id="preview-img" src="" alt="Preview" class="w-32 h-32 object-cover rounded-lg border border-gray-200">
+                    </div>
+                </div>
+
+                <!-- Gallery Selection Option -->
+                <div id="gallery-section" class="hidden space-y-4">
+                    @if($product->images->count() > 0)
+                        <label class="block text-sm font-medium text-text-heading mb-2">Select from Product Gallery</label>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            @foreach($product->images as $image)
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="gallery_image_id" value="{{ $image->id }}" class="sr-only peer">
+                                    <div class="relative rounded-lg overflow-hidden border-2 border-gray-200 peer-checked:border-brand-gold peer-checked:ring-2 peer-checked:ring-brand-gold transition-all">
+                                        <img src="{{ asset('storage/' . $image->image_path) }}" alt="Gallery Image" 
+                                             class="w-full h-24 object-cover">
+                                        <div class="absolute inset-0 bg-black bg-opacity-0 peer-checked:bg-opacity-10 transition-all"></div>
+                                        <div class="absolute top-2 right-2 w-6 h-6 bg-brand-gold rounded-full flex items-center justify-center opacity-0 peer-checked:opacity-100 transition-all">
+                                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </label>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                            <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <p class="text-gray-600 font-medium">No Gallery Images Available</p>
+                            <p class="text-sm text-gray-500 mt-1">This product has no gallery images to select from.</p>
+                        </div>
+                    @endif
+                </div>
             </div>
 
             <!-- Status -->
@@ -254,90 +306,42 @@
 </div>
 
 <script>
-function addAttribute() {
-    const container = document.getElementById('attributes-container');
-    const newRow = document.createElement('div');
-    newRow.className = 'attribute-row grid grid-cols-1 md:grid-cols-3 gap-4';
-    newRow.innerHTML = `
-        <div>
-            <label class="block text-sm font-medium text-text-heading mb-2">Attribute Name</label>
-            <input type="text" name="attribute_names[]" placeholder="e.g., Color, Size" 
-                   class="attribute-name w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent">
-        </div>
-        <div>
-            <label class="block text-sm font-medium text-text-heading mb-2">Attribute Value</label>
-            <input type="text" name="attribute_values[]" placeholder="e.g., Red, Large" 
-                   class="attribute-value w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent">
-        </div>
-        <div class="flex items-end">
-            <button type="button" onclick="removeAttribute(this)" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg hover:bg-red-200 transition-all duration-300">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                </svg>
-            </button>
-        </div>
-    `;
-    container.appendChild(newRow);
-}
-
-function removeAttribute(button) {
-    const row = button.closest('.attribute-row');
-    if (document.querySelectorAll('.attribute-row').length > 1) {
-        row.remove();
+// Toggle image selection type
+function toggleImageType() {
+    const uploadSection = document.getElementById('upload-section');
+    const gallerySection = document.getElementById('gallery-section');
+    const imageType = document.querySelector('input[name="image_type"]:checked').value;
+    
+    if (imageType === 'upload') {
+        uploadSection.classList.remove('hidden');
+        gallerySection.classList.add('hidden');
+    } else {
+        uploadSection.classList.add('hidden');
+        gallerySection.classList.remove('hidden');
     }
 }
 
-function addImage() {
-    const container = document.getElementById('variation-images');
-    const newRow = document.createElement('div');
-    newRow.className = 'image-row grid grid-cols-1 md:grid-cols-2 gap-4';
-    newRow.innerHTML = `
-        <div>
-            <label class="block text-sm font-medium text-text-heading mb-2">Image URL</label>
-            <input type="text" name="images[]" placeholder="Enter image URL" 
-                   class="variation-image w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent">
-        </div>
-        <div class="flex items-end">
-            <button type="button" onclick="removeImage(this)" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg hover:bg-red-200 transition-all duration-300">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                </svg>
-            </button>
-        </div>
-    `;
-    container.appendChild(newRow);
-}
-
-function removeImage(button) {
-    const row = button.closest('.image-row');
-    if (document.querySelectorAll('.image-row').length > 1) {
-        row.remove();
+// Image preview for upload
+document.addEventListener('DOMContentLoaded', function() {
+    const imageInput = document.getElementById('variation_image');
+    const preview = document.getElementById('image-preview');
+    const previewImg = document.getElementById('preview-img');
+    
+    if (imageInput) {
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    preview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.classList.add('hidden');
+            }
+        });
     }
-}
-
-// Form submission - build attributes object
-document.querySelector('form').addEventListener('submit', function(e) {
-    const attributeNames = document.querySelectorAll('.attribute-name');
-    const attributeValues = document.querySelectorAll('.attribute-value');
-    const attributes = {};
-    
-    attributeNames.forEach((input, index) => {
-        const name = input.value.trim();
-        const value = attributeValues[index].value.trim();
-        if (name && value) {
-            attributes[name] = value;
-        }
-    });
-    
-    // Add hidden input for attributes
-    const hiddenInput = document.createElement('input');
-    hiddenInput.type = 'hidden';
-    hiddenInput.name = 'attributes';
-    hiddenInput.value = JSON.stringify(attributes);
-    this.appendChild(hiddenInput);
-    
-    // Remove individual attribute inputs
-    attributeNames.forEach(input => input.closest('.attribute-row').remove());
 });
 </script>
 @endsection
