@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Admin\ThemeColorController;
+use App\Http\Controllers\Admin\ProductVariationController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Api\PaymentMethodController;
 use App\Http\Controllers\Webhook\RazorpayWebhookController;
