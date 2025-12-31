@@ -201,6 +201,34 @@
             </button>
         </div>
 
+        <!-- Product Variations Section -->
+        <div class="border-t pt-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Product Variations</h3>
+                <div class="flex items-center space-x-4">
+                    <label class="flex items-center">
+                        <input type="checkbox" name="has_variations" value="1" class="w-4 h-4 text-brand-gold border-gray-300 rounded focus:ring-brand-gold" onchange="toggleVariationsSection()">
+                        <span class="ml-2 text-sm text-gray-700">Enable Variations</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div id="variations-section" class="hidden">
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                    <p class="text-sm text-blue-800">
+                        <strong>Note:</strong> Create product attributes first, then you can manage variations from the product edit page.
+                    </p>
+                </div>
+                
+                <!-- Variations will be managed after product creation -->
+                <div class="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                    <i class="fas fa-box-open text-4xl text-gray-400 mb-3"></i>
+                    <p class="text-gray-600 font-medium">Variations Management</p>
+                    <p class="text-sm text-gray-500 mt-1">After creating this product, you can add variations from the edit page</p>
+                </div>
+            </div>
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Meta Title</label>
@@ -639,6 +667,18 @@
         `;
         container.appendChild(newRow);
         attributeIndex++;
+    }
+    
+    // Toggle variations section
+    function toggleVariationsSection() {
+        const checkbox = document.querySelector('input[name="has_variations"]');
+        const variationsSection = document.getElementById('variations-section');
+        
+        if (checkbox.checked) {
+            variationsSection.classList.remove('hidden');
+        } else {
+            variationsSection.classList.add('hidden');
+        }
     }
     
     // Form validation before submit
