@@ -131,20 +131,6 @@ class ProductController extends Controller
             }
         }
 
-        // Create product attributes
-        if ($request->has('attributes')) {
-            foreach ($request->attributes as $attr) {
-                if (!empty($attr['name']) && !empty($attr['value'])) {
-                    $product->attributes()->create([
-                        'attribute_name' => $attr['name'],
-                        'attribute_value' => $attr['value'],
-                        'price_adjustment' => $attr['price_adjustment'] ?? 0,
-                        'stock_adjustment' => $attr['stock_adjustment'] ?? 0,
-                    ]);
-                }
-            }
-        }
-
         // Sync related products if provided
         if ($request->has('related_products')) {
             $product->relatedProducts()->sync($request->related_products);
@@ -157,7 +143,7 @@ class ProductController extends Controller
         $categories = Category::where('is_active', true)->get();
         $subCategories = SubCategory::where('is_active', true)->get();
         $brands = Brand::where('is_active', true)->get();
-        $product->load('images', 'attributes', 'relatedProducts');
+        $product->load('images', 'relatedProducts');
         return view('admin.products.edit', compact('product', 'categories', 'subCategories', 'brands'));
     }
 
@@ -288,20 +274,6 @@ class ProductController extends Controller
                     'image_path' => $image->store('products/gallery', 'public'),
                     'sort_order' => $product->images()->count() + $index,
                 ]);
-            }
-        }
-
-        // Add new product attributes
-        if ($request->has('new_attributes')) {
-            foreach ($request->new_attributes as $attr) {
-                if (!empty($attr['name']) && !empty($attr['value'])) {
-                    $product->attributes()->create([
-                        'attribute_name' => $attr['name'],
-                        'attribute_value' => $attr['value'],
-                        'price_adjustment' => $attr['price_adjustment'] ?? 0,
-                        'stock_adjustment' => $attr['stock_adjustment'] ?? 0,
-                    ]);
-                }
             }
         }
 

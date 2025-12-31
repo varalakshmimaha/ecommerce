@@ -167,40 +167,6 @@
             </label>
         </div>
 
-        <div class="border-t pt-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Product Attributes (Color, Size, etc.)</h3>
-            <div id="attributes-container" class="space-y-4">
-                <div class="attribute-row grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Attribute Type</label>
-                        <select name="attributes[0][name]" class="input-field">
-                            <option value="">Select Type</option>
-                            <option value="color">Color</option>
-                            <option value="size">Size</option>
-                            <option value="weight">Weight</option>
-                            <option value="material">Material</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Value</label>
-                        <input type="text" name="attributes[0][value]" class="input-field" placeholder="e.g., Red, XL, etc.">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Price Adjustment (₹)</label>
-                        <input type="number" step="0.01" name="attributes[0][price_adjustment]" value="0" class="input-field">
-                    </div>
-                    <div class="flex items-end space-x-2">
-                        <input type="number" name="attributes[0][stock_adjustment]" value="0" class="input-field" placeholder="Stock Adj">
-                        <button type="button" onclick="this.closest('.attribute-row').remove()" class="text-red-600 hover:text-red-700 font-medium px-2">×</button>
-                    </div>
-                </div>
-            </div>
-            <button type="button" onclick="addAttributeRow()" class="mt-4 text-brand-gold hover:text-brand-amber font-medium">
-                + Add Another Attribute
-            </button>
-        </div>
-
         <!-- Product Variations Section -->
         <div class="border-t pt-6">
             <div class="flex items-center justify-between mb-4">
@@ -632,41 +598,6 @@
     
     function updateRelatedProductsField() {
         document.getElementById('related_products').value = Array.from(selectedProducts).join(',');
-    }
-    
-    // Add new attribute row
-    let attributeIndex = 1;
-    function addAttributeRow() {
-        const container = document.getElementById('attributes-container');
-        const newRow = document.createElement('div');
-        newRow.className = 'attribute-row grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg';
-        newRow.innerHTML = `
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Attribute Type</label>
-                <select name="attributes[${attributeIndex}][name]" class="input-field">
-                    <option value="">Select Type</option>
-                    <option value="color">Color</option>
-                    <option value="size">Size</option>
-                    <option value="weight">Weight</option>
-                    <option value="material">Material</option>
-                    <option value="other">Other</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Value</label>
-                <input type="text" name="attributes[${attributeIndex}][value]" class="input-field" placeholder="e.g., Red, XL, etc.">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Price Adjustment (₹)</label>
-                <input type="number" step="0.01" name="attributes[${attributeIndex}][price_adjustment]" value="0" class="input-field">
-            </div>
-            <div class="flex items-end space-x-2">
-                <input type="number" name="attributes[${attributeIndex}][stock_adjustment]" value="0" class="input-field" placeholder="Stock Adj">
-                <button type="button" onclick="this.closest('.attribute-row').remove()" class="text-red-600 hover:text-red-700 font-medium px-2">×</button>
-            </div>
-        `;
-        container.appendChild(newRow);
-        attributeIndex++;
     }
     
     // Toggle variations section
