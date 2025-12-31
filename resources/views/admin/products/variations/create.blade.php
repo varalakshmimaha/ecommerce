@@ -82,35 +82,62 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
                     </svg>
                     Variation Attributes
+                    <span class="text-sm text-gray-500 font-normal">(Select one value for each attribute)</span>
                 </h3>
                 @if($attributes->count() > 0)
                     <div class="space-y-4">
                         @foreach($attributes as $attribute)
                             <div class="border border-gray-200 rounded-lg p-4">
-                                <label class="block text-sm font-medium text-text-heading mb-2">
+                                <label class="block text-sm font-medium text-text-heading mb-3">
                                     {{ $attribute->name }}
                                     @if($attribute->description)
                                         <span class="text-xs text-gray-500 ml-2">({{ $attribute->description }})</span>
                                     @endif
                                 </label>
                                 @if($attribute->activeValues->count() > 0)
-                                    <select name="attribute_values[{{ $attribute->id }}]" required 
-                                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent">
-                                        <option value="">Select {{ $attribute->name }}</option>
+                                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                                         @foreach($attribute->activeValues as $value)
-                                            <option value="{{ $value->id }}">
-                                                {{ $value->value }}
-                                                @if($value->hex_color)
-                                                    <span class="inline-block w-3 h-3 rounded-full ml-2" style="background-color: {{ $value->hex_color }}"></span>
-                                                @endif
-                                            </option>
+                                            <label class="cursor-pointer">
+                                                <input type="radio" 
+                                                       name="attribute_values[{{ $attribute->id }}]" 
+                                                       value="{{ $value->id }}" 
+                                                       class="sr-only peer"
+                                                       required>
+                                                <div class="relative rounded-lg border-2 border-gray-200 p-3 text-center peer-checked:border-brand-gold peer-checked:bg-brand-gold/10 peer-checked:ring-2 peer-checked:ring-brand-gold/20 transition-all hover:border-gray-300">
+                                                    @if($value->hex_color)
+                                                        <div class="flex flex-col items-center space-y-2">
+                                                            <div class="w-8 h-8 rounded-full border-2 border-gray-300" 
+                                                                 style="background-color: {{ $value->hex_color }}"></div>
+                                                            <span class="text-xs font-medium">{{ $value->value }}</span>
+                                                        </div>
+                                                    @else
+                                                        <div class="flex items-center justify-center">
+                                                            <span class="text-sm font-medium">{{ $value->value }}</span>
+                                                        </div>
+                                                    @endif
+                                                    <div class="absolute top-1 right-1 w-5 h-5 bg-brand-gold rounded-full flex items-center justify-center opacity-0 peer-checked:opacity-100 transition-all">
+                                                        <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </label>
                                         @endforeach
-                                    </select>
+                                    </div>
+                                    <p class="mt-2 text-xs text-gray-500">Select one {{ $attribute->name }} option</p>
                                 @else
                                     <p class="text-sm text-gray-500">No active values available for this attribute.</p>
                                 @endif
                             </div>
                         @endforeach
+                    </div>
+                    
+                    <!-- Selected Attributes Preview -->
+                    <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                        <h4 class="text-sm font-medium text-text-heading mb-2">Selected Combination:</h4>
+                        <div id="selected-attributes-preview" class="text-sm text-gray-600">
+                            <span class="text-gray-400">Select attributes above to see the combination</span>
+                        </div>
                     </div>
                 @else
                     <div class="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
@@ -321,6 +348,42 @@ function toggleImageType() {
     }
 }
 
+// Update selected attributes preview
+function updateSelectedAttributesPreview() {
+    const preview = document.getElementById('selected-attributes-preview');
+    const selectedOptions = [];
+    
+    // Get all selected radio buttons
+    const selectedRadios = document.querySelectorAll('input[name^="attribute_values"]:checked');
+    
+    selectedRadios.forEach(radio => {
+        const label = radio.closest('label');
+        const valueText = label.querySelector('span').textContent.trim();
+        const attributeName = radio.name.replace('attribute_values[', '').replace(']', '');
+        
+        // Find the attribute name from the DOM
+        const attributeContainer = radio.closest('.border-gray-200');
+        const attributeNameElement = attributeContainer.querySelector('label.font-medium');
+        const attributeTitle = attributeNameElement.textContent.trim().split(' ')[0];
+        
+        selectedOptions.push(`${attributeTitle}: ${valueText}`);
+    });
+    
+    if (selectedOptions.length > 0) {
+        preview.innerHTML = `
+            <div class="flex flex-wrap gap-2">
+                ${selectedOptions.map(option => 
+                    `<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-brand-gold text-white">
+                        ${option}
+                    </span>`
+                ).join('')}
+            </div>
+        `;
+    } else {
+        preview.innerHTML = '<span class="text-gray-400">Select attributes above to see the combination</span>';
+    }
+}
+
 // Image preview for upload
 document.addEventListener('DOMContentLoaded', function() {
     const imageInput = document.getElementById('variation_image');
@@ -342,6 +405,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    
+    // Add event listeners to attribute radio buttons
+    const attributeRadios = document.querySelectorAll('input[name^="attribute_values"]');
+    attributeRadios.forEach(radio => {
+        radio.addEventListener('change', updateSelectedAttributesPreview);
+    });
+    
+    // Initialize preview
+    updateSelectedAttributesPreview();
 });
 </script>
 @endsection

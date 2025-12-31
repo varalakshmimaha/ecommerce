@@ -70,6 +70,10 @@ class ProductVariationController extends Controller
             $validated['stock_quantity'] = $product->stock_quantity;
         }
 
+        // Generate variation title based on selected attributes
+        $variationTitle = $this->generateVariationTitle($validated['attribute_values']);
+        $validated['variation_title'] = $variationTitle;
+
         // Check if this combination of attribute values already exists
         $existingVariation = $this->findVariationByAttributeValues($product, $validated['attribute_values']);
         
@@ -99,7 +103,27 @@ class ProductVariationController extends Controller
         }
 
         return redirect()->route('admin.products.variations.index', $product)
-            ->with('success', 'Product variation created successfully.');
+            ->with('success', "Product variation '{$variationTitle}' created successfully.");
+    }
+
+    /**
+     * Generate variation title based on selected attribute values
+     */
+    private function generateVariationTitle($attributeValueIds)
+    {
+        $attributeValues = ProductAttributeValue::with('attribute')
+            ->whereIn('id', $attributeValueIds)
+            ->get()
+            ->sortBy(function ($value) {
+                return $value->attribute->sort_order;
+            });
+
+        $titleParts = [];
+        foreach ($attributeValues as $value) {
+            $titleParts[] = $value->value;
+        }
+
+        return implode(' - ', $titleParts);
     }
 
     public function edit(Product $product, ProductVariation $variation)
