@@ -221,84 +221,6 @@
             </div>
         </div>
 
-        <!-- Product Variations Section -->
-        <div class="border-t pt-6">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-900">Product Variations</h3>
-                <div class="flex items-center space-x-4">
-                    <label class="flex items-center">
-                        <input type="checkbox" name="has_variations" value="1" {{ old('has_variations', $product->has_variations) ? 'checked' : '' }} class="w-4 h-4 text-brand-gold border-gray-300 rounded focus:ring-brand-gold" onchange="toggleVariationsSection()">
-                        <span class="ml-2 text-sm text-gray-700">Enable Variations</span>
-                    </label>
-                    @if($product->has_variations)
-                        <a href="{{ route('admin.products.variations.index', $product) }}" class="text-brand-gold hover:text-brand-amber font-medium">
-                            <i class="fas fa-box-open mr-2"></i>Manage Variations
-                        </a>
-                    @endif
-                </div>
-            </div>
-            
-            <div id="variations-section" {{ !$product->has_variations ? 'class="hidden"' : '' }}>
-                @if($product->has_variations)
-                    <!-- Show existing variations count and link -->
-                    <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-sm text-green-800">
-                                    <strong>{{ $product->variations()->count() }}</strong> variation(s) configured for this product
-                                </p>
-                                <p class="text-xs text-green-600 mt-1">Click "Manage Variations" to add, edit, or delete variations</p>
-                            </div>
-                            <a href="{{ route('admin.products.variations.index', $product) }}" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700">
-                                <i class="fas fa-cog mr-2"></i>Manage Variations
-                            </a>
-                        </div>
-                    </div>
-                @else
-                    <!-- Show setup instructions -->
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                        <p class="text-sm text-blue-800">
-                            <strong>Setup Instructions:</strong>
-                        </p>
-                        <ol class="text-xs text-blue-700 mt-2 ml-4 list-decimal">
-                            <li>Create product attributes from the admin sidebar</li>
-                            <li>Enable variations for this product</li>
-                            <li>Click "Manage Variations" to create product variations</li>
-                        </ol>
-                    </div>
-                    
-                    <div class="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-                        <i class="fas fa-box-open text-4xl text-gray-400 mb-3"></i>
-                        <p class="text-gray-600 font-medium">No Variations Yet</p>
-                        <p class="text-sm text-gray-500 mt-1">Enable variations and click "Manage Variations" to get started</p>
-                    </div>
-                @endif
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Meta Title</label>
-                <input type="text" name="meta_title" value="{{ old('meta_title', $product->meta_title) }}" class="input-field">
-            </div>
-            <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Meta Description</label>
-                                <textarea name="meta_description" rows="2" class="input-field">{{ old('meta_description', $product->meta_description) }}</textarea>
-            </div>
-            <div class="md:col-span-3">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Meta Keywords</label>
-                <input type="text" name="meta_keywords" value="{{ old('meta_keywords', $product->meta_keywords) }}" class="input-field" placeholder="keyword1, keyword2, keyword3">
-            </div>
-        </div>
-        
-        <div class="flex justify-end space-x-4 pt-6 border-t">
-            <a href="{{ route('admin.products.index') }}" class="suvee-form-cancel-btn px-5 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-all duration-300 hover:shadow-md transform hover:-translate-y-0.5">Cancel</a>
-            <button type="submit" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">
-                Update Product
-            </button>
-        </div>
-    </form>
-
     <!-- Product Variations Section -->
     <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6 mt-6">
         <div class="flex items-center justify-between mb-4">
@@ -392,6 +314,30 @@
             </div>
         @endif
     </div>
+
+
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Meta Title</label>
+                <input type="text" name="meta_title" value="{{ old('meta_title', $product->meta_title) }}" class="input-field">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Meta Description</label>
+                                <textarea name="meta_description" rows="2" class="input-field">{{ old('meta_description', $product->meta_description) }}</textarea>
+            </div>
+            <div class="md:col-span-3">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Meta Keywords</label>
+                <input type="text" name="meta_keywords" value="{{ old('meta_keywords', $product->meta_keywords) }}" class="input-field" placeholder="keyword1, keyword2, keyword3">
+            </div>
+        </div>
+        
+        <div class="flex justify-end space-x-4 pt-6 border-t">
+            <a href="{{ route('admin.products.index') }}" class="suvee-form-cancel-btn px-5 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-all duration-300 hover:shadow-md transform hover:-translate-y-0.5">Cancel</a>
+            <button type="submit" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">
+                Update Product
+            </button>
+        </div>
 </div>
 
 <!-- Related Products Modal -->

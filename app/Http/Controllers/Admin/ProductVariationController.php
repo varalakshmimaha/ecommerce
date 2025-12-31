@@ -54,10 +54,10 @@ class ProductVariationController extends Controller
 
         // Handle image upload or gallery selection
         if ($request->hasFile('variation_image')) {
-            $validated['image'] = $request->file('variation_image')->store('product_variations', 'public');
+            $validated['variation_image'] = $request->file('variation_image')->store('product_variations', 'public');
         } elseif ($request->filled('gallery_image_id')) {
             $galleryImage = $product->images()->findOrFail($request->gallery_image_id);
-            $validated['image'] = $galleryImage->image_path;
+            $validated['variation_image'] = $galleryImage->image_path;
         }
 
         // Use product price if variation price not provided
@@ -152,10 +152,11 @@ class ProductVariationController extends Controller
 
         $validated = $request->validate([
             'sku' => 'nullable|string|max:255|unique:product_variations,sku,' . $variation->id,
-            'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
+            'price' => 'nullable|numeric|min:0',
+            'stock_quantity' => 'nullable|integer|min:0',
             'weight' => 'nullable|numeric|min:0',
-            'image' => 'nullable|string|max:255',
+            'variation_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'gallery_image_id' => 'nullable|exists:product_images,id',
             'is_active' => 'boolean',
             'sort_order' => 'integer|min:0',
             'attribute_values' => 'required|array|min:1',
@@ -164,6 +165,22 @@ class ProductVariationController extends Controller
 
         $validated['is_active'] = $request->has('is_active');
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
+        
+        // Handle image upload or gallery selection
+        if ($request->hasFile('variation_image')) {
+            $validated['variation_image'] = $request->file('variation_image')->store('product_variations', 'public');
+        } elseif ($request->filled('gallery_image_id')) {
+            $galleryImage = $product->images()->findOrFail($request->gallery_image_id);
+            $validated['variation_image'] = $galleryImage->image_path;
+        }
+        
+        // Remove current image if requested
+        if ($request->has('remove_current_image') && $request->input('remove_current_image') == '1') {
+            if ($variation->variation_image) {
+                \Storage::disk('public')->delete($variation->variation_image);
+                $validated['variation_image'] = null;
+            }
+        }
 
         // Check if this combination of attribute values already exists (excluding current variation)
         $existingVariation = $this->findVariationByAttributeValues($product, $validated['attribute_values'], $variation->id);
@@ -185,7 +202,7 @@ class ProductVariationController extends Controller
             
             VariationAttributeValue::create([
                 'variation_id' => $variation->id,
-                'attribute_id' => $attributeValue->attribute_id,
+                'product_attribute_id' => $attributeValue->product_attribute_id,
                 'attribute_value_id' => $attributeValueId,
             ]);
         }

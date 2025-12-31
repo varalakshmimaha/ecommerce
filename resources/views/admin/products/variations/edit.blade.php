@@ -1,14 +1,14 @@
 @extends('layouts.admin')
 
-@section('title', 'Add Variation - ' . $product->name)
+@section('title', 'Edit Variation - ' . $product->name)
 
 @section('content')
 <div class="container-fluid px-4 py-6">
     <!-- Page Header -->
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-text-heading">Add Product Variation</h1>
-            <p class="text-text-muted mt-1">Create a new variation for: {{ $product->name }}</p>
+            <h1 class="text-2xl font-bold text-text-heading">Edit Product Variation</h1>
+            <p class="text-text-muted mt-1">Editing variation for: {{ $product->name }}</p>
         </div>
         <a href="{{ route('admin.products.variations.index', $product) }}" 
            class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-all duration-300">
@@ -42,8 +42,9 @@
 
     <!-- Variation Form -->
     <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-        <form method="POST" action="{{ route('admin.products.variations.store', $product) }}" enctype="multipart/form-data" class="space-y-6">
+        <form method="POST" action="{{ route('admin.products.variations.update', [$product, $variation]) }}" enctype="multipart/form-data" class="space-y-6">
             @csrf
+            @method('PUT')
             
             <!-- Basic Information -->
             <div>
@@ -56,7 +57,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="sku" class="block text-sm font-medium text-text-heading mb-2">SKU (Optional)</label>
-                        <input type="text" id="sku" name="sku" value="{{ old('sku') }}" 
+                        <input type="text" id="sku" name="sku" value="{{ old('sku', $variation->sku) }}" 
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
                                placeholder="Leave blank to auto-generate">
                         @error('sku')
@@ -65,7 +66,7 @@
                     </div>
                     <div>
                         <label for="sort_order" class="block text-sm font-medium text-text-heading mb-2">Sort Order</label>
-                        <input type="number" id="sort_order" name="sort_order" value="{{ old('sort_order', 0) }}" 
+                        <input type="number" id="sort_order" name="sort_order" value="{{ old('sort_order', $variation->sort_order ?? 0) }}" 
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
                                placeholder="0">
                         @error('sort_order')
@@ -101,7 +102,8 @@
                                                 <input type="checkbox" 
                                                        name="attribute_values[]" 
                                                        value="{{ $value->id }}" 
-                                                       class="sr-only peer">
+                                                       class="sr-only peer"
+                                                       {{ $variation->attributeValues->pluck('id')->contains($value->id) ? 'checked' : '' }}>
                                                 <div class="relative rounded-lg border-2 border-gray-200 p-3 text-center peer-checked:border-brand-gold peer-checked:bg-brand-gold/10 peer-checked:ring-2 peer-checked:ring-brand-gold/20 transition-all hover:border-gray-300">
                                                     @if($value->hex_color)
                                                         <div class="flex flex-col items-center space-y-2">
@@ -135,7 +137,20 @@
                     <div class="mt-6 p-4 bg-gray-50 rounded-lg">
                         <h4 class="text-sm font-medium text-text-heading mb-2">Selected Combination:</h4>
                         <div id="selected-attributes-preview" class="text-sm text-gray-600">
-                            <span class="text-gray-400">Select attributes above to see the combination</span>
+                            @php
+                                $selectedValues = $variation->attributeValues;
+                            @endphp
+                            @if($selectedValues->count() > 0)
+                                <div class="flex flex-wrap gap-2">
+                                    @foreach($selectedValues as $value)
+                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-brand-gold text-white">
+                                            {{ $value->attribute->name }}: {{ $value->value }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            @else
+                                <span class="text-gray-400">Select attributes above to see the combination</span>
+                            @endif
                         </div>
                     </div>
                 @else
@@ -168,7 +183,7 @@
                         <label for="price" class="block text-sm font-medium text-text-heading mb-2">Selling Price</label>
                         <div class="relative">
                             <span class="absolute left-3 top-2.5 text-gray-500">₹</span>
-                            <input type="number" id="price" name="price" step="0.01" min="0" value="{{ old('price') }}" 
+                            <input type="number" id="price" name="price" step="0.01" min="0" value="{{ old('price', $variation->price) }}" 
                                    class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
                                    placeholder="0.00">
                         </div>
@@ -181,7 +196,7 @@
                         <label for="compare_price" class="block text-sm font-medium text-text-heading mb-2">Compare Price (MRP)</label>
                         <div class="relative">
                             <span class="absolute left-3 top-2.5 text-gray-500">₹</span>
-                            <input type="number" id="compare_price" name="compare_price" step="0.01" min="0" value="{{ old('compare_price') }}" 
+                            <input type="number" id="compare_price" name="compare_price" step="0.01" min="0" value="{{ old('compare_price', $variation->compare_price) }}" 
                                    class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
                                    placeholder="0.00">
                         </div>
@@ -203,7 +218,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="stock_quantity" class="block text-sm font-medium text-text-heading mb-2">Stock Quantity</label>
-                        <input type="number" id="stock_quantity" name="stock_quantity" min="0" value="{{ old('stock_quantity') }}" 
+                        <input type="number" id="stock_quantity" name="stock_quantity" min="0" value="{{ old('stock_quantity', $variation->stock_quantity) }}" 
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
                                placeholder="0">
                         <p class="mt-1 text-xs text-gray-500">Leave blank to use product stock ({{ $product->stock_quantity }})</p>
@@ -213,7 +228,7 @@
                     </div>
                     <div>
                         <label for="weight" class="block text-sm font-medium text-text-heading mb-2">Weight (kg)</label>
-                        <input type="number" id="weight" name="weight" step="0.01" min="0" value="{{ old('weight') }}" 
+                        <input type="number" id="weight" name="weight" step="0.01" min="0" value="{{ old('weight', $variation->weight) }}" 
                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-transparent"
                                placeholder="0.00">
                         @error('weight')
@@ -232,23 +247,42 @@
                     Variation Images (Optional)
                 </h3>
                 
+                <!-- Current Image -->
+                @if($variation->variation_image)
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-text-heading mb-2">Current Image</label>
+                        <div class="flex items-center gap-4">
+                            <img src="{{ asset('storage/' . $variation->variation_image) }}" alt="Current Variation Image" class="w-24 h-24 object-cover rounded-lg border border-gray-200">
+                            <div class="flex flex-col gap-2">
+                                <button type="button" 
+                                        onclick="confirmRemoveImage()" 
+                                        class="text-red-600 hover:text-red-800 text-sm font-medium">
+                                    Remove Current Image
+                                </button>
+                                <p class="text-xs text-gray-500">The current image will be removed if you upload a new one</p>
+                            </div>
+                        </div>
+                        <input type="hidden" id="remove_current_image" name="remove_current_image" value="0">
+                    </div>
+                @endif
+                
                 <!-- Image Selection Type -->
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-text-heading mb-2">Image Selection Type</label>
                     <div class="flex items-center space-x-4">
                         <label class="flex items-center">
-                            <input type="radio" name="image_type" value="upload" checked class="mr-2" onchange="toggleImageType()">
+                            <input type="radio" name="image_type" value="upload" class="mr-2" onchange="toggleImageType()" {{ !$variation->variation_image || old('image_type') === 'upload' ? 'checked' : '' }}>
                             <span class="text-sm">Upload New Image</span>
                         </label>
                         <label class="flex items-center">
-                            <input type="radio" name="image_type" value="gallery" class="mr-2" onchange="toggleImageType()">
+                            <input type="radio" name="image_type" value="gallery" class="mr-2" onchange="toggleImageType()" {{ old('image_type') === 'gallery' ? 'checked' : '' }}>
                             <span class="text-sm">Select from Gallery</span>
                         </label>
                     </div>
                 </div>
 
                 <!-- Upload Option -->
-                <div id="upload-section" class="space-y-4">
+                <div id="upload-section" class="{{ old('image_type') === 'gallery' ? 'hidden' : '' }} space-y-4">
                     <div>
                         <label for="variation_image" class="block text-sm font-medium text-text-heading mb-2">Upload Image</label>
                         <input type="file" id="variation_image" name="variation_image" accept="image/*" 
@@ -261,13 +295,14 @@
                 </div>
 
                 <!-- Gallery Selection Option -->
-                <div id="gallery-section" class="hidden space-y-4">
+                <div id="gallery-section" class="{{ old('image_type') !== 'gallery' ? 'hidden' : '' }} space-y-4">
                     @if($product->images->count() > 0)
                         <label class="block text-sm font-medium text-text-heading mb-2">Select from Product Gallery</label>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                             @foreach($product->images as $image)
                                 <label class="cursor-pointer">
-                                    <input type="radio" name="gallery_image_id" value="{{ $image->id }}" class="sr-only peer">
+                                    <input type="radio" name="gallery_image_id" value="{{ $image->id }}" class="sr-only peer"
+                                           {{ old('gallery_image_id', $variation->image_path) === $image->image_path ? 'checked' : '' }}>
                                     <div class="relative rounded-lg overflow-hidden border-2 border-gray-200 peer-checked:border-brand-gold peer-checked:ring-2 peer-checked:ring-brand-gold transition-all">
                                         <img src="{{ asset('storage/' . $image->image_path) }}" alt="Gallery Image" 
                                              class="w-full h-24 object-cover">
@@ -305,11 +340,13 @@
                 <div class="space-y-4">
                     <div class="flex items-center">
                         <input type="checkbox" id="is_default" name="is_default" value="1" 
+                               {{ old('is_default', $variation->is_default) ? 'checked' : '' }}
                                class="w-4 h-4 text-brand-gold border-gray-300 rounded focus:ring-brand-gold">
                         <label for="is_default" class="ml-2 text-sm text-text-heading">Set as Default Variation</label>
                     </div>
                     <div class="flex items-center">
-                        <input type="checkbox" id="is_active" name="is_active" value="1" checked
+                        <input type="checkbox" id="is_active" name="is_active" value="1" 
+                               {{ old('is_active', $variation->is_active) ? 'checked' : '' }}
                                class="w-4 h-4 text-brand-gold border-gray-300 rounded focus:ring-brand-gold">
                         <label for="is_active" class="ml-2 text-sm text-text-heading">Active</label>
                     </div>
@@ -324,7 +361,7 @@
                 </a>
                 <button type="submit" 
                         class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition-all duration-300">
-                    Create Variation
+                    Update Variation
                 </button>
             </div>
         </form>
@@ -414,5 +451,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize preview
     updateSelectedAttributesPreview();
 });
+
+// Confirm image removal
+function confirmRemoveImage() {
+    if (confirm('Are you sure you want to remove the current image?')) {
+        document.getElementById('remove_current_image').value = '1';
+        // Hide the current image section
+        const currentImageSection = document.querySelector('.mb-4 div:first-child');
+        if (currentImageSection) {
+            currentImageSection.style.display = 'none';
+        }
+    }
+}
 </script>
 @endsection
