@@ -18,7 +18,7 @@ class ProductAttributeValueController extends Controller
             $attributeValues = $attribute->values()->orderBy('sort_order')->paginate(20);
         } else {
             $attributeValues = ProductAttributeValue::with('attribute')
-                ->orderBy('attribute_id')
+                ->orderBy('product_attribute_id')
                 ->orderBy('sort_order')
                 ->paginate(20);
         }
@@ -104,7 +104,7 @@ class ProductAttributeValueController extends Controller
             return back()->with('error', 'Cannot delete value that is used by product variations.');
         }
 
-        $attributeId = $productAttributeValue->attribute_id;
+        $attributeId = $productAttributeValue->product_attribute_id;
         $productAttributeValue->delete();
 
         return redirect()->route('admin.product-attribute-values.index', ['attribute_id' => $attributeId])

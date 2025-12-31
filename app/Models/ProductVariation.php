@@ -14,16 +14,23 @@ class ProductVariation extends Model
         'product_id',
         'sku',
         'price',
-        'stock',
+        'compare_price',
+        'stock_quantity',
         'weight',
-        'image',
+        'attributes',
+        'images',
+        'is_default',
         'is_active',
         'sort_order',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
+        'compare_price' => 'decimal:2',
         'weight' => 'decimal:2',
+        'attributes' => 'array',
+        'images' => 'array',
+        'is_default' => 'boolean',
         'is_active' => 'boolean',
     ];
 
@@ -32,7 +39,7 @@ class ProductVariation extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function attributeValues()
+    public function variationAttributeValues()
     {
         return $this->hasMany(VariationAttributeValue::class);
     }
@@ -44,10 +51,10 @@ class ProductVariation extends Model
             ->withTimestamps();
     }
 
-    public function attributeValuesRelation()
+    public function attributeValues()
     {
         return $this->belongsToMany(ProductAttributeValue::class, 'variation_attribute_values')
-            ->withPivot('attribute_id')
+            ->withPivot('product_attribute_id')
             ->withTimestamps();
     }
 
@@ -56,7 +63,7 @@ class ProductVariation extends Model
      */
     public function getVariationTitleAttribute()
     {
-        $attributes = $this->attributeValues()
+        $attributes = $this->variationAttributeValues()
             ->with('attributeValue')
             ->get()
             ->map(function ($variationAttributeValue) {
@@ -73,8 +80,9 @@ class ProductVariation extends Model
      */
     public function getVariationImageAttribute()
     {
-        if ($this->image) {
-            return $this->image;
+        $images = $this->images;
+        if (!empty($images) && isset($images[0])) {
+            return $images[0];
         }
 
         return $this->product->main_image;
@@ -85,7 +93,7 @@ class ProductVariation extends Model
      */
     public function isInStock()
     {
-        return $this->stock > 0;
+        return $this->stock_quantity > 0;
     }
 
     /**
@@ -98,7 +106,7 @@ class ProductVariation extends Model
         static::creating(function ($variation) {
             if (empty($variation->sku)) {
                 $baseSku = $variation->product->sku ?? strtoupper(substr($variation->product->name, 0, 6));
-                $attributes = $variation->attributeValues()
+                $attributes = $variation->variationAttributeValues()
                     ->with('attributeValue')
                     ->get()
                     ->take(2)

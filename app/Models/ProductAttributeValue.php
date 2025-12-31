@@ -11,10 +11,10 @@ class ProductAttributeValue extends Model
     use HasFactory;
 
     protected $fillable = [
-        'attribute_id',
+        'product_attribute_id',
         'value',
         'slug',
-        'hex_code',
+        'hex_color',
         'is_active',
         'sort_order',
     ];

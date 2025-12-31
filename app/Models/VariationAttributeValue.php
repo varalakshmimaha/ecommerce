@@ -14,7 +14,7 @@ class VariationAttributeValue extends Model
 
     protected $fillable = [
         'variation_id',
-        'attribute_id',
+        'product_attribute_id',
         'attribute_value_id',
     ];
 
