@@ -109,6 +109,7 @@ class ProductController extends Controller
             'is_trending' => 'boolean',
             'is_top_rated' => 'boolean',
             'status' => 'required|in:published,unpublished',
+            'has_variations' => 'boolean',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
@@ -257,6 +258,7 @@ class ProductController extends Controller
             'is_trending' => 'nullable|boolean',
             'is_top_rated' => 'nullable|boolean',
             'status' => 'required|in:published,unpublished',
+            'has_variations' => 'boolean',
         ]);
 
         // Update slug if name changed
@@ -269,6 +271,7 @@ class ProductController extends Controller
         $validated['is_featured'] = $request->has('is_featured') ? (bool)$request->is_featured : false;
         $validated['is_trending'] = $request->has('is_trending') ? (bool)$request->is_trending : false;
         $validated['is_top_rated'] = $request->has('is_top_rated') ? (bool)$request->is_top_rated : false;
+        $validated['has_variations'] = $request->has('has_variations') ? (bool)$request->has_variations : false;
 
         if ($request->hasFile('main_image')) {
             if ($product->main_image) {
