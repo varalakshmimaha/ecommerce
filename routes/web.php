@@ -113,6 +113,9 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::post('products/{product}/variations/{variation}/toggle-status', [ProductVariationController::class, 'toggleStatus'])->name('products.variations.toggle-status');
     Route::post('products/{product}/variations/{variation}/set-default', [ProductVariationController::class, 'setDefault'])->name('products.variations.set-default');
     
+    // Test route
+    Route::get('/test-controller', [TestController::class, 'index'])->name('test.controller');
+    
     // Orders
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
