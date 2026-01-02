@@ -24,7 +24,7 @@ class ProductVariationController extends Controller
         }
 
         $variations = $product->activeVariations()
-            ->with('attributeValues.attributeValue')
+            ->with('variationAttributeValues.attributeValue.attribute')
             ->get()
             ->map(function ($variation) {
                 return [
@@ -37,13 +37,13 @@ class ProductVariationController extends Controller
                     'is_active' => $variation->is_active,
                     'is_in_stock' => $variation->isInStock(),
                     'title' => $variation->variation_title,
-                    'attributes' => $variation->attributeValues->map(function ($attributeValue) {
+                    'attributes' => $variation->variationAttributeValues->map(function ($varAttrValue) {
                         return [
-                            'attribute_id' => $attributeValue->attribute_id,
-                            'attribute_name' => $attributeValue->attribute->name,
-                            'attribute_value_id' => $attributeValue->attribute_value_id,
-                            'attribute_value' => $attributeValue->attributeValue->value,
-                            'hex_code' => $attributeValue->attributeValue->hex_color,
+                            'attribute_id' => $varAttrValue->product_attribute_id,
+                            'attribute_name' => $varAttrValue->attribute->name,
+                            'attribute_value_id' => $varAttrValue->attribute_value_id,
+                            'attribute_value' => $varAttrValue->attributeValue->value,
+                            'hex_code' => $varAttrValue->attributeValue->hex_color,
                         ];
                     }),
                 ];
