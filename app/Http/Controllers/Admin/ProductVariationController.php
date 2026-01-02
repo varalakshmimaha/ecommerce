@@ -77,23 +77,26 @@ class ProductVariationController extends Controller
 
         // Generate variation title based on selected attributes
         $variationTitle = $this->generateVariationTitle($validated['attribute_values']);
-        $validated['variation_title'] = $variationTitle;
 
         // Check if this combination of attribute values already exists
         $existingVariation = $this->findVariationByAttributeValues($product, $validated['attribute_values']);
-        
+
         if ($existingVariation) {
             return back()
                 ->withErrors(['attribute_values' => 'A variation with these attribute values already exists.'])
                 ->withInput();
         }
 
+        // Remove non-fillable fields before creating variation
+        $attributeValues = $validated['attribute_values'];
+        unset($validated['attribute_values']);
+
         $variation = ProductVariation::create($validated);
 
         // Attach attribute values to the variation
-        foreach ($validated['attribute_values'] as $attributeValueId) {
+        foreach ($attributeValues as $attributeValueId) {
             $attributeValue = ProductAttributeValue::findOrFail($attributeValueId);
-            
+
             VariationAttributeValue::create([
                 'variation_id' => $variation->id,
                 'product_attribute_id' => $attributeValue->product_attribute_id,
@@ -194,12 +197,16 @@ class ProductVariationController extends Controller
 
         // Check if this combination of attribute values already exists (excluding current variation)
         $existingVariation = $this->findVariationByAttributeValues($product, $validated['attribute_values'], $variation->id);
-        
+
         if ($existingVariation) {
             return back()
                 ->withErrors(['attribute_values' => 'A variation with these attribute values already exists.'])
                 ->withInput();
         }
+
+        // Remove non-fillable fields before updating variation
+        $attributeValues = $validated['attribute_values'];
+        unset($validated['attribute_values']);
 
         $variation->update($validated);
 
@@ -207,9 +214,9 @@ class ProductVariationController extends Controller
         VariationAttributeValue::where('variation_id', $variation->id)->delete();
 
         // Attach new attribute values to the variation
-        foreach ($validated['attribute_values'] as $attributeValueId) {
+        foreach ($attributeValues as $attributeValueId) {
             $attributeValue = ProductAttributeValue::findOrFail($attributeValueId);
-            
+
             VariationAttributeValue::create([
                 'variation_id' => $variation->id,
                 'product_attribute_id' => $attributeValue->product_attribute_id,
