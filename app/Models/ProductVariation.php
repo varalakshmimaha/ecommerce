@@ -46,14 +46,24 @@ class ProductVariation extends Model
 
     public function attributes()
     {
-        return $this->belongsToMany(ProductAttribute::class, 'variation_attribute_values')
+        return $this->belongsToMany(
+            ProductAttribute::class,
+            'variation_attribute_values',
+            'variation_id',
+            'product_attribute_id'
+        )
             ->withPivot('attribute_value_id')
             ->withTimestamps();
     }
 
     public function attributeValues()
     {
-        return $this->belongsToMany(ProductAttributeValue::class, 'variation_attribute_values')
+        return $this->belongsToMany(
+            ProductAttributeValue::class,
+            'variation_attribute_values',
+            'variation_id',
+            'attribute_value_id'
+        )
             ->withPivot('product_attribute_id')
             ->withTimestamps();
     }
