@@ -143,7 +143,7 @@ class ProductController extends Controller
         $categories = Category::where('is_active', true)->get();
         $subCategories = SubCategory::where('is_active', true)->get();
         $brands = Brand::where('is_active', true)->get();
-        $product->load('images', 'relatedProducts');
+        $product->load('images', 'relatedProducts', 'variations.variationAttributeValues.attributeValue.attribute');
         return view('admin.products.edit', compact('product', 'categories', 'subCategories', 'brands'));
     }
 

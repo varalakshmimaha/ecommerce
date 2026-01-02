@@ -245,7 +245,7 @@
         
         @if($product->hasVariations())
             <div class="space-y-2">
-                @foreach($product->activeVariations()->take(5) as $variation)
+                @foreach($product->activeVariations()->take(5)->get() as $variation)
                     <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div class="flex items-center gap-3">
                             @if($variation->variation_image)
@@ -290,11 +290,14 @@
                 @endforeach
             </div>
             
-            @if($product->activeVariations()->count() > 5)
+            @php
+                $totalVariations = $product->activeVariations()->count();
+            @endphp
+            @if($totalVariations > 5)
                 <div class="mt-4 text-center">
-                    <a href="{{ route('admin.products.variations.index', $product) }}" 
+                    <a href="{{ route('admin.products.variations.index', $product) }}"
                        class="text-brand-gold hover:text-brand-amber text-sm font-medium">
-                        View all {{ $product->activeVariations()->count() }} variations →
+                        View all {{ $totalVariations }} variations →
                     </a>
                 </div>
             @endif
