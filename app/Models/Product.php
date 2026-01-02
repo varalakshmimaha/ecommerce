@@ -184,8 +184,8 @@ class Product extends Model
             ];
             
             // Add hex code for colors if available
-            if ($attributeValue->attributeValue->hex_code) {
-                $attributeValueData['hex_code'] = $attributeValue->attributeValue->hex_code;
+            if ($attributeValue->attributeValue->hex_color) {
+                $attributeValueData['hex_code'] = $attributeValue->attributeValue->hex_color;
             }
             
             if (!isset($options[$attributeName])) {
