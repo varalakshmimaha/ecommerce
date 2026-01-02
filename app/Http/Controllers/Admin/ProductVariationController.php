@@ -110,6 +110,11 @@ class ProductVariationController extends Controller
             $product->variations()->where('id', '!=', $variation->id)->update(['is_default' => false]);
         }
 
+        // Automatically enable has_variations flag on the product
+        if (!$product->has_variations) {
+            $product->update(['has_variations' => true]);
+        }
+
         return redirect()->route('admin.products.variations.index', $product)
             ->with('success', "Product variation '{$variationTitle}' created successfully.");
     }
