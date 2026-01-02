@@ -99,11 +99,11 @@
                                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                                         @foreach($attribute->activeValues as $value)
                                             <label class="cursor-pointer">
-                                                <input type="checkbox" 
-                                                       name="attribute_values[]" 
-                                                       value="{{ $value->id }}" 
+                                                <input type="checkbox"
+                                                       name="attribute_values[]"
+                                                       value="{{ $value->id }}"
                                                        class="sr-only peer"
-                                                       {{ $variation->attributeValues->pluck('id')->contains($value->id) ? 'checked' : '' }}>
+                                                       {{ $variation->variationAttributeValues->pluck('attribute_value_id')->contains($value->id) ? 'checked' : '' }}>
                                                 <div class="relative rounded-lg border-2 border-gray-200 p-3 text-center peer-checked:border-brand-gold peer-checked:bg-brand-gold/10 peer-checked:ring-2 peer-checked:ring-brand-gold/20 transition-all hover:border-gray-300">
                                                     @if($value->hex_color)
                                                         <div class="flex flex-col items-center space-y-2">
@@ -138,13 +138,13 @@
                         <h4 class="text-sm font-medium text-text-heading mb-2">Selected Combination:</h4>
                         <div id="selected-attributes-preview" class="text-sm text-gray-600">
                             @php
-                                $selectedValues = $variation->attributeValues;
+                                $selectedValues = $variation->variationAttributeValues;
                             @endphp
                             @if($selectedValues->count() > 0)
                                 <div class="flex flex-wrap gap-2">
-                                    @foreach($selectedValues as $value)
+                                    @foreach($selectedValues as $varAttrValue)
                                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-brand-gold text-white">
-                                            {{ $value->attribute->name }}: {{ $value->value }}
+                                            {{ $varAttrValue->attribute->name }}: {{ $varAttrValue->attributeValue->value }}
                                         </span>
                                     @endforeach
                                 </div>

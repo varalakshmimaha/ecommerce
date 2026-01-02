@@ -14,7 +14,7 @@ class ProductVariationController extends Controller
     public function index(Product $product)
     {
         $variations = $product->variations()
-            ->with('attributeValues.attributeValue')
+            ->with('variationAttributeValues.attributeValue.attribute')
             ->orderBy('sort_order')
             ->paginate(20);
 
@@ -141,8 +141,8 @@ class ProductVariationController extends Controller
             abort(404);
         }
 
-        $variation->load('attributeValues.attributeValue');
-        
+        $variation->load('variationAttributeValues.attributeValue');
+
         $attributes = ProductAttribute::where('is_active', true)
             ->with('activeValues')
             ->orderBy('sort_order')

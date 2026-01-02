@@ -122,9 +122,9 @@
                                     <div>
                                         <div class="font-medium text-gray-900">{{ $variation->variation_title }}</div>
                                         <div class="text-sm text-gray-500">
-                                            @foreach($variation->attributeValues as $attrValue)
+                                            @foreach($variation->variationAttributeValues as $varAttrValue)
                                                 <span class="inline-block px-2 py-1 bg-gray-100 rounded text-xs mr-1 mb-1">
-                                                    {{ $attrValue->attribute->name }}: {{ $attrValue->attributeValue->value }}
+                                                    {{ $varAttrValue->attribute->name }}: {{ $varAttrValue->attributeValue->value }}
                                                 </span>
                                             @endforeach
                                         </div>
