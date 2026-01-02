@@ -40,9 +40,9 @@ class ProductVariationController extends Controller
             'weight' => 'nullable|numeric|min:0',
             'variation_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'gallery_image_id' => 'nullable|exists:product_images,id',
-            'is_active' => 'boolean',
-            'is_default' => 'boolean',
-            'sort_order' => 'integer|min:0',
+            'is_active' => 'nullable|boolean',
+            'is_default' => 'nullable|boolean',
+            'sort_order' => 'nullable|integer|min:0',
             'attribute_values' => 'required|array|min:1',
             'attribute_values.*' => 'exists:product_attribute_values,id',
         ]);
@@ -165,8 +165,8 @@ class ProductVariationController extends Controller
             'weight' => 'nullable|numeric|min:0',
             'variation_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'gallery_image_id' => 'nullable|exists:product_images,id',
-            'is_active' => 'boolean',
-            'sort_order' => 'integer|min:0',
+            'is_active' => 'nullable|boolean',
+            'sort_order' => 'nullable|integer|min:0',
             'attribute_values' => 'required|array|min:1',
             'attribute_values.*' => 'exists:product_attribute_values,id',
         ]);
