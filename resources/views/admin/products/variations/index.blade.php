@@ -11,7 +11,7 @@
             <p class="text-text-muted mt-1">Manage variations for: {{ $product->name }}</p>
         </div>
         <div class="flex gap-3">
-            <a href="{{ route('admin.products.show', $product) }}" 
+            <a href="{{ route('admin.products.edit', $product) }}"
                class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-all duration-300">
                 <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
