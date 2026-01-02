@@ -123,6 +123,7 @@ class CheckoutController extends Controller
             // Handle user identification
             $userId = null;
             $isNewUser = false;
+            $newUserPassword = null;
 
             // Try to authenticate user from token if provided
             $token = $request->bearerToken();
@@ -142,12 +143,13 @@ class CheckoutController extends Controller
                     if ($existing) {
                         $userId = $existing->id;
                     } else {
-                        // Create new user only if mobile is provided
+                        // Create new user with random password
+                        $newUserPassword = Str::random(8);
                         $newUser = User::create([
                             'name' => $request->name,
                             'mobile' => $request->mobile,
                             'email' => $request->email,
-                            'password' => Hash::make(12345678),
+                            'password' => Hash::make($newUserPassword),
                             'is_verified' => true,
                         ]);
                         $userId = $newUser->id;

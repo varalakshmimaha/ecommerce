@@ -155,11 +155,13 @@
 </style>
 
 <script>
+// Global variables for product and variations
+let currentProduct = null;
+let currentVariation = null;
+let productVariations = [];
+
 document.addEventListener('DOMContentLoaded', function() {
     const slug = '{{ $slug }}';
-    let currentProduct = null;
-    let currentVariation = null;
-    let productVariations = [];
 
     fetch(`${API_BASE}/products/${slug}`)
         .then(res => res.json())
@@ -369,20 +371,20 @@ function renderVariationSelector(variationData) {
     let html = '';
 
     // Group variations by attribute
-    for (const [attributeId, attributeData] of Object.entries(variationData.variation_options)) {
+    for (const [attributeName, attributeValues] of Object.entries(variationData.variation_options)) {
         html += `
             <div class="bg-white rounded-xl border border-gray-100 p-6 mb-4">
-                <label class="block text-sm font-semibold text-brand-gold mb-3">${attributeData.name}</label>
+                <label class="block text-sm font-semibold text-brand-gold mb-3">${attributeName}</label>
                 <div class="flex flex-wrap gap-2">
         `;
 
-        for (const value of attributeData.values) {
+        for (const value of attributeValues) {
             const isColor = value.hex_code && value.hex_code !== '';
 
             if (isColor) {
                 // Color swatch
                 html += `
-                    <div class="variation-option" data-attribute-id="${attributeId}" data-value-id="${value.id}" onclick="selectAttributeValue(${attributeId}, ${value.id})">
+                    <div class="variation-option" data-attribute-name="${attributeName}" data-value-id="${value.id}" onclick="selectAttributeValue('${attributeName}', ${value.id})">
                         <div class="w-12 h-12 rounded-lg border-2 border-gray-200 cursor-pointer hover:border-brand-gold transition-all relative flex items-center justify-center" style="background-color: ${value.hex_code}">
                             <span class="sr-only">${value.value}</span>
                         </div>
@@ -395,9 +397,9 @@ function renderVariationSelector(variationData) {
                     <button
                         type="button"
                         class="variation-option px-4 py-2 border-2 border-gray-200 rounded-lg hover:border-brand-gold hover:bg-brand-gold hover:text-white transition-all"
-                        data-attribute-id="${attributeId}"
+                        data-attribute-name="${attributeName}"
                         data-value-id="${value.id}"
-                        onclick="selectAttributeValue(${attributeId}, ${value.id})"
+                        onclick="selectAttributeValue('${attributeName}', ${value.id})"
                     >
                         ${value.value}
                     </button>
@@ -415,9 +417,9 @@ function renderVariationSelector(variationData) {
 }
 
 // Function to select attribute value
-window.selectAttributeValue = function(attributeId, valueId) {
+window.selectAttributeValue = function(attributeName, valueId) {
     // Update UI
-    document.querySelectorAll(`[data-attribute-id="${attributeId}"]`).forEach(el => {
+    document.querySelectorAll(`[data-attribute-name="${attributeName}"]`).forEach(el => {
         if (parseInt(el.dataset.valueId) === valueId) {
             if (el.tagName === 'BUTTON') {
                 el.classList.add('border-brand-gold', 'bg-brand-gold', 'text-white');
@@ -449,9 +451,9 @@ window.selectAttributeValue = function(attributeId, valueId) {
     document.querySelectorAll('.variation-option').forEach(el => {
         const btn = el.tagName === 'BUTTON' ? el : el.querySelector('div');
         if (btn && (btn.classList.contains('bg-brand-gold') || btn.classList.contains('border-brand-gold'))) {
-            if (!uniqueAttributes.has(el.dataset.attributeId)) {
+            if (!uniqueAttributes.has(el.dataset.attributeName)) {
                 selectedValues.push(parseInt(el.dataset.valueId));
-                uniqueAttributes.add(el.dataset.attributeId);
+                uniqueAttributes.add(el.dataset.attributeName);
             }
         }
     });
@@ -481,6 +483,39 @@ window.selectVariation = function(variationId) {
     if (!variation) return;
 
     currentVariation = variation;
+
+    // Update UI to show selected attributes
+    variation.attributes.forEach(attr => {
+        const elements = document.querySelectorAll(`[data-value-id="${attr.attribute_value_id}"]`);
+        elements.forEach(el => {
+            const attributeName = el.dataset.attributeName;
+            // First, clear all selections for this attribute
+            document.querySelectorAll(`[data-attribute-name="${attributeName}"]`).forEach(otherEl => {
+                if (otherEl.tagName === 'BUTTON') {
+                    otherEl.classList.remove('border-brand-gold', 'bg-brand-gold', 'text-white');
+                    otherEl.classList.add('border-gray-200');
+                } else {
+                    const innerDiv = otherEl.querySelector('div');
+                    if (innerDiv) {
+                        innerDiv.classList.add('border-gray-200');
+                        innerDiv.classList.remove('border-brand-gold');
+                    }
+                }
+            });
+
+            // Then, select this one
+            if (el.tagName === 'BUTTON') {
+                el.classList.add('border-brand-gold', 'bg-brand-gold', 'text-white');
+                el.classList.remove('border-gray-200');
+            } else {
+                const innerDiv = el.querySelector('div');
+                if (innerDiv) {
+                    innerDiv.classList.remove('border-gray-200');
+                    innerDiv.classList.add('border-brand-gold');
+                }
+            }
+        });
+    });
 
     // Update price display
     const priceDisplay = document.getElementById('price-display');

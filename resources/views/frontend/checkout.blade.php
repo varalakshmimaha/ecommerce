@@ -405,6 +405,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const items = cart.map(item => ({
             product_id: item.product_id,
             quantity: item.quantity,
+            variation_id: item.variation_id || null,
             attributes: item.attributes || []
         }));
         
@@ -479,6 +480,10 @@ document.addEventListener('DOMContentLoaded', function() {
         cart.forEach((item, idx) => {
             formData.append(`items[${idx}][product_id]`, item.product_id);
             formData.append(`items[${idx}][quantity]`, item.quantity);
+            // Include variation_id if present
+            if (item.variation_id) {
+                formData.append(`items[${idx}][variation_id]`, item.variation_id);
+            }
             if (item.attributes) {
                 item.attributes.forEach((attr, aidx) => {
                     formData.append(`items[${idx}][attributes][${aidx}][name]`, attr.name);
@@ -510,6 +515,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     items: cart.map(item => ({
                         product_id: item.product_id,
                         quantity: item.quantity,
+                        variation_id: item.variation_id || null,
                         attributes: item.attributes || []
                     })),
                     address_id: typeof selectedAddressId !== 'undefined' ? selectedAddressId : null,
