@@ -31,7 +31,7 @@ class ProductVariationController extends Controller
                     'id' => $variation->id,
                     'sku' => $variation->sku,
                     'price' => $variation->price,
-                    'stock' => $variation->stock,
+                    'stock' => $variation->stock_quantity,
                     'weight' => $variation->weight,
                     'image' => $variation->variation_image,
                     'is_active' => $variation->is_active,
@@ -43,7 +43,7 @@ class ProductVariationController extends Controller
                             'attribute_name' => $attributeValue->attribute->name,
                             'attribute_value_id' => $attributeValue->attribute_value_id,
                             'attribute_value' => $attributeValue->attributeValue->value,
-                            'hex_code' => $attributeValue->attributeValue->hex_code,
+                            'hex_code' => $attributeValue->attributeValue->hex_color,
                         ];
                     }),
                 ];
@@ -100,7 +100,7 @@ class ProductVariationController extends Controller
                     'id' => $variation->id,
                     'sku' => $variation->sku,
                     'price' => $variation->price,
-                    'stock' => $variation->stock,
+                    'stock' => $variation->stock_quantity,
                     'weight' => $variation->weight,
                     'image' => $variation->variation_image,
                     'is_active' => $variation->is_active,
@@ -154,7 +154,7 @@ class ProductVariationController extends Controller
                     'variation_id' => $variation->id,
                     'attribute_values' => $attributeValues,
                     'price' => $variation->price,
-                    'stock' => $variation->stock,
+                    'stock' => $variation->stock_quantity,
                     'is_in_stock' => $variation->isInStock(),
                 ];
             }
@@ -210,7 +210,7 @@ class ProductVariationController extends Controller
                             'id' => $value->id,
                             'value' => $value->value,
                             'slug' => $value->slug,
-                            'hex_code' => $value->hex_code,
+                            'hex_code' => $value->hex_color,
                         ];
                     }),
                 ];
@@ -239,7 +239,7 @@ class ProductVariationController extends Controller
             'success' => true,
             'data' => [
                 'variation_id' => $variation->id,
-                'stock' => $variation->stock,
+                'stock' => $variation->stock_quantity,
                 'is_in_stock' => $variation->isInStock(),
                 'is_active' => $variation->is_active,
             ]
@@ -297,7 +297,7 @@ class ProductVariationController extends Controller
                     'attribute_values' => $attributeValueIds,
                     'title' => $variation->variation_title,
                     'price' => $variation->price,
-                    'stock' => $variation->stock,
+                    'stock' => $variation->stock_quantity,
                     'is_in_stock' => $variation->isInStock(),
                 ];
             }

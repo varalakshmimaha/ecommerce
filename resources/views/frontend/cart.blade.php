@@ -52,12 +52,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     </thead>
                     <tbody class="divide-y">
                         ${itemsData.map(item => `
-                            <tr data-product-id="${item.product_id}">
+                            <tr data-product-id="${item.product_id}" data-variation-id="${item.variation_id || ''}">
                                 <td class="px-6 py-4 flex items-center space-x-4">
-                                    <img src="/storage/${item.product.main_image}" class="w-16 h-16 object-cover rounded">
+                                    <img src="/storage/${item.image || item.product.main_image}" class="w-16 h-16 object-cover rounded">
                                     <div>
                                         <div class="font-semibold">${item.product.name}</div>
-                                        <!--<div class="text-sm text-gray-500">${item.product.short_description || ''}</div>-->
+                                        ${item.variation_title ? `<div class="text-sm text-gray-500">${item.variation_title}</div>` : ''}
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">₹${parseFloat(item.price).toFixed(2)}</td>
@@ -91,9 +91,10 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.addEventListener('click', function() {
                 const row = this.closest('tr');
                 const pid = parseInt(row.dataset.productId);
+                const vid = row.dataset.variationId ? parseInt(row.dataset.variationId) : null;
                 const input = row.querySelector('.qty-input');
                 input.value = parseInt(input.value) + 1;
-                updateQuantity(pid, parseInt(input.value));
+                updateQuantity(pid, vid, parseInt(input.value));
             });
         });
 
@@ -101,11 +102,12 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.addEventListener('click', function() {
                 const row = this.closest('tr');
                 const pid = parseInt(row.dataset.productId);
+                const vid = row.dataset.variationId ? parseInt(row.dataset.variationId) : null;
                 const input = row.querySelector('.qty-input');
                 const min = parseInt(input.getAttribute('min') || '1');
                 if (parseInt(input.value) > min) {
                     input.value = parseInt(input.value) - 1;
-                    updateQuantity(pid, parseInt(input.value));
+                    updateQuantity(pid, vid, parseInt(input.value));
                 }
             });
         });
@@ -114,9 +116,10 @@ document.addEventListener('DOMContentLoaded', function() {
             input.addEventListener('change', function() {
                 const row = this.closest('tr');
                 const pid = parseInt(row.dataset.productId);
+                const vid = row.dataset.variationId ? parseInt(row.dataset.variationId) : null;
                 let v = parseInt(this.value) || 1;
                 if (v < 1) v = 1; this.value = v;
-                updateQuantity(pid, v);
+                updateQuantity(pid, vid, v);
             });
         });
 
@@ -124,14 +127,18 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.addEventListener('click', function() {
                 const row = this.closest('tr');
                 const pid = parseInt(row.dataset.productId);
-                removeItem(pid);
+                const vid = row.dataset.variationId ? parseInt(row.dataset.variationId) : null;
+                removeItem(pid, vid);
             });
         });
     }
 
-    function updateQuantity(productId, quantity) {
+    function updateQuantity(productId, variationId, quantity) {
         const cart = getCart();
-        const item = cart.find(i => i.product_id === productId);
+        const item = cart.find(i =>
+            i.product_id === productId &&
+            (i.variation_id || null) === variationId
+        );
         if (item) {
             item.quantity = quantity;
             saveCart(cart);
@@ -139,9 +146,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function removeItem(productId) {
+    function removeItem(productId, variationId) {
         let cart = getCart();
-        cart = cart.filter(i => i.product_id !== productId);
+        cart = cart.filter(i =>
+            !(i.product_id === productId && (i.variation_id || null) === variationId)
+        );
         saveCart(cart);
         refresh();
     }
@@ -153,20 +162,55 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Fetch products list and map
-        fetch(`${API_BASE}/products?per_page=1000`)
-            .then(res => res.json())
-            .then(data => {
-                const products = data.data;
+        // Fetch products list and variations
+        const fetchPromises = [fetch(`${API_BASE}/products?per_page=1000`).then(res => res.json())];
+
+        // Fetch variations for products that have variations
+        const productsWithVariations = [...new Set(cart.filter(ci => ci.variation_id).map(ci => ci.product_id))];
+        const variationPromises = productsWithVariations.map(pid =>
+            fetch(`${API_BASE}/products/${pid}/variations`).then(res => res.json())
+        );
+
+        Promise.all([...fetchPromises, ...variationPromises])
+            .then(results => {
+                const productsData = results[0].data;
+                const variationsData = results.slice(1);
+
+                // Build variations lookup map
+                const variationsMap = {};
+                variationsData.forEach((varData, index) => {
+                    if (varData.success && varData.data.variations) {
+                        const productId = productsWithVariations[index];
+                        variationsMap[productId] = varData.data.variations;
+                    }
+                });
+
                 const itemsData = cart.map(ci => {
-                    const product = products.find(p => p.id === ci.product_id) || {};
-                    const price = parseFloat(product.discounted_price || product.selling_price || 0);
+                    const product = productsData.find(p => p.id === ci.product_id) || {};
+                    let price, image, variationTitle;
+
+                    if (ci.variation_id && variationsMap[ci.product_id]) {
+                        const variation = variationsMap[ci.product_id].find(v => v.id === ci.variation_id);
+                        if (variation) {
+                            price = parseFloat(variation.price || 0);
+                            image = variation.image;
+                            variationTitle = variation.title;
+                        } else {
+                            price = parseFloat(product.discounted_price || product.selling_price || 0);
+                        }
+                    } else {
+                        price = parseFloat(product.discounted_price || product.selling_price || 0);
+                    }
+
                     const subtotal = price * ci.quantity;
                     return {
                         product_id: ci.product_id,
+                        variation_id: ci.variation_id,
                         quantity: ci.quantity,
                         price: price,
                         subtotal: subtotal,
+                        image: image,
+                        variation_title: variationTitle,
                         product: product
                     };
                 });

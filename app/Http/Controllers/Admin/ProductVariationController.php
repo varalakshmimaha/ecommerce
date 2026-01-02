@@ -53,11 +53,16 @@ class ProductVariationController extends Controller
         $validated['product_id'] = $product->id;
 
         // Handle image upload or gallery selection
+        $images = [];
         if ($request->hasFile('variation_image')) {
-            $validated['variation_image'] = $request->file('variation_image')->store('product_variations', 'public');
+            $images[] = $request->file('variation_image')->store('product_variations', 'public');
         } elseif ($request->filled('gallery_image_id')) {
             $galleryImage = $product->images()->findOrFail($request->gallery_image_id);
-            $validated['variation_image'] = $galleryImage->image_path;
+            $images[] = $galleryImage->image_path;
+        }
+
+        if (!empty($images)) {
+            $validated['images'] = $images;
         }
 
         // Use product price if variation price not provided
@@ -165,22 +170,27 @@ class ProductVariationController extends Controller
 
         $validated['is_active'] = $request->has('is_active');
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
-        
+
         // Handle image upload or gallery selection
+        $images = $variation->images ?? [];
         if ($request->hasFile('variation_image')) {
-            $validated['variation_image'] = $request->file('variation_image')->store('product_variations', 'public');
+            $images = [$request->file('variation_image')->store('product_variations', 'public')];
         } elseif ($request->filled('gallery_image_id')) {
             $galleryImage = $product->images()->findOrFail($request->gallery_image_id);
-            $validated['variation_image'] = $galleryImage->image_path;
+            $images = [$galleryImage->image_path];
         }
-        
+
         // Remove current image if requested
         if ($request->has('remove_current_image') && $request->input('remove_current_image') == '1') {
-            if ($variation->variation_image) {
-                \Storage::disk('public')->delete($variation->variation_image);
-                $validated['variation_image'] = null;
+            if (!empty($variation->images)) {
+                foreach ($variation->images as $image) {
+                    \Storage::disk('public')->delete($image);
+                }
+                $images = [];
             }
         }
+
+        $validated['images'] = $images;
 
         // Check if this combination of attribute values already exists (excluding current variation)
         $existingVariation = $this->findVariationByAttributeValues($product, $validated['attribute_values'], $variation->id);
@@ -242,6 +252,29 @@ class ProductVariationController extends Controller
             'success' => true,
             'message' => 'Variation status updated successfully.',
             'is_active' => $variation->is_active
+        ]);
+    }
+
+    /**
+     * Set variation as default
+     */
+    public function setDefault(Product $product, ProductVariation $variation)
+    {
+        // Ensure the variation belongs to the product
+        if ($variation->product_id !== $product->id) {
+            abort(404);
+        }
+
+        // Remove default flag from all other variations
+        $product->variations()->update(['is_default' => false]);
+
+        // Set this variation as default
+        $variation->update(['is_default' => true]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Default variation set successfully.',
+            'is_default' => true
         ]);
     }
 

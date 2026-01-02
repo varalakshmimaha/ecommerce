@@ -157,10 +157,14 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const slug = '{{ $slug }}';
+    let currentProduct = null;
+    let currentVariation = null;
+    let productVariations = [];
 
     fetch(`${API_BASE}/products/${slug}`)
         .then(res => res.json())
         .then(product => {
+            currentProduct = product;
             const container = document.getElementById('product-detail');
             container.innerHTML = `
                 <div class="animate-fade-in">
@@ -217,7 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                             <!-- Price -->
                             <div class="bg-white rounded-xl border border-gray-100 p-6">
-                                <div class="flex items-end gap-3 mb-2">
+                                <div id="price-display" class="flex items-end gap-3 mb-2">
                                     <span class="text-4xl font-bold text-brand-gold">₹${parseFloat(product.discounted_price || product.selling_price).toFixed(2)}</span>
                                     ${product.discounted_price ? `
                                         <span class="text-2xl text-[#6B6B6B] line-through mb-1">₹${parseFloat(product.selling_price).toFixed(2)}</span>
@@ -229,7 +233,11 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <span class="text-green-400">(${Math.round(((product.mrp - parseFloat(product.discounted_price || product.selling_price)) / product.mrp) * 100)}% OFF)</span>
                                     </div>
                                 ` : ''}
-                                                            </div>
+                                <div id="stock-display" class="mt-2 text-sm"></div>
+                            </div>
+
+                            <!-- Variation Selector (will be populated if product has variations) -->
+                            <div id="variation-selector"></div>
 
                             <!-- Quantity Selector -->
                             <div class="bg-white rounded-xl border border-gray-100 p-6">
@@ -312,6 +320,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 }, 100);
             }
+
+            // Fetch and display variations if product has variations
+            if (product.has_variations) {
+                fetchProductVariations(product.id);
+            }
         })
         .catch(err => {
             console.error('Error loading product:', err);
@@ -326,6 +339,172 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         });
 });
+
+// Function to fetch product variations
+window.fetchProductVariations = function(productId) {
+    fetch(`${API_BASE}/products/${productId}/variations`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.data.variations.length > 0) {
+                productVariations = data.data.variations;
+                renderVariationSelector(data.data);
+
+                // Set default variation if exists
+                const defaultVariation = productVariations.find(v => v.is_default);
+                if (defaultVariation) {
+                    selectVariation(defaultVariation.id);
+                }
+            }
+        })
+        .catch(err => {
+            console.error('Error loading variations:', err);
+        });
+};
+
+// Function to render variation selector
+function renderVariationSelector(variationData) {
+    const container = document.getElementById('variation-selector');
+    if (!container || !variationData.variation_options) return;
+
+    let html = '';
+
+    // Group variations by attribute
+    for (const [attributeId, attributeData] of Object.entries(variationData.variation_options)) {
+        html += `
+            <div class="bg-white rounded-xl border border-gray-100 p-6 mb-4">
+                <label class="block text-sm font-semibold text-brand-gold mb-3">${attributeData.name}</label>
+                <div class="flex flex-wrap gap-2">
+        `;
+
+        for (const value of attributeData.values) {
+            const isColor = value.hex_code && value.hex_code !== '';
+
+            if (isColor) {
+                // Color swatch
+                html += `
+                    <div class="variation-option" data-attribute-id="${attributeId}" data-value-id="${value.id}" onclick="selectAttributeValue(${attributeId}, ${value.id})">
+                        <div class="w-12 h-12 rounded-lg border-2 border-gray-200 cursor-pointer hover:border-brand-gold transition-all relative flex items-center justify-center" style="background-color: ${value.hex_code}">
+                            <span class="sr-only">${value.value}</span>
+                        </div>
+                        <div class="text-xs text-center mt-1 text-gray-600">${value.value}</div>
+                    </div>
+                `;
+            } else {
+                // Regular text button
+                html += `
+                    <button
+                        type="button"
+                        class="variation-option px-4 py-2 border-2 border-gray-200 rounded-lg hover:border-brand-gold hover:bg-brand-gold hover:text-white transition-all"
+                        data-attribute-id="${attributeId}"
+                        data-value-id="${value.id}"
+                        onclick="selectAttributeValue(${attributeId}, ${value.id})"
+                    >
+                        ${value.value}
+                    </button>
+                `;
+            }
+        }
+
+        html += `
+                </div>
+            </div>
+        `;
+    }
+
+    container.innerHTML = html;
+}
+
+// Function to select attribute value
+window.selectAttributeValue = function(attributeId, valueId) {
+    // Update UI
+    document.querySelectorAll(`[data-attribute-id="${attributeId}"]`).forEach(el => {
+        if (parseInt(el.dataset.valueId) === valueId) {
+            if (el.tagName === 'BUTTON') {
+                el.classList.add('border-brand-gold', 'bg-brand-gold', 'text-white');
+                el.classList.remove('border-gray-200');
+            } else {
+                const innerDiv = el.querySelector('div');
+                if (innerDiv) {
+                    innerDiv.classList.remove('border-gray-200');
+                    innerDiv.classList.add('border-brand-gold');
+                }
+            }
+        } else {
+            if (el.tagName === 'BUTTON') {
+                el.classList.remove('border-brand-gold', 'bg-brand-gold', 'text-white');
+                el.classList.add('border-gray-200');
+            } else {
+                const innerDiv = el.querySelector('div');
+                if (innerDiv) {
+                    innerDiv.classList.add('border-gray-200');
+                    innerDiv.classList.remove('border-brand-gold');
+                }
+            }
+        }
+    });
+
+    // Get all selected attribute values
+    const selectedValues = [];
+    const uniqueAttributes = new Set();
+    document.querySelectorAll('.variation-option').forEach(el => {
+        const btn = el.tagName === 'BUTTON' ? el : el.querySelector('div');
+        if (btn && (btn.classList.contains('bg-brand-gold') || btn.classList.contains('border-brand-gold'))) {
+            if (!uniqueAttributes.has(el.dataset.attributeId)) {
+                selectedValues.push(parseInt(el.dataset.valueId));
+                uniqueAttributes.add(el.dataset.attributeId);
+            }
+        }
+    });
+
+    // Find matching variation
+    if (selectedValues.length > 0) {
+        findMatchingVariation(selectedValues);
+    }
+};
+
+// Function to find matching variation
+function findMatchingVariation(selectedAttributeValues) {
+    const matchingVariation = productVariations.find(variation => {
+        const variationAttrValues = variation.attributes.map(attr => attr.attribute_value_id);
+        return selectedAttributeValues.length === variationAttrValues.length &&
+               selectedAttributeValues.every(val => variationAttrValues.includes(val));
+    });
+
+    if (matchingVariation) {
+        selectVariation(matchingVariation.id);
+    }
+}
+
+// Function to select a specific variation
+window.selectVariation = function(variationId) {
+    const variation = productVariations.find(v => v.id === variationId);
+    if (!variation) return;
+
+    currentVariation = variation;
+
+    // Update price display
+    const priceDisplay = document.getElementById('price-display');
+    if (priceDisplay) {
+        priceDisplay.innerHTML = `
+            <span class="text-4xl font-bold text-brand-gold">₹${parseFloat(variation.price).toFixed(2)}</span>
+        `;
+    }
+
+    // Update stock display
+    const stockDisplay = document.getElementById('stock-display');
+    if (stockDisplay) {
+        if (variation.is_in_stock) {
+            stockDisplay.innerHTML = `<span class="text-green-600">✓ In Stock (${variation.stock} available)</span>`;
+        } else {
+            stockDisplay.innerHTML = `<span class="text-red-600">✗ Out of Stock</span>`;
+        }
+    }
+
+    // Update main image if variation has image
+    if (variation.image) {
+        changeMainImage('/storage/' + variation.image);
+    }
+};
 
 // Function for adding to cart from related products
 window.addToCartRelated = function(productId, quantity) {
@@ -404,30 +583,69 @@ window.decreaseQuantity = function() {
 window.addToCart = function(productId) {
     const quantityInput = document.getElementById('quantity');
     const quantity = quantityInput ? parseInt(quantityInput.value) || 1 : 1;
-    
+
+    // Check if product has variations and one is selected
+    if (currentProduct && currentProduct.has_variations && !currentVariation) {
+        if (typeof window.showModal === 'function') {
+            window.showModal('Error', 'Please select product options before adding to cart', 'error');
+        } else {
+            alert('Please select product options before adding to cart');
+        }
+        return;
+    }
+
+    // Check stock for variation
+    if (currentVariation && !currentVariation.is_in_stock) {
+        if (typeof window.showModal === 'function') {
+            window.showModal('Error', 'Selected variation is out of stock', 'error');
+        } else {
+            alert('Selected variation is out of stock');
+        }
+        return;
+    }
+
     let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existing = cart.find(item => item.product_id === productId);
-    
+
+    const cartItem = {
+        product_id: productId,
+        quantity: quantity
+    };
+
+    // Add variation_id if a variation is selected
+    if (currentVariation) {
+        cartItem.variation_id = currentVariation.id;
+    }
+
+    // Find existing item with same product_id and variation_id
+    const existing = cart.find(item =>
+        item.product_id === productId &&
+        item.variation_id === (currentVariation ? currentVariation.id : undefined)
+    );
+
     if (existing) {
         existing.quantity += quantity;
     } else {
-        cart.push({ product_id: productId, quantity: quantity });
+        cart.push(cartItem);
     }
-    
+
     localStorage.setItem('cart', JSON.stringify(cart));
-    
+
     // Update cart count if function exists
     if (typeof window.updateCartCount === 'function') {
         window.updateCartCount();
     }
-    
+
     // Show success message
+    const message = currentVariation ?
+        `${currentVariation.title} added to cart!` :
+        'Product added to cart!';
+
     if (typeof window.showModal === 'function') {
-        window.showModal('Success', 'Product added to cart!', 'success');
+        window.showModal('Success', message, 'success');
     } else {
-        alert('Product added to cart!');
+        alert(message);
     }
-    
+
     // Redirect to cart after a delay
     setTimeout(() => {
         window.location.href = '/cart';
