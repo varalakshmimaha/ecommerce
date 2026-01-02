@@ -79,14 +79,14 @@ class CheckoutController extends Controller
                         ], 400);
                     }
                     
-                    if ($variation->stock < $item['quantity']) {
+                    if ($variation->stock_quantity < $item['quantity']) {
                         return response()->json([
                             'error' => "Insufficient stock for {$product->name} - {$variation->variation_title}"
                         ], 400);
                     }
-                    
+
                     $price = $variation->price;
-                    $stock = $variation->stock;
+                    $stock = $variation->stock_quantity;
                 } else {
                     // Check product stock if no variation
                     if ($stock < $item['quantity']) {
@@ -215,7 +215,7 @@ class CheckoutController extends Controller
 
                 // Update stock
                 if ($item['variation']) {
-                    $item['variation']->decrement('stock', $item['quantity']);
+                    $item['variation']->decrement('stock_quantity', $item['quantity']);
                 } else {
                     $item['product']->decrement('stock_quantity', $item['quantity']);
                 }
