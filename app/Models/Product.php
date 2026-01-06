@@ -81,7 +81,7 @@ class Product extends Model
 
     public function variations()
     {
-        return $this->hasMany(ProductVariation::class)->orderBy('sort_order');
+        return $this->hasMany(ProductVariation::class)->orderBy('id');
     }
 
     public function activeVariations()

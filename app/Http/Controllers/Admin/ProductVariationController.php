@@ -15,7 +15,7 @@ class ProductVariationController extends Controller
     {
         $variations = $product->variations()
             ->with('variationAttributeValues.attributeValue.attribute')
-            ->orderBy('sort_order')
+            ->orderBy('id')
             ->paginate(20);
 
         return view('admin.products.variations.index', compact('product', 'variations'));
