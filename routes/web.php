@@ -24,6 +24,8 @@ Route::get('/', function () {
     return view('frontend.home');
 })->name('home');
 
+use App\Http\Controllers\Api\FavouriteController;
+use App\Http\Controllers\Api\CompareController;
 
 use App\Http\Controllers\Frontend\Auth\ForgotPasswordController;
 use App\Http\Controllers\Frontend\Auth\NewPasswordController;
@@ -60,10 +62,27 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/dashboard/queries', [DashboardController::class, 'createQuery'])->name('user.dashboard.queries.create');
     Route::get('/dashboard/orders/{orderNumber}/invoice', [DashboardController::class, 'downloadInvoice'])->name('user.dashboard.invoice');
 
+    // Favourites & Compare pages
+    Route::get('/favourites', function() { return view('frontend.favourites'); })->name('favourites');
+    Route::get('/compare', function() { return view('frontend.compare'); })->name('compare');
+
     // User Orders (My Orders, Show, Cancel)
     Route::get('/user/orders', [UserOrderController::class, 'index'])->name('user.orders.index');
     Route::get('/user/orders/{id}', [UserOrderController::class, 'show'])->name('user.orders.show');
     Route::post('/user/orders/{id}/cancel', [UserOrderController::class, 'cancel'])->name('user.orders.cancel');
+
+    // Favourites API (session auth) - /user-api prefix to avoid conflict with /api routes
+    Route::get('/user-api/favourites', [FavouriteController::class, 'index']);
+    Route::post('/user-api/favourites/toggle', [FavouriteController::class, 'toggle']);
+    Route::get('/user-api/favourites/check/{productId}', [FavouriteController::class, 'check']);
+    Route::delete('/user-api/favourites/{productId}', [FavouriteController::class, 'destroy']);
+
+    // Compare API (session auth)
+    Route::get('/user-api/compare', [CompareController::class, 'index']);
+    Route::post('/user-api/compare/toggle', [CompareController::class, 'toggle']);
+    Route::get('/user-api/compare/check/{productId}', [CompareController::class, 'check']);
+    Route::delete('/user-api/compare/{productId}', [CompareController::class, 'destroy']);
+    Route::delete('/user-api/compare', [CompareController::class, 'clear']);
 });
 
 Route::get('/products', function () {

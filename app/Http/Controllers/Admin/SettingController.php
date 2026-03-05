@@ -26,6 +26,8 @@ class SettingController extends Controller
             'bank_account_number' => Setting::get('bank_account_number'),
             'bank_ifsc' => Setting::get('bank_ifsc'),
             'bank_account_holder' => Setting::get('bank_account_holder'),
+            'enable_favourites' => Setting::get('enable_favourites', 'false'),
+            'enable_compare' => Setting::get('enable_compare', 'false'),
         ];
 
         $footerSections = FooterSection::with('links')->orderBy('sort_order')->get();
@@ -48,6 +50,8 @@ class SettingController extends Controller
             'bank_account_number' => 'nullable|string|max:50',
             'bank_ifsc' => 'nullable|string|max:20',
             'bank_account_holder' => 'nullable|string|max:255',
+            'enable_favourites' => 'nullable|in:true,false',
+            'enable_compare' => 'nullable|in:true,false',
         ]);
 
         foreach ($validated as $key => $value) {
@@ -62,6 +66,14 @@ class SettingController extends Controller
             } else {
                 Setting::set($key, $value);
             }
+        }
+
+        // Checkboxes not submitted = unchecked = false
+        if (!$request->has('enable_favourites')) {
+            Setting::set('enable_favourites', 'false');
+        }
+        if (!$request->has('enable_compare')) {
+            Setting::set('enable_compare', 'false');
         }
 
         return redirect()->back()->with('success', 'Settings updated successfully');

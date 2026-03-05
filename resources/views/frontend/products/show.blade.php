@@ -3,6 +3,45 @@
 @section('title', 'Product Details')
 
 @section('content')
+<style>
+/* Product card action buttons - hidden by default, shown on hover */
+.product-card .action-buttons {
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+}
+
+/* Individual buttons hidden by default */
+.product-card .action-btn-favourite,
+.product-card .action-btn-compare {
+    display: none;
+}
+
+/* When favourites is enabled, show favourite button */
+body.features-enabled-favourites .product-card .action-btn-favourite {
+    display: flex;
+}
+
+/* When compare is enabled, show compare button */
+body.features-enabled-compare .product-card .action-btn-compare {
+    display: flex;
+}
+
+/* Show buttons container on hover when either feature is enabled */
+body.features-enabled-favourites .product-card:hover .action-buttons,
+body.features-enabled-compare .product-card:hover .action-buttons {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Also show buttons when hovering over the image area */
+body.features-enabled-favourites .product-card .relative:hover .action-buttons,
+body.features-enabled-compare .product-card .relative:hover .action-buttons {
+    opacity: 1;
+    transform: translateX(0);
+}
+</style>
+
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-white py-8">
     <div id="product-detail" class="container mx-auto px-4">
         <!-- Product will be loaded here -->
@@ -266,6 +305,11 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </svg>
                                 Add to Cart
                             </button>
+                            
+                            <!-- Favourites and Compare Buttons -->
+                            <div id="product-actions" class="flex gap-3">
+                                <!-- Buttons will be rendered by JavaScript based on feature flags -->
+                            </div>
                         </div>
                     </div>
                     <!-- Product Description -->
@@ -289,13 +333,37 @@ document.addEventListener('DOMContentLoaded', function() {
                                 Related Products
                             </h2>
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                ${product.related_products.map(related => `
-                                    <div class="card overflow-hidden group">
-                                        <a href="/products/${related.slug}">
-                                            <div class="relative overflow-hidden">
-                                                <img src="/storage/${related.main_image}" alt="${related.name}" class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500">
-                                                ${related.discounted_price ? `<span class="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-sm">Sale</span>` : ''}
+                                ${product.related_products.map(related => {
+                                    // Use default values if FEATURES is not yet loaded
+                                    const features = typeof FEATURES !== 'undefined' ? FEATURES : { enable_favourites: false, enable_compare: false };
+                                    const showActions = features.enable_favourites || features.enable_compare;
+                                    return `
+                                    <div class="card overflow-hidden relative product-card">
+                                        <div class="relative">
+                                            <a href="/products/${related.slug}" class="block">
+                                                <div class="relative overflow-hidden">
+                                                    <img src="/storage/${related.main_image}" alt="${related.name}" class="w-full h-64 object-cover hover:scale-110 transition-transform duration-500">
+                                                    ${related.discounted_price ? `<span class="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-sm">Sale</span>` : ''}
+                                                </div>
+                                            </a>
+                                            
+                                            <!-- Action Buttons Overlay - Controlled by CSS based on admin settings -->
+                                            <div class="action-buttons absolute top-2 left-2 flex flex-col gap-2 transition-all duration-300 pointer-events-auto z-10">
+                                                <button onclick="toggleFavourite(${related.id}, this);" 
+                                                    class="action-btn-favourite w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-400 hover:text-red-500 transition-all duration-200 transform hover:scale-110">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                                    </svg>
+                                                </button>
+                                                <button onclick="toggleCompare(${related.id}, this);" 
+                                                    class="action-btn-compare w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-400 hover:text-brand-gold transition-all duration-200 transform hover:scale-110">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                                    </svg>
+                                                </button>
                                             </div>
+                                        </div>
+                                        <a href="/products/${related.slug}" class="block">
                                             <div class="p-4">
                                                 <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-brand-gold transition-colors">${related.name}</h3>
                                                 <div class="flex items-center space-x-2 mb-3">
@@ -306,7 +374,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                             </div>
                                         </a>
                                     </div>
-                                `).join('')}
+                                `}).join('')}
                             </div>
                         </div>
                     ` : ''}
@@ -327,6 +395,18 @@ document.addEventListener('DOMContentLoaded', function() {
             if (product.has_variations) {
                 fetchProductVariations(product.id);
             }
+            
+            // Render favourites and compare buttons after feature flags are loaded
+            // The layout's loadFeatureFlags() will call updateFeatureUI which triggers this
+            window.currentProductId = product.id;
+            
+            // Try to render immediately if features already loaded
+            renderProductActions(product.id);
+            
+            // Also try again after a short delay to ensure feature flags are loaded
+            setTimeout(() => {
+                renderProductActions(product.id);
+            }, 500);
         })
         .catch(err => {
             console.error('Error loading product:', err);
@@ -341,6 +421,96 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         });
 });
+
+// Function to render favourites and compare buttons
+function renderProductActions(productId) {
+    const container = document.getElementById('product-actions');
+    if (!container) return;
+    
+    // Use default values if FEATURES is not yet loaded
+    const features = typeof FEATURES !== 'undefined' ? FEATURES : { enable_favourites: false, enable_compare: false };
+    
+    // Show both buttons when either feature is enabled
+    const showActions = features.enable_favourites || features.enable_compare;
+    
+    if (!showActions) {
+        container.style.display = 'none';
+        return;
+    }
+    
+    container.style.display = 'flex';
+    
+    let html = '';
+    
+    if (features.enable_favourites) {
+        html += `
+            <button onclick="toggleFavourite(${productId}, this)" 
+                class="flex-1 bg-white border-2 border-gray-200 text-gray-700 py-3 rounded-xl font-semibold hover:border-red-500 hover:text-red-500 transition-all duration-300 flex items-center justify-center gap-2 product-fav-btn">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+                Add to Favourites
+            </button>
+        `;
+    }
+    
+    if (features.enable_compare) {
+        html += `
+            <button onclick="toggleCompare(${productId}, this)" 
+                class="flex-1 bg-white border-2 border-gray-200 text-gray-700 py-3 rounded-xl font-semibold hover:border-brand-gold hover:text-brand-gold transition-all duration-300 flex items-center justify-center gap-2 product-compare-btn">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                Add to Compare
+            </button>
+        `;
+    }
+    
+    container.innerHTML = html;
+    
+    // Check if product is already in favourites/compare and update button state
+    checkProductStatus(productId);
+}
+
+// Check if product is in favourites or compare
+async function checkProductStatus(productId) {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    
+    // Use default values if FEATURES is not yet loaded
+    const features = typeof FEATURES !== 'undefined' ? FEATURES : { enable_favourites: false, enable_compare: false };
+    
+    if (features.enable_favourites) {
+        try {
+            const response = await fetch(`${API_BASE}/favourites/check/${productId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            if (data.success && data.is_favourite) {
+                const favBtn = document.querySelector('.product-fav-btn');
+                if (favBtn) {
+                    favBtn.classList.add('text-red-500', 'border-red-500');
+                    favBtn.querySelector('svg')?.classList.add('fill-current');
+                }
+            }
+        } catch (e) {}
+    }
+    
+    if (features.enable_compare) {
+        try {
+            const response = await fetch(`${API_BASE}/compare/check/${productId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            if (data.success && data.is_in_compare) {
+                const compareBtn = document.querySelector('.product-compare-btn');
+                if (compareBtn) {
+                    compareBtn.classList.add('text-brand-gold', 'border-brand-gold');
+                }
+            }
+        } catch (e) {}
+    }
+}
 
 // Function to fetch product variations
 window.fetchProductVariations = function(productId) {

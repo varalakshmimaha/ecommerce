@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ProductVariationController;
+use App\Http\Controllers\Api\FavouriteController;
+use App\Http\Controllers\Api\CompareController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -20,6 +22,17 @@ Route::get('/categories', [ProductController::class, 'categories']);
 Route::get('/categories/{category}', [ProductController::class, 'showCategory']);
 Route::get('/brands', [ProductController::class, 'brands']);
 Route::get('/banners', [ProductController::class, 'banners']);
+
+// Public settings for feature flags
+Route::get('/settings/features', function () {
+    return response()->json([
+        'success' => true,
+        'data' => [
+            'enable_favourites' => \App\Models\Setting::get('enable_favourites', 'false') === 'true',
+            'enable_compare' => \App\Models\Setting::get('enable_compare', 'false') === 'true',
+        ]
+    ]);
+});
 
 // Product Variation Routes
 Route::get('/products/{product}/variations', [ProductVariationController::class, 'index']);
@@ -57,6 +70,21 @@ Route::middleware('auth:sanctum')->group(function () {
     // Queries
     Route::get('/user/queries', [\App\Http\Controllers\Api\QueryController::class, 'index']);
     Route::post('/user/queries', [\App\Http\Controllers\Api\QueryController::class, 'store']);
+
+    // Favourites
+    Route::get('/favourites', [FavouriteController::class, 'index']);
+    Route::post('/favourites', [FavouriteController::class, 'store']);
+    Route::post('/favourites/toggle', [FavouriteController::class, 'toggle']);
+    Route::delete('/favourites/{productId}', [FavouriteController::class, 'destroy']);
+    Route::get('/favourites/check/{productId}', [FavouriteController::class, 'check']);
+
+    // Compare
+    Route::get('/compare', [CompareController::class, 'index']);
+    Route::post('/compare', [CompareController::class, 'store']);
+    Route::post('/compare/toggle', [CompareController::class, 'toggle']);
+    Route::delete('/compare/{productId}', [CompareController::class, 'destroy']);
+    Route::get('/compare/check/{productId}', [CompareController::class, 'check']);
+    Route::delete('/compare', [CompareController::class, 'clear']);
 });
 
 // Public order tracking

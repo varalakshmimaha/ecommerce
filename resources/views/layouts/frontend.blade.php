@@ -64,12 +64,31 @@
                         <span class="text-2xl font-bold bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson bg-clip-text text-transparent">{{ \App\Models\Setting::get('company_name', 'Suvee') }}</span>
                     @endif
                 </a>
-                <a href="{{ route('cart') }}" class="relative group">
-                    <svg class="w-6 h-6 text-text-heading group-hover:text-ui-hover transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
-                    <span class="cart-count absolute -top-2 -right-2 bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold shadow-md">0</span>
-                </a>
+                <div class="flex items-center space-x-3">
+                    <!-- Mobile Favourites Icon -->
+                    <a id="mobile-favourites-link" href="{{ route('favourites') }}" class="relative group">
+                        <svg class="w-6 h-6 text-text-heading group-hover:text-brand-gold transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                        <span class="fav-count absolute -top-2 -right-2 bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold shadow-md hidden">0</span>
+                    </a>
+                    
+                    <!-- Mobile Compare Icon -->
+                    <a id="mobile-compare-link" href="{{ route('compare') }}" class="relative group">
+                        <svg class="w-6 h-6 text-text-heading group-hover:text-brand-gold transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        <span class="compare-count absolute -top-2 -right-2 bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold shadow-md hidden">0</span>
+                    </a>
+                    
+                    <!-- Cart Icon -->
+                    <a href="{{ route('cart') }}" class="relative group">
+                        <svg class="w-6 h-6 text-text-heading group-hover:text-ui-hover transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        <span class="cart-count absolute -top-2 -right-2 bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold shadow-md">0</span>
+                    </a>
+                </div>
             </div>
             
             <!-- Desktop & Mobile Layout -->
@@ -120,8 +139,35 @@
                             class="w-64 px-4 py-2 bg-white border border-gray-200 rounded-lg text-text-heading placeholder-text-muted focus:ring-2 focus:ring-brand-gold focus:border-brand-gold transition-all duration-300 shadow-sm">
                     </form>
 
+                    <!-- Favourites, Compare & Cart Icons -->
+                    <div class="flex items-center space-x-4 pl-4 border-l border-gray-200">
+                        <!-- Favourites Icon -->
+                        <a id="favourites-link" href="{{ route('favourites') }}" class="relative group">
+                            <svg class="w-6 h-6 text-text-heading group-hover:text-brand-gold transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                            </svg>
+                            <span class="fav-count absolute -top-2 -right-2 bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold shadow-md hidden">0</span>
+                        </a>
+
+                        <!-- Compare Icon -->
+                        <a id="compare-link" href="{{ route('compare') }}" class="relative group">
+                            <svg class="w-6 h-6 text-text-heading group-hover:text-brand-gold transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                            <span class="compare-count absolute -top-2 -right-2 bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold shadow-md hidden">0</span>
+                        </a>
+
+                        <!-- Cart Icon -->
+                        <a href="{{ route('cart') }}" class="relative group">
+                            <svg class="w-6 h-6 text-text-heading group-hover:text-ui-hover transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                            <span class="cart-count absolute -top-2 -right-2 bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold shadow-md">0</span>
+                        </a>
+                    </div>
+
                     <!-- User Account -->
-                    <div class="user-account-section">
+                    <div class="user-account-section pl-4 border-l border-gray-200">
                         @auth
                         <!-- Show when user is logged in -->
                         <div class="logged-in-links relative">
@@ -156,13 +202,6 @@
                         </div>
                         @endauth
                     </div>
-
-                    <a href="{{ route('cart') }}" class="relative group">
-                        <svg class="w-6 h-6 text-text-heading group-hover:text-ui-hover transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                        </svg>
-                        <span class="cart-count absolute -top-2 -right-2 bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-semibold shadow-md">0</span>
-                    </a>
                 </div>
             </div>
             
@@ -205,6 +244,7 @@
                     @foreach(\App\Models\Page::where('show_in_navbar', true)->where('is_active', true)->orderBy('sort_order')->get() as $mobileNavPage)
                         <a href="{{ route('page.show', $mobileNavPage) }}" class="text-text-heading hover:text-ui-hover transition-all duration-300 font-medium py-2">{{ $mobileNavPage->title }}</a>
                     @endforeach
+                    
                     <form action="{{ route('products.index') }}" method="GET" class="pt-2">
                         <input type="text" name="search" placeholder="Search products..." value="{{ request('search') }}"
                             class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-text-heading placeholder-text-muted focus:ring-2 focus:ring-brand-gold focus:border-brand-gold transition-all duration-300 shadow-sm">
@@ -343,16 +383,55 @@
 
     <script>
         const API_BASE = '{{ url('/api') }}';
-        
-        // Mobile Menu Toggle
+        const USER_LOGGED_IN = {{ auth()->check() ? 'true' : 'false' }};
+        const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+        // Feature flags - loaded from admin settings
+        let FEATURES = { enable_favourites: false, enable_compare: false };
+
+        // Load features from DB then update UI
+        async function loadAndApplyFeatures() {
+            try {
+                const resp = await fetch(`${API_BASE}/settings/features`);
+                if (resp.ok) {
+                    const json = await resp.json();
+                    if (json.success) FEATURES = json.data;
+                }
+            } catch(e) {}
+            applyFeatureUI();
+            if (USER_LOGGED_IN) {
+                updateFavouritesCount();
+                updateCompareCount();
+            }
+        }
+
+        function applyFeatureUI() {
+            // Desktop icons
+            const favouritesLink = document.getElementById('favourites-link');
+            const compareLink = document.getElementById('compare-link');
+            if (favouritesLink) favouritesLink.classList.toggle('hidden', !FEATURES.enable_favourites);
+            if (compareLink) compareLink.classList.toggle('hidden', !FEATURES.enable_compare);
+            
+            // Mobile icons
+            const mobileFavouritesLink = document.getElementById('mobile-favourites-link');
+            const mobileCompareLink = document.getElementById('mobile-compare-link');
+            if (mobileFavouritesLink) mobileFavouritesLink.classList.toggle('hidden', !FEATURES.enable_favourites);
+            if (mobileCompareLink) mobileCompareLink.classList.toggle('hidden', !FEATURES.enable_compare);
+            
+            document.body.classList.toggle('features-enabled-favourites', !!FEATURES.enable_favourites);
+            document.body.classList.toggle('features-enabled-compare', !!FEATURES.enable_compare);
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Load feature flags from DB and update UI
+            loadAndApplyFeatures();
+
+            // Mobile Menu Toggle
             const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
             const mobileMenu = document.getElementById('mobile-menu');
-
             if (mobileMenuToggle && mobileMenu) {
                 mobileMenuToggle.addEventListener('click', function() {
                     mobileMenu.classList.toggle('hidden');
-                    // Toggle icon
                     const icon = mobileMenuToggle.querySelector('svg');
                     if (mobileMenu.classList.contains('hidden')) {
                         icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>';
@@ -362,38 +441,125 @@
                 });
             }
 
-            // User dropdown menu toggle
+            // User dropdown
             const userMenuBtn = document.getElementById('user-menu-btn');
             const userDropdown = document.getElementById('user-dropdown');
-
             if (userMenuBtn && userDropdown) {
                 userMenuBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     userDropdown.classList.toggle('hidden');
                 });
-
-                // Close dropdown when clicking outside
                 document.addEventListener('click', function() {
                     userDropdown.classList.add('hidden');
                 });
             }
         });
 
-        // Helper to show modal messages (supports type: 'success'|'error'|'info')
+        // Update favourites count badge
+        async function updateFavouritesCount() {
+            if (!USER_LOGGED_IN) return;
+            const countEls = document.querySelectorAll('.fav-count');
+            try {
+                const response = await fetch(`{{ url('/user-api/favourites') }}`, {
+                    headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    const count = data.data ? data.data.length : 0;
+                    countEls.forEach(el => {
+                        el.textContent = count;
+                        if (count > 0) { el.classList.remove('hidden'); el.classList.add('flex'); }
+                        else { el.classList.add('hidden'); el.classList.remove('flex'); }
+                    });
+                }
+            } catch(e) {}
+        }
+
+        // Update compare count badge
+        async function updateCompareCount() {
+            if (!USER_LOGGED_IN) return;
+            const countEls = document.querySelectorAll('.compare-count');
+            try {
+                const response = await fetch(`{{ url('/user-api/compare') }}`, {
+                    headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    const count = data.data ? data.data.length : 0;
+                    countEls.forEach(el => {
+                        el.textContent = count;
+                        if (count > 0) { el.classList.remove('hidden'); el.classList.add('flex'); }
+                        else { el.classList.add('hidden'); el.classList.remove('flex'); }
+                    });
+                }
+            } catch(e) {}
+        }
+
+        // Show login required modal
+        function showLoginRequired() {
+            const modal = document.getElementById('loginRequiredModal');
+            if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+        }
+
+        // Toggle favourite
+        async function toggleFavourite(productId, buttonEl) {
+            if (!USER_LOGGED_IN) { showLoginRequired(); return; }
+            try {
+                const response = await fetch(`{{ url('/user-api/favourites/toggle') }}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+                    body: JSON.stringify({ product_id: productId })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    if (buttonEl) {
+                        const svg = buttonEl.querySelector('svg');
+                        if (svg) svg.setAttribute('fill', data.is_in_favourites ? 'currentColor' : 'none');
+                        buttonEl.classList.toggle('text-red-500', data.is_in_favourites);
+                        buttonEl.classList.toggle('text-gray-400', !data.is_in_favourites);
+                    }
+                    updateFavouritesCount();
+                }
+            } catch(e) { console.error('Favourite error:', e); }
+        }
+
+        // Toggle compare
+        async function toggleCompare(productId, buttonEl) {
+            if (!USER_LOGGED_IN) { showLoginRequired(); return; }
+            try {
+                const response = await fetch(`{{ url('/user-api/compare/toggle') }}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+                    body: JSON.stringify({ product_id: productId })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    if (buttonEl) {
+                        buttonEl.classList.toggle('text-brand-gold', data.is_in_compare);
+                        buttonEl.classList.toggle('text-gray-400', !data.is_in_compare);
+                    }
+                    updateCompareCount();
+                    if (data.is_in_compare) showModal('Added', 'Product added to compare list', 'success');
+                    else showModal('Removed', 'Product removed from compare list', 'info');
+                } else {
+                    showModal('Limit Reached', data.message || 'Cannot add more items', 'error');
+                }
+            } catch(e) { console.error('Compare error:', e); }
+        }
+
+        // Helper to show modal messages
         function showModal(title, message, type = 'info') {
             const modal = document.getElementById('appModal');
             const titleEl = document.getElementById('appModalTitle');
             const bodyEl = document.getElementById('appModalBody');
             titleEl.textContent = title;
             bodyEl.textContent = message;
-            // style based on type
             titleEl.className = 'text-lg font-bold ' + (type === 'success' ? 'text-green-600' : (type === 'error' ? 'text-red-600' : 'text-gray-900'));
             modal.querySelector('.animate-fade-in')?.classList.remove('ring-4','ring-green-100','ring-red-100');
             if (type === 'success') modal.querySelector('.animate-fade-in')?.classList.add('ring-4','ring-green-100');
             if (type === 'error') modal.querySelector('.animate-fade-in')?.classList.add('ring-4','ring-red-100');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
-            // gentle auto close
             setTimeout(() => closeModal(), 3600);
         }
 
@@ -403,13 +569,27 @@
             modal.classList.remove('flex');
         }
 
-            // Global cart count updater — updates all cart-count badges
         function updateCartCount() {
             const cart = JSON.parse(localStorage.getItem('cart') || '[]');
             const count = cart.reduce((sum, item) => sum + item.quantity, 0);
             document.querySelectorAll('.cart-count').forEach(el => el.textContent = count);
         }
     </script>
+    <!-- Login Required Modal -->
+    <div id="loginRequiredModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center">
+            <svg class="w-16 h-16 text-brand-gold mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+            <h3 class="text-xl font-bold text-text-heading mb-2">Login Required</h3>
+            <p class="text-text-muted mb-6">Please login to use this feature.</p>
+            <div class="flex gap-3">
+                <button onclick="document.getElementById('loginRequiredModal').classList.add('hidden');document.getElementById('loginRequiredModal').classList.remove('flex');" class="flex-1 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-50 transition-colors">Cancel</button>
+                <a href="{{ route('user.login') }}" class="flex-1 bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg transition-all">Login</a>
+            </div>
+        </div>
+    </div>
+
     @yield('scripts')
 </body>
 </html>
