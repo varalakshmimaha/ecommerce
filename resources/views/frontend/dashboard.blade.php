@@ -47,6 +47,14 @@
                         My Queries
                     </span>
                 </button>
+                <button onclick="switchTab('referrals')" id="tab-referrals" class="tab-btn px-6 py-3 rounded-lg font-semibold transition-all duration-300 text-text-muted hover:text-brand-gold hover:bg-gray-50">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        My Referrals / Earnings
+                    </span>
+                </button>
             </nav>
         </div>
 
@@ -313,8 +321,190 @@
                 </div>
             </div>
         </div>
+
+        <!-- Referrals & Earnings Tab -->
+        <div id="content-referrals" class="tab-content hidden">
+            <div class="space-y-6">
+                {{-- Referral code card (shown at the top) --}}
+                @if($referralLink)
+                    <div class="bg-gradient-to-br from-brand-gold via-brand-amber to-brand-crimson rounded-2xl shadow-lg p-6 text-white">
+                        <div class="flex flex-wrap items-center justify-between gap-4">
+                            <div class="flex-1 min-w-0">
+                                <div class="text-xs uppercase tracking-wider opacity-80 font-semibold mb-1">Your Referral Code</div>
+                                <div class="font-mono font-bold text-3xl">{{ $user->referral_code }}</div>
+                                <div class="text-sm opacity-90 mt-3 truncate">{{ $referralLink }}</div>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <button type="button" onclick="(function(btn){navigator.clipboard.writeText('{{ $referralLink }}'); const t=btn.innerText; btn.innerText='Copied!'; setTimeout(()=>btn.innerText=t,1500);})(this)"
+                                        class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm font-semibold backdrop-blur border border-white/20">Copy Link</button>
+                                <a href="https://wa.me/?text={{ urlencode('Join via my referral link: ' . $referralLink) }}" target="_blank" rel="noopener" class="bg-white text-brand-crimson hover:bg-white/90 px-4 py-2 rounded-lg text-sm font-semibold">WhatsApp</a>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                @if(in_array($user->role, ['affiliate','rm','manager']))
+                    {{-- Earnings KPI strip --}}
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden">
+                            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#ea580c;"></div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background:#ffedd5;">
+                                    <svg class="w-4 h-4" style="color:#c2410c;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                                </div>
+                                <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#9a3412;">Lifetime</div>
+                            </div>
+                            <div class="text-xl font-bold text-text-heading tabular-nums mt-2">&#8377;{{ number_format($commissionTotals['lifetime'], 2) }}</div>
+                        </div>
+                        <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden">
+                            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#10b981;"></div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background:#d1fae5;">
+                                    <svg class="w-4 h-4" style="color:#059669;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                </div>
+                                <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#047857;">Paid</div>
+                            </div>
+                            <div class="text-xl font-bold text-text-heading tabular-nums mt-2">&#8377;{{ number_format($commissionTotals['paid'], 2) }}</div>
+                        </div>
+                        <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden">
+                            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#f59e0b;"></div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background:#fef3c7;">
+                                    <svg class="w-4 h-4" style="color:#d97706;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </div>
+                                <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#b45309;">Pending</div>
+                            </div>
+                            <div class="text-xl font-bold text-text-heading tabular-nums mt-2">&#8377;{{ number_format($commissionTotals['pending'], 2) }}</div>
+                        </div>
+                        <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden">
+                            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#3b82f6;"></div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background:#dbeafe;">
+                                    <svg class="w-4 h-4" style="color:#2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                </div>
+                                <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#1d4ed8;">Approved</div>
+                            </div>
+                            <div class="text-xl font-bold text-text-heading tabular-nums mt-2">&#8377;{{ number_format($commissionTotals['approved'], 2) }}</div>
+                        </div>
+                    </div>
+
+                    @php
+                        $myRate = ['affiliate' => 5, 'rm' => 3, 'manager' => 2][$user->role] ?? 0;
+                        $referralsWithActivity = $referrals->filter(fn($r) => ($r->orders_count ?? 0) > 0 || ($baseByReferral[$r->id] ?? 0) > 0);
+                    @endphp
+
+                    {{-- My Referrals --}}
+                    @if($referralsWithActivity->count())
+                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                        <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between flex-wrap gap-3">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2.5 bg-gradient-to-br from-brand-gold via-brand-amber to-brand-crimson rounded-xl shadow-sm">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                                </div>
+                                <div>
+                                    <h2 class="text-xl font-bold text-text-heading leading-tight">My Referrals</h2>
+                                    <p class="text-xs text-text-muted">Direct referrals earning you {{ $myRate }}% commission</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-50 text-text-muted text-xs uppercase tracking-wider">
+                                    <tr>
+                                        <th class="text-left px-5 py-3 font-semibold">Name</th>
+                                        <th class="text-left px-5 py-3 font-semibold">Date</th>
+                                        <th class="text-left px-5 py-3 font-semibold">Role</th>
+                                        <th class="text-right px-5 py-3 font-semibold">Base</th>
+                                        <th class="text-right px-5 py-3 font-semibold">Rate</th>
+                                        <th class="text-right px-5 py-3 font-semibold">Orders</th>
+                                        <th class="text-right px-5 py-3 font-semibold">Amount</th>
+                                        <th class="text-center px-5 py-3 font-semibold">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    @foreach($referrals as $r)
+                                        @php
+                                            $base = (float) ($baseByReferral[$r->id] ?? 0);
+                                            $comm = (float) ($commByReferral[$r->id] ?? 0);
+                                            $ordCount = $r->orders_count ?? 0;
+                                            $initial = strtoupper(mb_substr($r->name ?? 'U', 0, 1));
+                                        @endphp
+                                        <tr class="hover:bg-gray-50/70 align-middle">
+                                            <td class="px-5 py-3">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-9 h-9 rounded-full bg-brand-gold/10 text-brand-gold flex items-center justify-center text-sm font-bold shrink-0">{{ $initial }}</div>
+                                                    <div class="min-w-0">
+                                                        <div class="font-semibold text-text-heading">{{ $r->name ?? 'User #'.$r->id }}</div>
+                                                        @if($r->referral_code)<div class="text-xs text-text-muted font-mono">{{ $r->referral_code }}</div>@endif
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-5 py-3 text-text-muted text-xs">{{ $r->created_at?->format('d M Y') }}</td>
+                                            <td class="px-5 py-3 uppercase text-xs font-semibold">{{ $r->role }}</td>
+                                            <td class="px-5 py-3 text-right tabular-nums {{ $base > 0 ? 'text-text-heading' : 'text-gray-400' }}">&#8377;{{ number_format($base, 2) }}</td>
+                                            <td class="px-5 py-3 text-right tabular-nums text-xs text-text-muted">{{ $myRate }}%</td>
+                                            <td class="px-5 py-3 text-right tabular-nums">{{ $ordCount }}</td>
+                                            <td class="px-5 py-3 text-right tabular-nums {{ $comm > 0 ? 'text-brand-gold font-bold' : 'text-gray-400' }}">&#8377;{{ number_format($comm, 2) }}</td>
+                                            <td class="px-5 py-3 text-center">
+                                                <a href="{{ route('user.dashboard.referral.show', $r) }}" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-brand-gold/10 text-brand-gold hover:bg-brand-gold/20 text-xs font-semibold transition">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                    View
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    @endif
+
+                @else
+                    {{-- "Referred by" note + Become an Affiliate CTA for customers --}}
+                    @if(!empty($upline))
+                        @php $referrer = $upline[0]; @endphp
+                        <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
+                            <div class="flex items-center gap-3">
+                                <div class="w-11 h-11 rounded-full bg-brand-gold/10 flex items-center justify-center text-brand-gold font-bold">
+                                    {{ strtoupper(substr($referrer->name ?? '?', 0, 1)) }}
+                                </div>
+                                <div>
+                                    <div class="text-xs text-text-muted uppercase tracking-wide font-semibold">Referred by</div>
+                                    <div class="font-semibold text-text-heading">{{ $referrer->name ?? 'Affiliate #'.$referrer->id }}
+                                        @if($referrer->referral_code)
+                                            <span class="ml-2 text-xs text-text-muted font-mono font-normal">{{ $referrer->referral_code }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- Become an Affiliate CTA --}}
+                    <div class="bg-gradient-to-br from-brand-gold via-brand-amber to-brand-crimson rounded-2xl shadow-lg p-6 text-white">
+                        <div class="flex flex-wrap items-center justify-between gap-4">
+                            <div class="flex items-start gap-4 flex-1 min-w-0">
+                                <div class="p-3 bg-white/20 rounded-xl ring-2 ring-white/30 shrink-0">
+                                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                                </div>
+                                <div class="min-w-0">
+                                    <div class="text-xs uppercase tracking-wider opacity-80 font-semibold mb-1">Earn With Us</div>
+                                    <h3 class="text-xl font-bold">Become an Affiliate</h3>
+                                    <p class="text-sm opacity-90 mt-1">Get your own referral code and earn <strong>5% commission</strong> on every sale from people you refer.</p>
+                                </div>
+                            </div>
+                            <a href="{{ route('become.affiliate') }}" class="bg-white text-brand-crimson hover:bg-white/90 px-6 py-3 rounded-lg font-bold text-sm inline-flex items-center gap-2 shadow-md whitespace-nowrap">
+                                Apply Now
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
     </div>
 </div>
+
 @endsection
 
 @section('scripts')

@@ -35,9 +35,12 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                                 </svg>
                             </div>
-                            <input type="text" name="mobile" value="{{ old('mobile') }}" required
+                            <input type="tel" name="mobile" value="{{ old('mobile') }}" required
+                                maxlength="10" minlength="10" pattern="[0-9]{10}" inputmode="numeric"
+                                oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)"
+                                title="Enter exactly 10 digits"
                                 class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-lg text-text-heading placeholder-text-muted focus:ring-2 focus:ring-brand-gold focus:border-brand-gold transition-all duration-300"
-                                placeholder="Enter your mobile number">
+                                placeholder="10-digit mobile number">
                         </div>
                     </div>
 

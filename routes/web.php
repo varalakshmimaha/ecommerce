@@ -39,6 +39,15 @@ Route::post('/reset-password', [NewPasswordController::class, 'store'])->middlew
 Route::get('/user/register', [RegisterController::class, 'create'])->name('user.register');
 Route::post('/user/register', [RegisterController::class, 'store']);
 
+Route::get('/become-affiliate', function () {
+    return view('frontend.become-affiliate');
+})->name('become.affiliate');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/become-affiliate/apply', [\App\Http\Controllers\Frontend\Affiliate\ApplicationController::class, 'create'])->name('become.affiliate.apply.create');
+    Route::post('/become-affiliate/apply', [\App\Http\Controllers\Frontend\Affiliate\ApplicationController::class, 'store'])->name('become.affiliate.apply.store');
+});
+
 Route::get('/user/login', [FrontendAuthenticatedSessionController::class, 'create'])->name('user.login');
 Route::post('/user/login', [FrontendAuthenticatedSessionController::class, 'store']);
 Route::post('/user/logout', [FrontendAuthenticatedSessionController::class, 'destroy'])->name('user.logout');
@@ -54,6 +63,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/dashboard/addresses/{address}', [AddressController::class, 'destroy'])->name('user.dashboard.addresses.destroy');
     Route::post('/dashboard/addresses/{address}/default', [AddressController::class, 'setDefault'])->name('user.dashboard.addresses.default');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('user.dashboard');
+    Route::get('/dashboard/referrals/{referral}', [DashboardController::class, 'referralShow'])->name('user.dashboard.referral.show');
     Route::get('/dashboard/profile', [DashboardController::class, 'profile'])->name('user.dashboard.profile');
     Route::post('/dashboard/profile', [DashboardController::class, 'updateProfile'])->name('user.dashboard.profile.update');
     Route::post('/dashboard/password', [DashboardController::class, 'updatePassword'])->name('user.dashboard.password.update');
@@ -245,6 +255,63 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+
+    // Managers CRUD
+    Route::get('/managers', [\App\Http\Controllers\Admin\ManagerController::class, 'index'])->name('managers.index');
+    Route::get('/managers/create', [\App\Http\Controllers\Admin\ManagerController::class, 'create'])->name('managers.create');
+    Route::post('/managers', [\App\Http\Controllers\Admin\ManagerController::class, 'store'])->name('managers.store');
+    Route::get('/managers/{manager}', [\App\Http\Controllers\Admin\ManagerController::class, 'show'])->name('managers.show');
+    Route::get('/managers/{manager}/edit', [\App\Http\Controllers\Admin\ManagerController::class, 'edit'])->name('managers.edit');
+    Route::put('/managers/{manager}', [\App\Http\Controllers\Admin\ManagerController::class, 'update'])->name('managers.update');
+    Route::delete('/managers/{manager}', [\App\Http\Controllers\Admin\ManagerController::class, 'destroy'])->name('managers.destroy');
+
+    // RMs CRUD
+    Route::get('/rms', [\App\Http\Controllers\Admin\RmController::class, 'index'])->name('rms.index');
+    Route::get('/rms/create', [\App\Http\Controllers\Admin\RmController::class, 'create'])->name('rms.create');
+    Route::post('/rms', [\App\Http\Controllers\Admin\RmController::class, 'store'])->name('rms.store');
+    Route::get('/rms/{rm}', [\App\Http\Controllers\Admin\RmController::class, 'show'])->name('rms.show');
+    Route::get('/rms/{rm}/edit', [\App\Http\Controllers\Admin\RmController::class, 'edit'])->name('rms.edit');
+    Route::put('/rms/{rm}', [\App\Http\Controllers\Admin\RmController::class, 'update'])->name('rms.update');
+    Route::delete('/rms/{rm}', [\App\Http\Controllers\Admin\RmController::class, 'destroy'])->name('rms.destroy');
+
+    // Commission Settings
+    Route::get('/commission-settings', [\App\Http\Controllers\Admin\CommissionSettingController::class, 'index'])->name('commission-settings.index');
+    Route::put('/commission-settings', [\App\Http\Controllers\Admin\CommissionSettingController::class, 'update'])->name('commission-settings.update');
+
+    // Commissions ledger
+    Route::get('/commissions', [\App\Http\Controllers\Admin\CommissionController::class, 'index'])->name('commissions.index');
+    Route::get('/commissions/export', [\App\Http\Controllers\Admin\CommissionController::class, 'export'])->name('commissions.export');
+    Route::post('/commissions/{commission}/approve', [\App\Http\Controllers\Admin\CommissionController::class, 'approve'])->name('commissions.approve');
+    Route::post('/commissions/{commission}/reverse', [\App\Http\Controllers\Admin\CommissionController::class, 'reverse'])->name('commissions.reverse');
+    Route::post('/commissions/{commission}/pay', [\App\Http\Controllers\Admin\CommissionController::class, 'markPaid'])->name('commissions.pay');
+
+    // Withdrawals (payouts)
+    Route::get('/withdrawals', [\App\Http\Controllers\Admin\WithdrawalController::class, 'index'])->name('withdrawals.index');
+    Route::get('/withdrawals/create', [\App\Http\Controllers\Admin\WithdrawalController::class, 'create'])->name('withdrawals.create');
+    Route::post('/withdrawals', [\App\Http\Controllers\Admin\WithdrawalController::class, 'store'])->name('withdrawals.store');
+    Route::get('/withdrawals/{withdrawal}', [\App\Http\Controllers\Admin\WithdrawalController::class, 'show'])->name('withdrawals.show');
+    Route::delete('/withdrawals/{withdrawal}', [\App\Http\Controllers\Admin\WithdrawalController::class, 'destroy'])->name('withdrawals.destroy');
+
+    // Affiliates
+    Route::get('/affiliates', [\App\Http\Controllers\Admin\AffiliateController::class, 'index'])->name('affiliates.index');
+    Route::get('/affiliates/create', [\App\Http\Controllers\Admin\AffiliateController::class, 'create'])->name('affiliates.create');
+    Route::post('/affiliates', [\App\Http\Controllers\Admin\AffiliateController::class, 'store'])->name('affiliates.store');
+    Route::get('/affiliates/{user}', [\App\Http\Controllers\Admin\AffiliateController::class, 'show'])->name('affiliates.show');
+    Route::get('/affiliates/{user}/edit', [\App\Http\Controllers\Admin\AffiliateController::class, 'edit'])->name('affiliates.edit');
+    Route::put('/affiliates/{user}', [\App\Http\Controllers\Admin\AffiliateController::class, 'update'])->name('affiliates.update');
+    Route::delete('/affiliates/{user}', [\App\Http\Controllers\Admin\AffiliateController::class, 'destroy'])->name('affiliates.destroy');
+    Route::post('/affiliates/{user}/approve', [\App\Http\Controllers\Admin\AffiliateController::class, 'approve'])->name('affiliates.approve');
+    Route::post('/affiliates/{user}/reject', [\App\Http\Controllers\Admin\AffiliateController::class, 'reject'])->name('affiliates.reject');
+    Route::post('/affiliates/{user}/verify-kyc', [\App\Http\Controllers\Admin\AffiliateController::class, 'verifyKyc'])->name('affiliates.verify-kyc');
+    Route::put('/affiliates/{user}/parent', [\App\Http\Controllers\Admin\AffiliateController::class, 'assignParent'])->name('affiliates.assign-parent');
+});
+
+// Affiliate / RM / Manager dashboard + team management
+Route::middleware('auth')->group(function () {
+    Route::get('/affiliate/dashboard', [\App\Http\Controllers\Frontend\Affiliate\DashboardController::class, 'index'])->name('affiliate.dashboard');
+    Route::get('/my-team', [\App\Http\Controllers\Frontend\Affiliate\TeamController::class, 'index'])->name('team.index');
+    Route::post('/my-team', [\App\Http\Controllers\Frontend\Affiliate\TeamController::class, 'store'])->name('team.store');
+    Route::delete('/my-team/{member}', [\App\Http\Controllers\Frontend\Affiliate\TeamController::class, 'destroy'])->name('team.destroy');
 });
 
 // Public dynamic pages

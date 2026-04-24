@@ -16,8 +16,10 @@ class AuthenticatedSessionController extends Controller
     public function store(Request $request)
     {
         $credentials = $request->validate([
-            'mobile' => ['required', 'string'],
+            'mobile' => ['required', 'digits:10'],
             'password' => ['required'],
+        ], [
+            'mobile.digits' => 'Mobile number must be exactly 10 digits.',
         ]);
 
         $user = \App\Models\User::where('mobile', $credentials['mobile'])->first();

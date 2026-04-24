@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\NewUserCredentials;
 use Illuminate\Support\Facades\Hash;
 use Razorpay\Api\Api;
+use App\Services\CommissionService;
 
 class CheckoutController extends Controller
 {
@@ -222,6 +223,8 @@ class CheckoutController extends Controller
                     $item['product']->decrement('stock_quantity', $item['quantity']);
                 }
             }
+
+            app(CommissionService::class)->generateForOrder($order);
 
             DB::commit();
 
@@ -448,6 +451,8 @@ class CheckoutController extends Controller
                 // Update stock
                 $item['product']->decrement('stock_quantity', $item['quantity']);
             }
+
+            app(CommissionService::class)->generateForOrder($order);
 
             return response()->json([
                 'success' => true,

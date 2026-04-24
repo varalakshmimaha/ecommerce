@@ -22,4 +22,8 @@ yarn-error.log
 /storage/logs/*
 /bootstrap/cache/*
 
+# Sensitive user uploads — never commit KYC / identity documents
+/storage/app/public/affiliate-kyc
+/storage/app/public/affiliate-kyc/*
+
 

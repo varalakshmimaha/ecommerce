@@ -344,6 +344,22 @@
                         @endif
                     </ul>
                 </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-brand-gold">Earn With Us</h4>
+                    <p class="text-text-muted text-sm leading-relaxed mb-3">Share products you love &amp; earn a commission on every sale.</p>
+                    <a href="{{ route('become.affiliate') }}" class="inline-block bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-5 py-2 rounded-lg text-sm font-bold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">
+                        Join Now
+                    </a>
+                    @auth
+                        @if(in_array(auth()->user()->role, ['rm','manager']))
+                            <ul class="space-y-2 mt-4">
+                                <li>
+                                    <a href="{{ route('team.index') }}" class="text-text-muted hover:text-ui-hover transition-all duration-300 text-sm">My Team</a>
+                                </li>
+                            </ul>
+                        @endif
+                    @endauth
+                </div>
             </div>
             <div class="border-t border-gray-200 mt-8 pt-8 text-center text-text-muted text-sm">
                 <p>&copy; {{ date('Y') }} {{ \App\Models\Setting::get('company_name', 'Suwish') }}. All rights reserved.</p>

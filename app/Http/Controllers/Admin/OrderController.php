@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\CommissionService;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -30,7 +31,7 @@ class OrderController extends Controller
         return view('admin.orders.show', compact('order'));
     }
 
-    public function updateStatus(Request $request, Order $order)
+    public function updateStatus(Request $request, Order $order, CommissionService $commissions)
     {
         $validated = $request->validate([
             'order_status' => 'required|in:pending,confirmed,shipped,delivered,cancelled',
@@ -39,7 +40,14 @@ class OrderController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        $previousStatus = $order->order_status;
         $order->update($validated);
+
+        if ($validated['order_status'] === 'delivered' && $previousStatus !== 'delivered') {
+            $commissions->approveForOrder($order);
+        } elseif ($validated['order_status'] === 'cancelled' && $previousStatus !== 'cancelled') {
+            $commissions->reverseForOrder($order);
+        }
 
         return redirect()->back()->with('success', 'Order status updated successfully');
     }
@@ -65,4 +73,3 @@ class OrderController extends Controller
         return view('invoices.order', compact('order'));
     }
 }
-
