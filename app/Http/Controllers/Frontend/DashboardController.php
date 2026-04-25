@@ -87,15 +87,20 @@ class DashboardController extends Controller
             ->get();
 
         $walletBalance      = WalletTransaction::balanceFor($user->id);
-        $hasPendingRequest  = WithdrawalRequest::where('user_id', $user->id)->where('status', 'pending')->exists();
-        $withdrawalRequests = WithdrawalRequest::where('user_id', $user->id)->orderByDesc('created_at')->limit(10)->get();
-        $totalRequested     = (float) WithdrawalRequest::where('user_id', $user->id)->sum('amount');
+        $totalAdded         = (float) WalletTransaction::where('user_id', $user->id)->where('type', 'credit')->where('status', 'approved')->sum('amount');
+        $totalRemoved       = (float) WalletTransaction::where('user_id', $user->id)->where('type', 'debit')->where('status', 'approved')->sum('amount');
+        $hasPendingRequest  = WithdrawalRequest::where('user_id', $user->id)->where('status', 'pending')->where('request_type', 'withdrawal')->exists();
+        $withdrawalRequests = WithdrawalRequest::where('user_id', $user->id)->where('request_type', 'withdrawal')->orderByDesc('created_at')->limit(20)->get();
+        $totalRequested     = (float) WithdrawalRequest::where('user_id', $user->id)->where('request_type', 'withdrawal')->sum('amount');
+        $walletTransactions = WalletTransaction::with('creator:id,name')->where('user_id', $user->id)->where('status', 'approved')->orderByDesc('created_at')->limit(15)->get();
         $referralsCount     = $referrals->count();
 
         return view('frontend.dashboard', compact(
             'user', 'upline', 'referrals', 'referralLink', 'commissionTotals',
             'recentCommissions', 'baseByReferral', 'commByReferral',
-            'walletBalance', 'hasPendingRequest', 'withdrawalRequests', 'totalRequested', 'referralsCount'
+            'walletBalance', 'totalAdded', 'totalRemoved',
+            'hasPendingRequest', 'withdrawalRequests', 'totalRequested',
+            'walletTransactions', 'referralsCount'
         ));
     }
 

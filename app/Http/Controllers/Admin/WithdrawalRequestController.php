@@ -39,24 +39,41 @@ class WithdrawalRequestController extends Controller
         ));
     }
 
+    public function show(WithdrawalRequest $withdrawalRequest)
+    {
+        $withdrawalRequest->load('user', 'reviewer');
+        return view('admin.hierarchy.withdrawal-requests.show', compact('withdrawalRequest'));
+    }
+
+    public function edit(WithdrawalRequest $withdrawalRequest)
+    {
+        $withdrawalRequest->load('user', 'reviewer');
+        return view('admin.hierarchy.withdrawal-requests.edit', compact('withdrawalRequest'));
+    }
+
     public function approve(WithdrawalRequest $withdrawalRequest)
     {
         if ($withdrawalRequest->status !== 'pending') {
             return redirect()->back()->with('error', 'Only pending requests can be approved.');
         }
 
-        $walletBalance = WalletTransaction::balanceFor($withdrawalRequest->user_id);
-        if ($withdrawalRequest->amount > $walletBalance + 0.001) {
-            return redirect()->back()->with('error', 'Insufficient wallet balance for this request.');
+        $isCredit = ($withdrawalRequest->request_type ?? 'withdrawal') === 'credit';
+
+        if (!$isCredit) {
+            $walletBalance = WalletTransaction::balanceFor($withdrawalRequest->user_id);
+            if ($withdrawalRequest->amount > $walletBalance + 0.001) {
+                return redirect()->back()->with('error', 'Insufficient wallet balance for this request.');
+            }
         }
 
-        DB::transaction(function () use ($withdrawalRequest) {
+        DB::transaction(function () use ($withdrawalRequest, $isCredit) {
             WalletTransaction::create([
                 'user_id'    => $withdrawalRequest->user_id,
-                'type'       => 'debit',
+                'type'       => $isCredit ? 'credit' : 'debit',
                 'amount'     => $withdrawalRequest->amount,
-                'remark'     => 'Withdrawal approved by admin',
+                'remark'     => $isCredit ? 'Credit request approved by admin' : 'Withdrawal approved by admin',
                 'created_by' => auth()->id(),
+                'status'     => 'approved',
             ]);
 
             $withdrawalRequest->update([
@@ -66,7 +83,11 @@ class WithdrawalRequestController extends Controller
             ]);
         });
 
-        return redirect()->back()->with('success', '₹' . number_format($withdrawalRequest->amount, 2) . ' withdrawal approved and wallet debited.');
+        $msg = $isCredit
+            ? '₹' . number_format($withdrawalRequest->amount, 2) . ' credited to wallet.'
+            : '₹' . number_format($withdrawalRequest->amount, 2) . ' withdrawal approved and wallet debited.';
+
+        return redirect()->back()->with('success', $msg);
     }
 
     public function reject(Request $request, WithdrawalRequest $withdrawalRequest)

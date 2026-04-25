@@ -50,20 +50,41 @@ class DashboardController extends Controller
         abort_unless(in_array($user->role, ['affiliate', 'rm', 'manager'], true), 403);
 
         $validated = $request->validate([
-            'direction' => 'required|in:credit,debit',
+            'direction' => 'required|in:credit,debit,withdrawal',
             'amount'    => 'required|numeric|min:1',
             'remark'    => 'nullable|string|max:500',
         ]);
 
+        $amount = (float) $validated['amount'];
+
+        if ($validated['direction'] === 'withdrawal') {
+            // Withdrawal → pending request, needs admin approval
+            WithdrawalRequest::create([
+                'user_id'      => $user->id,
+                'amount'       => $amount,
+                'notes'        => $validated['remark'] ?? null,
+                'request_type' => 'withdrawal',
+                'status'       => 'pending',
+            ]);
+
+            return redirect()->route('user.dashboard', ['tab' => 'wallet'])
+                ->with('success', 'Withdrawal request of ₹' . number_format($amount, 2) . ' submitted. Awaiting admin approval.');
+        }
+
+        // Add (Credit) or Remove (Debit) → immediate approved wallet transaction
         WalletTransaction::create([
             'user_id'    => $user->id,
-            'type'       => $validated['direction'],
-            'amount'     => $validated['amount'],
+            'type'       => $validated['direction'], // 'credit' or 'debit'
+            'amount'     => $amount,
             'remark'     => $validated['remark'] ?? null,
             'created_by' => $user->id,
-            'status'     => 'pending',
+            'status'     => 'approved',
         ]);
 
-        return redirect()->back()->with('success', 'Wallet request for ₹' . number_format($validated['amount'], 2) . ' submitted. Awaiting admin approval.');
+        $msg = $validated['direction'] === 'credit'
+            ? '₹' . number_format($amount, 2) . ' added to your wallet.'
+            : '₹' . number_format($amount, 2) . ' removed from your wallet.';
+
+        return redirect()->route('user.dashboard', ['tab' => 'wallet'])->with('success', $msg);
     }
 }

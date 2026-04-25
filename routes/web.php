@@ -309,6 +309,8 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
 
     // Withdrawal Requests (user-initiated)
     Route::get('/withdrawal-requests', [\App\Http\Controllers\Admin\WithdrawalRequestController::class, 'index'])->name('withdrawal-requests.index');
+    Route::get('/withdrawal-requests/{withdrawalRequest}', [\App\Http\Controllers\Admin\WithdrawalRequestController::class, 'show'])->name('withdrawal-requests.show');
+    Route::get('/withdrawal-requests/{withdrawalRequest}/edit', [\App\Http\Controllers\Admin\WithdrawalRequestController::class, 'edit'])->name('withdrawal-requests.edit');
     Route::post('/withdrawal-requests/{withdrawalRequest}/approve', [\App\Http\Controllers\Admin\WithdrawalRequestController::class, 'approve'])->name('withdrawal-requests.approve');
     Route::post('/withdrawal-requests/{withdrawalRequest}/reject', [\App\Http\Controllers\Admin\WithdrawalRequestController::class, 'reject'])->name('withdrawal-requests.reject');
 

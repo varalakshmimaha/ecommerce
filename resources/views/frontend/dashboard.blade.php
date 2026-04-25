@@ -47,6 +47,16 @@
                         My Queries
                     </span>
                 </button>
+                @if(in_array($user->role ?? '', ['affiliate','rm','manager']))
+                <button onclick="switchTab('wallet')" id="tab-wallet" class="tab-btn px-6 py-3 rounded-lg font-semibold transition-all duration-300 text-text-muted hover:text-brand-gold hover:bg-gray-50">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        Wallet
+                    </span>
+                </button>
+                @endif
                 <button onclick="switchTab('referrals')" id="tab-referrals" class="tab-btn px-6 py-3 rounded-lg font-semibold transition-all duration-300 text-text-muted hover:text-brand-gold hover:bg-gray-50">
                     <span class="flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -322,6 +332,176 @@
             </div>
         </div>
 
+        <!-- Wallet Tab -->
+        @if(in_array($user->role ?? '', ['affiliate','rm','manager']))
+        <div id="content-wallet" class="tab-content hidden">
+            <div class="space-y-6">
+
+                {{-- Wallet KPI Cards – single horizontal row --}}
+                <div style="display:flex;gap:1rem;">
+                    <div style="flex:1;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:1rem;padding:1.25rem;display:flex;align-items:center;gap:1rem;box-shadow:0 1px 3px rgba(0,0,0,.06);">
+                        <div style="width:48px;height:48px;border-radius:.75rem;background:#dcfce7;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <svg style="width:24px;height:24px;color:#16a34a;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                        </div>
+                        <div>
+                            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#15803d;margin-bottom:4px;">Total Added</div>
+                            <div style="font-size:1.5rem;font-weight:800;color:#16a34a;font-variant-numeric:tabular-nums;">&#8377;{{ number_format($totalAdded, 2) }}</div>
+                        </div>
+                    </div>
+                    <div style="flex:1;background:#fff1f2;border:1px solid #fecdd3;border-radius:1rem;padding:1.25rem;display:flex;align-items:center;gap:1rem;box-shadow:0 1px 3px rgba(0,0,0,.06);">
+                        <div style="width:48px;height:48px;border-radius:.75rem;background:#fee2e2;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <svg style="width:24px;height:24px;color:#dc2626;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+                        </div>
+                        <div>
+                            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#b91c1c;margin-bottom:4px;">Total Removed</div>
+                            <div style="font-size:1.5rem;font-weight:800;color:#dc2626;font-variant-numeric:tabular-nums;">&#8377;{{ number_format($totalRemoved, 2) }}</div>
+                        </div>
+                    </div>
+                    <div style="flex:1;background:#eff6ff;border:1px solid #bfdbfe;border-radius:1rem;padding:1.25rem;display:flex;align-items:center;gap:1rem;box-shadow:0 1px 3px rgba(0,0,0,.06);">
+                        <div style="width:48px;height:48px;border-radius:.75rem;background:#dbeafe;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <svg style="width:24px;height:24px;color:#2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        </div>
+                        <div>
+                            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#1d4ed8;margin-bottom:4px;">Wallet Balance</div>
+                            <div style="font-size:1.5rem;font-weight:800;color:#2563eb;font-variant-numeric:tabular-nums;">&#8377;{{ number_format($walletBalance, 2) }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Wallet Transaction Form --}}
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <h3 class="font-bold text-text-heading flex items-center gap-2 mb-5">
+                        <svg class="w-4 h-4 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                        Wallet Transaction
+                    </h3>
+                    <form method="POST" action="{{ route('affiliate.wallet-request.store') }}" style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px;">
+                        @csrf
+                        {{-- Type --}}
+                        <div style="display:flex;flex-direction:column;gap:6px;">
+                            <label style="font-size:12px;font-weight:600;color:#6b7280;">Type *</label>
+                            <select name="direction" style="min-width:180px;height:42px;padding:0 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;background:#fff;color:#111827;cursor:pointer;">
+                                <option value="credit">+ Add (Credit)</option>
+                                <option value="debit">− Remove (Debit)</option>
+                                <option value="withdrawal">⇩ Request Withdrawal</option>
+                            </select>
+                        </div>
+                        {{-- Amount --}}
+                        <div style="display:flex;flex-direction:column;gap:6px;">
+                            <label style="font-size:12px;font-weight:600;color:#6b7280;">Amount (&#8377;) *</label>
+                            <input type="number" name="amount" min="1" step="0.01" required placeholder="0.00"
+                                   style="width:160px;height:42px;padding:0 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;box-sizing:border-box;">
+                        </div>
+                        {{-- Remark --}}
+                        <div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:6px;">
+                            <label style="font-size:12px;font-weight:600;color:#6b7280;">Remark</label>
+                            <input type="text" name="remark" placeholder="Reason for this transaction (optional)" maxlength="500"
+                                   style="width:100%;height:42px;padding:0 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;box-sizing:border-box;">
+                        </div>
+                        {{-- Submit --}}
+                        <button type="submit"
+                                style="height:42px;padding:0 28px;border-radius:8px;font-weight:700;font-size:14px;color:#fff;border:none;cursor:pointer;white-space:nowrap;background:linear-gradient(135deg,#f59e0b,#dc2626);">
+                            Apply
+                        </button>
+                    </form>
+                </div>
+
+                {{-- Transaction History --}}
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                        <h3 class="font-bold text-text-heading flex items-center gap-2">
+                            <svg class="w-4 h-4 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                            Transaction History
+                        </h3>
+                        <span class="text-xs font-semibold text-text-muted bg-gray-100 px-3 py-1 rounded-full">{{ $walletTransactions->count() + $withdrawalRequests->count() }} transaction(s)</span>
+                    </div>
+
+                    @php
+                        $hasAnyHistory = $walletTransactions->count() || $withdrawalRequests->count();
+                    @endphp
+                    @if($hasAnyHistory)
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead style="background:#f9fafb;border-bottom:1px solid #f3f4f6;">
+                                <tr style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#9ca3af;">
+                                    <th style="text-align:left;padding:12px 20px;">Type</th>
+                                    <th style="text-align:right;padding:12px 20px;">Amount</th>
+                                    <th style="text-align:left;padding:12px 20px;">Status</th>
+                                    <th style="text-align:left;padding:12px 20px;">Remark</th>
+                                    <th style="text-align:left;padding:12px 20px;">By</th>
+                                    <th style="text-align:right;padding:12px 20px;">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{-- Admin-applied wallet transactions (approved) --}}
+                                @foreach($walletTransactions as $tx)
+                                    <tr style="border-bottom:1px solid #f3f4f6;">
+                                        <td style="padding:14px 20px;">
+                                            @if($tx->type === 'credit')
+                                                <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:#dcfce7;color:#15803d;">
+                                                    ↑ CREDIT
+                                                </span>
+                                            @else
+                                                <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:#fee2e2;color:#dc2626;">
+                                                    ↓ DEBIT
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td style="padding:14px 20px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums;color:{{ $tx->type === 'credit' ? '#16a34a' : '#dc2626' }};">
+                                            {{ $tx->type === 'credit' ? '+' : '-' }}&#8377;{{ number_format($tx->amount, 2) }}
+                                        </td>
+                                        <td style="padding:14px 20px;">
+                                            <span style="padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700;background:#dcfce7;color:#15803d;">APPROVED</span>
+                                        </td>
+                                        <td style="padding:14px 20px;color:#6b7280;">{{ $tx->remark ?: '—' }}</td>
+                                        <td style="padding:14px 20px;color:#6b7280;">{{ $tx->creator?->name ?? 'Admin' }}</td>
+                                        <td style="padding:14px 20px;text-align:right;color:#9ca3af;white-space:nowrap;">{{ $tx->created_at?->format('d M Y, h:i A') }}</td>
+                                    </tr>
+                                @endforeach
+                                {{-- Withdrawal requests (pending admin approval) --}}
+                                @foreach($withdrawalRequests as $req)
+                                    @php
+                                        $statusBg    = match($req->status) {
+                                            'approved' => '#dcfce7', 'rejected' => '#fee2e2', default => '#fef9c3',
+                                        };
+                                        $statusColor = match($req->status) {
+                                            'approved' => '#15803d', 'rejected' => '#dc2626', default => '#854d0e',
+                                        };
+                                    @endphp
+                                    <tr style="border-bottom:1px solid #f3f4f6;background:#fafafa;">
+                                        <td style="padding:14px 20px;">
+                                            <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:#eff6ff;color:#1d4ed8;">
+                                                ⇩ WITHDRAWAL REQUEST
+                                            </span>
+                                        </td>
+                                        <td style="padding:14px 20px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums;color:#374151;">
+                                            &#8377;{{ number_format($req->amount, 2) }}
+                                        </td>
+                                        <td style="padding:14px 20px;">
+                                            <span style="padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700;background:{{ $statusBg }};color:{{ $statusColor }};">{{ strtoupper($req->status) }}</span>
+                                        </td>
+                                        <td style="padding:14px 20px;color:#6b7280;">{{ $req->notes ?: '—' }}</td>
+                                        <td style="padding:14px 20px;color:#6b7280;">You</td>
+                                        <td style="padding:14px 20px;text-align:right;color:#9ca3af;white-space:nowrap;">{{ $req->created_at?->format('d M Y, h:i A') }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    @else
+                    <div class="text-center py-14">
+                        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        </div>
+                        <p class="text-sm font-semibold text-gray-500">No wallet transactions yet.</p>
+                        <p class="text-xs text-gray-400 mt-1">Transactions added by admin will appear here.</p>
+                    </div>
+                    @endif
+                </div>
+
+            </div>
+        </div>
+        @endif
+
         <!-- Referrals & Earnings Tab -->
         <div id="content-referrals" class="tab-content hidden">
             <div class="space-y-6">
@@ -344,7 +524,7 @@
                 @endif
 
                 @if(in_array($user->role, ['affiliate','rm','manager']))
-                    {{-- Earnings KPI strip --}}
+                    {{-- Commission KPI strip --}}
                     <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
                         <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden flex-1" style="min-width:140px;">
                             <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#ea580c;"></div>
@@ -352,7 +532,7 @@
                                 <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background:#ffedd5;">
                                     <svg class="w-4 h-4" style="color:#c2410c;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
                                 </div>
-                                <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#9a3412;">Lifetime</div>
+                                <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#9a3412;">Lifetime Earnings</div>
                             </div>
                             <div class="text-xl font-bold text-text-heading tabular-nums">&#8377;{{ number_format($commissionTotals['lifetime'], 2) }}</div>
                         </div>
@@ -362,19 +542,9 @@
                                 <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background:#d1fae5;">
                                     <svg class="w-4 h-4" style="color:#059669;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                                 </div>
-                                <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#047857;">Wallet Balance</div>
+                                <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#047857;">Total Wallet</div>
                             </div>
                             <div class="text-xl font-bold tabular-nums" style="color:#059669;">&#8377;{{ number_format($walletBalance, 2) }}</div>
-                        </div>
-                        <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden flex-1" style="min-width:140px;">
-                            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#f59e0b;"></div>
-                            <div class="flex items-center gap-2 mb-2">
-                                <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background:#fef3c7;">
-                                    <svg class="w-4 h-4" style="color:#d97706;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                                </div>
-                                <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#b45309;">Total Requested</div>
-                            </div>
-                            <div class="text-xl font-bold tabular-nums" style="color:#d97706;">&#8377;{{ number_format($totalRequested, 2) }}</div>
                         </div>
                         <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden flex-1" style="min-width:140px;">
                             <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#8b5cf6;"></div>
@@ -388,88 +558,11 @@
                         </div>
                     </div>
 
-                    {{-- Wallet Withdrawal Request --}}
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-                        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-                            <h3 class="font-semibold text-text-heading flex items-center gap-2">
-                                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                                Request Wallet Withdrawal
-                            </h3>
-                            @if($hasPendingRequest)
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                    Request Pending
-                                </span>
-                            @endif
-                        </div>
-
-                        @if($hasPendingRequest)
-                            <p class="text-sm text-text-muted">Your pending request is being reviewed. You can submit a new request once it is processed.</p>
-                        @else
-                            <form method="POST" action="{{ route('affiliate.withdrawal-request.store') }}" class="flex flex-wrap gap-3 items-end">
-                                @csrf
-                                <div>
-                                    <label class="block text-xs font-medium text-text-muted mb-1">Amount (₹) *</label>
-                                    <input type="number" name="amount" min="1" step="0.01" required
-                                           placeholder="0.00"
-                                           class="px-3 py-2 border border-gray-200 rounded-lg text-sm w-36 tabular-nums focus:outline-none focus:ring-2 focus:ring-green-400">
-                                    <div class="text-[10px] text-text-muted mt-1">Available: &#8377;{{ number_format($walletBalance, 2) }}</div>
-                                </div>
-                                <div class="flex-1 min-w-[180px]">
-                                    <label class="block text-xs font-medium text-text-muted mb-1">Note (optional)</label>
-                                    <input type="text" name="notes" placeholder="Any note for admin" maxlength="500"
-                                           class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-400">
-                                </div>
-                                <button type="submit" style="background-color:#16a34a;color:#ffffff;"
-                                        class="px-5 py-2 rounded-lg font-semibold text-sm whitespace-nowrap hover:opacity-90">
-                                    Request Withdrawal
-                                </button>
-                            </form>
-                        @endif
-
-                        @if($withdrawalRequests->count())
-                            <div class="mt-5 pt-4 border-t border-gray-100">
-                                <div class="text-xs font-semibold text-text-muted uppercase tracking-wide mb-3">My Withdrawal Requests</div>
-                                <div class="overflow-x-auto">
-                                    <table class="w-full text-sm">
-                                        <thead class="text-text-muted text-[10px] uppercase tracking-wider">
-                                            <tr>
-                                                <th class="text-left pb-2">Date</th>
-                                                <th class="text-right pb-2">Amount</th>
-                                                <th class="text-left pb-2 pl-4">Status</th>
-                                                <th class="text-left pb-2 pl-4">Note / Reason</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="divide-y divide-gray-50">
-                                            @foreach($withdrawalRequests as $wr)
-                                                @php $wrBadge = ['pending'=>'bg-amber-100 text-amber-700','approved'=>'bg-green-100 text-green-700','rejected'=>'bg-red-100 text-red-700'][$wr->status] ?? 'bg-gray-100 text-gray-600'; @endphp
-                                                <tr>
-                                                    <td class="py-2 text-xs text-text-muted whitespace-nowrap">{{ $wr->created_at?->format('d M Y') }}</td>
-                                                    <td class="py-2 text-right tabular-nums font-semibold">&#8377;{{ number_format($wr->amount, 2) }}</td>
-                                                    <td class="py-2 pl-4"><span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase {{ $wrBadge }}">{{ $wr->status }}</span></td>
-                                                    <td class="py-2 pl-4 text-xs text-text-muted">
-                                                        @if($wr->status === 'rejected' && $wr->rejection_reason)
-                                                            <span class="text-red-600">{{ $wr->rejection_reason }}</span>
-                                                        @else
-                                                            {{ $wr->notes ?: '—' }}
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-
                     @php
                         $myRate = ['affiliate' => 5, 'rm' => 3, 'manager' => 2][$user->role] ?? 0;
-                        $referralsWithActivity = $referrals->filter(fn($r) => ($r->orders_count ?? 0) > 0 || ($baseByReferral[$r->id] ?? 0) > 0);
                     @endphp
 
                     {{-- My Referrals --}}
-                    @if($referralsWithActivity->count())
                     <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
                         <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between flex-wrap gap-3">
                             <div class="flex items-center gap-3">
@@ -481,7 +574,9 @@
                                     <p class="text-xs text-text-muted">Direct referrals earning you {{ $myRate }}% commission</p>
                                 </div>
                             </div>
+                            <span class="text-xs font-semibold text-text-muted bg-gray-100 px-3 py-1 rounded-full">{{ $referrals->count() }} referral(s)</span>
                         </div>
+                        @if($referrals->count())
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm">
                                 <thead class="bg-gray-50 text-text-muted text-xs uppercase tracking-wider">
@@ -492,7 +587,7 @@
                                         <th class="text-right px-5 py-3 font-semibold">Base</th>
                                         <th class="text-right px-5 py-3 font-semibold">Rate</th>
                                         <th class="text-right px-5 py-3 font-semibold">Orders</th>
-                                        <th class="text-right px-5 py-3 font-semibold">Amount</th>
+                                        <th class="text-right px-5 py-3 font-semibold">My Earnings</th>
                                         <th class="text-center px-5 py-3 font-semibold">Actions</th>
                                     </tr>
                                 </thead>
@@ -515,7 +610,7 @@
                                                 </div>
                                             </td>
                                             <td class="px-5 py-3 text-text-muted text-xs">{{ $r->created_at?->format('d M Y') }}</td>
-                                            <td class="px-5 py-3 uppercase text-xs font-semibold">{{ $r->role }}</td>
+                                            <td class="px-5 py-3"><span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-gray-100 text-gray-600">{{ $r->role }}</span></td>
                                             <td class="px-5 py-3 text-right tabular-nums {{ $base > 0 ? 'text-text-heading' : 'text-gray-400' }}">&#8377;{{ number_format($base, 2) }}</td>
                                             <td class="px-5 py-3 text-right tabular-nums text-xs text-text-muted">{{ $myRate }}%</td>
                                             <td class="px-5 py-3 text-right tabular-nums">{{ $ordCount }}</td>
@@ -531,8 +626,16 @@
                                 </tbody>
                             </table>
                         </div>
+                        @else
+                        <div class="text-center py-12">
+                            <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-gray-100 flex items-center justify-center">
+                                <svg class="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                            </div>
+                            <p class="text-sm font-semibold text-text-muted">No referrals yet.</p>
+                            <p class="text-xs text-text-muted mt-1 opacity-60">Share your referral link to start earning commission.</p>
+                        </div>
+                        @endif
                     </div>
-                    @endif
 
                 @else
                     {{-- "Referred by" note + Become an Affiliate CTA for customers --}}
@@ -586,7 +689,12 @@
 <script>
     // Main script for dashboard functionality
     document.addEventListener('DOMContentLoaded', function() {
-        // Load addresses when the page loads if the address tab content exists
+        // Auto-switch to tab from URL query param (e.g. ?tab=wallet)
+        const urlTab = new URLSearchParams(window.location.search).get('tab');
+        if (urlTab && document.getElementById('content-' + urlTab)) {
+            switchTab(urlTab);
+        }
+
         if (document.getElementById('content-addresses')) {
             loadAddresses();
         }

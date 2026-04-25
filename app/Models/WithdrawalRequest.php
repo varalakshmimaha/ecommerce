@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class WithdrawalRequest extends Model
 {
     protected $fillable = [
-        'user_id', 'amount', 'notes', 'status',
+        'user_id', 'amount', 'notes', 'request_type', 'status',
         'rejection_reason', 'reviewed_by', 'reviewed_at',
     ];
 

@@ -67,7 +67,8 @@
                         <tr>
                             <th class="text-left px-4 py-3 font-semibold">Member</th>
                             <th class="text-left px-4 py-3 font-semibold">Role</th>
-                            <th class="text-right px-4 py-3 font-semibold">Requested</th>
+                            <th class="text-left px-4 py-3 font-semibold">Type</th>
+                            <th class="text-right px-4 py-3 font-semibold">Amount</th>
                             <th class="text-left px-4 py-3 font-semibold">Note</th>
                             <th class="text-left px-4 py-3 font-semibold">Date</th>
                             <th class="text-left px-4 py-3 font-semibold">Action</th>
@@ -75,6 +76,14 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @foreach($pending as $req)
+                            @php
+                                $isCredit = ($req->request_type ?? 'withdrawal') === 'credit';
+                                $typeLabel = match($req->request_type ?? 'withdrawal') {
+                                    'credit'     => 'Credit Request',
+                                    'debit'      => 'Debit Request',
+                                    default      => 'Withdrawal',
+                                };
+                            @endphp
                             <tr class="hover:bg-gray-50/80">
                                 <td class="px-4 py-3">
                                     <div class="font-semibold text-text-heading">{{ optional($req->user)->name ?? 'User #'.$req->user_id }}</div>
@@ -83,33 +92,35 @@
                                 <td class="px-4 py-3">
                                     <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-gray-100 text-gray-600">{{ optional($req->user)->role ?? '—' }}</span>
                                 </td>
-                                <td class="px-4 py-3 text-right tabular-nums font-bold text-amber-700">&#8377;{{ number_format($req->amount, 2) }}</td>
+                                <td class="px-4 py-3">
+                                    @if($req->request_type === 'credit')
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700 uppercase">↑ Credit Request</span>
+                                    @elseif($req->request_type === 'debit')
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-100 text-orange-700 uppercase">↓ Debit Request</span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700 uppercase">↓ Withdrawal</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 text-right tabular-nums font-bold {{ $isCredit ? 'text-green-700' : 'text-amber-700' }}">&#8377;{{ number_format($req->amount, 2) }}</td>
                                 <td class="px-4 py-3 text-xs text-text-muted">{{ $req->notes ?: '—' }}</td>
                                 <td class="px-4 py-3 text-xs text-text-muted whitespace-nowrap">{{ $req->created_at?->format('d M Y, h:i A') }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <div class="flex items-center gap-2">
-                                        <form method="POST" action="{{ route('admin.withdrawal-requests.approve', $req) }}" class="inline"
-                                              onsubmit="return confirm('Approve ₹{{ number_format($req->amount, 2) }} withdrawal for {{ optional($req->user)->name }}?')">
-                                            @csrf
-                                            <button type="submit" style="background-color:#16a34a;color:#ffffff;" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold hover:opacity-90">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                                Approve
-                                            </button>
-                                        </form>
-                                        <button type="button"
-                                            onclick="document.getElementById('reject-form-{{ $req->id }}').classList.toggle('hidden')"
+                                        <a href="{{ route('admin.withdrawal-requests.show', $req) }}"
+                                            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold border border-blue-200 text-blue-600 hover:bg-blue-50">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                            View
+                                        </a>
+                                        <a href="{{ route('admin.withdrawal-requests.edit', $req) }}"
+                                            class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold border border-amber-200 text-amber-700 hover:bg-amber-50">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                            Edit
+                                        </a>
+                                        <a href="{{ route('admin.withdrawal-requests.edit', $req) }}#reject"
                                             class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold border border-red-200 text-red-600 hover:bg-red-50">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
                                             Reject
-                                        </button>
-                                    </div>
-                                    <div id="reject-form-{{ $req->id }}" class="hidden mt-2">
-                                        <form method="POST" action="{{ route('admin.withdrawal-requests.reject', $req) }}" class="flex gap-2 items-start">
-                                            @csrf
-                                            <input type="text" name="rejection_reason" placeholder="Reason (optional)" maxlength="500"
-                                                   class="px-2 py-1.5 border border-ui-border rounded-lg text-xs flex-1 min-w-[180px]">
-                                            <button type="submit" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-red-600 text-white hover:bg-red-700 whitespace-nowrap">Confirm</button>
-                                        </form>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
@@ -118,7 +129,7 @@
                 </table>
             </div>
         @else
-            <div class="px-5 py-10 text-center text-sm text-text-muted">No pending withdrawal requests.</div>
+            <div class="px-5 py-10 text-center text-sm text-text-muted">No pending requests.</div>
         @endif
     </div>
 
@@ -156,6 +167,7 @@
                             <th class="text-left px-4 py-3 font-semibold">Date</th>
                             <th class="text-left px-4 py-3 font-semibold">Member</th>
                             <th class="text-left px-4 py-3 font-semibold">Role</th>
+                            <th class="text-left px-4 py-3 font-semibold">Type</th>
                             <th class="text-right px-4 py-3 font-semibold">Amount</th>
                             <th class="text-left px-4 py-3 font-semibold">Status</th>
                             <th class="text-left px-4 py-3 font-semibold">Note / Reason</th>
@@ -165,6 +177,7 @@
                     <tbody class="divide-y divide-gray-100">
                         @foreach($requests as $req)
                             @php
+                                $isCredit = ($req->request_type ?? 'withdrawal') === 'credit';
                                 $badge = [
                                     'pending'  => 'bg-amber-100 text-amber-700',
                                     'approved' => 'bg-green-100 text-green-700',
@@ -178,7 +191,14 @@
                                     <div class="text-xs text-text-muted">{{ optional($req->user)->mobile }}</div>
                                 </td>
                                 <td class="px-4 py-3 uppercase text-xs font-semibold text-text-muted">{{ optional($req->user)->role ?? '—' }}</td>
-                                <td class="px-4 py-3 text-right tabular-nums font-bold {{ $req->status === 'approved' ? 'text-green-700' : 'text-text-heading' }}">&#8377;{{ number_format($req->amount, 2) }}</td>
+                                <td class="px-4 py-3">
+                                    @if($isCredit)
+                                        <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700 uppercase">Credit</span>
+                                    @else
+                                        <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700 uppercase">Withdrawal</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 text-right tabular-nums font-bold {{ $req->status === 'approved' ? ($isCredit ? 'text-green-700' : 'text-red-600') : 'text-text-heading' }}">&#8377;{{ number_format($req->amount, 2) }}</td>
                                 <td class="px-4 py-3">
                                     <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase {{ $badge }}">{{ $req->status }}</span>
                                 </td>
