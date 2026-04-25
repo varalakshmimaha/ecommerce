@@ -52,6 +52,19 @@
         <aside class="bg-gradient-to-b from-surface-main to-surface-alt border-r border-ui-border shadow-lg w-full md:w-64 md:flex-shrink-0 overflow-y-auto hidden md:flex md:flex-col" id="adminSidebar">
             <div class="p-6 flex-1">
                 <h1 class="text-2xl font-bold bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson bg-clip-text text-transparent mb-8">{{ \App\Models\Setting::get('company_name', 'Suwish') }} Admin</h1>
+                @php
+                    $sidebarUser = auth()->user();
+                    $sidebarPerms = is_array($sidebarUser->permissions) ? $sidebarUser->permissions : [];
+                    $managerPerms = ['orders','managers','rms','affiliates','commissions','withdrawal_requests'];
+                    $rmPerms      = ['orders','rms','affiliates','commissions','withdrawal_requests'];
+                    $canSee = function(string $perm) use ($sidebarUser, $sidebarPerms, $managerPerms, $rmPerms): bool {
+                        if ($sidebarUser->is_admin) return true;
+                        if (!empty($sidebarPerms)) return in_array($perm, $sidebarPerms);
+                        if ($sidebarUser->role === 'manager') return in_array($perm, $managerPerms);
+                        if ($sidebarUser->role === 'rm') return in_array($perm, $rmPerms);
+                        return false;
+                    };
+                @endphp
                 <nav class="space-y-2">
                     <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.dashboard') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,42 +72,60 @@
                         </svg>
                         Dashboard
                     </a>
+
+                    @if($canSee('products'))
                     <a href="{{ route('admin.products.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.products.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                         </svg>
                         Products
                     </a>
+                    @endif
+
+                    @if($canSee('orders'))
                     <a href="{{ route('admin.orders.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.orders.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                         </svg>
                         Orders
                     </a>
+                    @endif
+
+                    @if($canSee('customers'))
                     <a href="{{ route('admin.customers.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.customers.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                         </svg>
                         Customers
                     </a>
+                    @endif
+
+                    @if($canSee('categories'))
                     <a href="{{ route('admin.categories.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.categories.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                         </svg>
                         Categories
                     </a>
+                    @endif
+
+                    @if($canSee('banners'))
                     <a href="{{ route('admin.banners.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.banners.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
                         Banners
                     </a>
+                    @endif
+                    @if($canSee('brands'))
                     <a href="{{ route('admin.brands.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.brands.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                         </svg>
                         Brands
                     </a>
+                    @endif
+                    @if($canSee('product_attributes'))
                     <a href="{{ route('admin.product-attributes.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.product-attributes.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -107,18 +138,24 @@
                         </svg>
                         Attribute Values
                     </a>
+                    @endif
+                    @if($canSee('pages'))
                     <a href="{{ route('admin.pages.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.pages.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
                         Pages
                     </a>
+                    @endif
+                    @if($canSee('reports'))
                     <a href="{{ route('admin.reports.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.reports.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
                         Reports
                     </a>
+                    @endif
+                    @if($canSee('settings'))
                     <a href="{{ route('admin.settings.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.settings.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
@@ -126,63 +163,101 @@
                         </svg>
                         Settings
                     </a>
+                    @endif
+                    @if($canSee('theme_colors'))
                     <a href="{{ route('admin.theme-colors.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.theme-colors.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
                         </svg>
                         Theme Colors
                     </a>
+                    @endif
+                    @if($canSee('payment_methods'))
                     <a href="{{ route('admin.payment.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.payment.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                         </svg>
                         Payment Methods
                     </a>
+                    @endif
+                    @if($canSee('shipping'))
                     <a href="{{ route('admin.shipping.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.shipping.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7h18M3 12h18M3 17h18"></path>
                         </svg>
                         Shipping
                     </a>
+                    @endif
+                    @if($canSee('queries'))
                     <a href="{{ route('admin.queries.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.queries.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         Queries
                     </a>
+                    @endif
 
                     <div class="pt-4 mt-4 border-t border-gray-100">
                         <div class="px-4 pb-2 text-xs font-semibold uppercase tracking-wider text-text-muted">User Hierarchy</div>
+
+                        @if($sidebarUser->is_admin || ($canSee('managers') && $sidebarUser->role !== 'manager'))
                         <a href="{{ route('admin.managers.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.managers.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
                             </svg>
                             Managers
                         </a>
+                        @elseif($sidebarUser->role === 'manager')
+                        <a href="{{ route('admin.managers.show', $sidebarUser) }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.managers.show') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                            My Profile
+                        </a>
+                        @endif
+
+                        @if($sidebarUser->is_admin || ($canSee('rms') && $sidebarUser->role !== 'rm' && $sidebarUser->role !== 'manager'))
                         <a href="{{ route('admin.rms.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.rms.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"/>
                             </svg>
                             Relationship Managers
                         </a>
+                        @elseif($sidebarUser->role === 'rm')
+                        <a href="{{ route('admin.rms.show', $sidebarUser) }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.rms.show') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                            My Profile
+                        </a>
+                        @endif
+
+                        @if($canSee('affiliates'))
                         <a href="{{ route('admin.affiliates.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.affiliates.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
                             </svg>
                             Affiliates
                         </a>
+                        @endif
+                        @if($canSee('commissions'))
                         <a href="{{ route('admin.commissions.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.commissions.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             Commissions
                         </a>
-                        <a href="{{ route('admin.withdrawals.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.withdrawals.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
+                        @endif
+                        @if($canSee('withdrawal_requests'))
+                        <a href="{{ route('admin.withdrawal-requests.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.withdrawal-requests.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
                             </svg>
-                            Withdrawals
+                            Withdrawal Requests
                         </a>
+                        @endif
+
+                        @if($canSee('commission_settings'))
                         <a href="{{ route('admin.commission-settings.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.commission-settings.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
@@ -190,10 +265,19 @@
                             </svg>
                             Commission Settings
                         </a>
+                        @endif
                     </div>
                 </nav>
             </div>
             <div class="p-6 border-t border-gray-100 flex-shrink-0">
+                @if($canSee('users'))
+                <a href="{{ route('admin.users.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 mb-2 {{ request()->routeIs('admin.users.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                    </svg>
+                    Users
+                </a>
+                @endif
                 <a href="{{ route('admin.profile.edit') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 mb-2 {{ request()->routeIs('admin.profile.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>

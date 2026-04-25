@@ -28,7 +28,9 @@ class AuthenticatedSessionController extends Controller
             ])->onlyInput('mobile');
         }
 
-        if (!$user->is_admin) {
+        $hasAdminAccess = $user->is_admin || in_array($user->role, ['manager', 'rm'], true);
+
+        if (!$hasAdminAccess) {
             return back()->withErrors([
                 'mobile' => 'You do not have access to the admin panel.',
             ])->onlyInput('mobile');
@@ -37,6 +39,16 @@ class AuthenticatedSessionController extends Controller
         Auth::login($user);
 
         $request->session()->regenerate();
+
+        // Redirect manager/rm to their own profile page
+        if (!$user->is_admin) {
+            if ($user->role === 'manager') {
+                return redirect()->route('admin.managers.show', $user);
+            }
+            if ($user->role === 'rm') {
+                return redirect()->route('admin.rms.show', $user);
+            }
+        }
 
         return redirect()->intended(route('admin.dashboard'));
     }

@@ -45,13 +45,13 @@ class ApplicationController extends Controller
             'ifsc' => ['required', 'string', 'size:11', 'regex:/^[A-Z]{4}0[A-Z0-9]{6}$/'],
             'upi_id' => ['nullable', 'string', 'max:100'],
             'pan_number' => ['required', 'string', 'size:10', 'regex:/^[A-Z]{5}[0-9]{4}[A-Z]$/'],
-            'aadhaar_last4' => ['required', 'digits:4'],
+            'aadhaar_number' => ['required', 'digits:12'],
             'kyc_doc' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
             'terms' => ['accepted'],
         ], [
             'ifsc.regex' => 'Enter a valid IFSC code (e.g. HDFC0001234).',
             'pan_number.regex' => 'Enter a valid PAN number (e.g. ABCDE1234F).',
-            'aadhaar_last4.digits' => 'Enter the last 4 digits of your Aadhaar.',
+            'aadhaar_number.digits' => 'Enter a valid 12-digit Aadhaar number.',
             'terms.accepted' => 'You must agree to the affiliate terms.',
         ]);
 
@@ -75,7 +75,7 @@ class ApplicationController extends Controller
             'ifsc' => strtoupper($validated['ifsc']),
             'upi_id' => $validated['upi_id'] ?? null,
             'pan_number' => strtoupper($validated['pan_number']),
-            'aadhaar_last4' => $validated['aadhaar_last4'],
+            'aadhaar_number' => $validated['aadhaar_number'],
             'kyc_verified' => false,
             'rejection_reason' => null,
         ]);

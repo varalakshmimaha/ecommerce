@@ -31,42 +31,41 @@
                         <tr>
                             <th class="text-left px-4 py-3">Name</th>
                             <th class="text-left px-4 py-3">Mobile</th>
-                            <th class="text-left px-4 py-3">Email</th>
                             <th class="text-right px-4 py-3">RMs</th>
                             <th class="text-right px-4 py-3">Affiliates</th>
-                            <th class="text-right px-4 py-3">Commissions</th>
-                            <th class="text-right px-4 py-3">Pending</th>
-                            <th class="text-right px-4 py-3">Approved</th>
-                            <th class="text-right px-4 py-3">Paid</th>
+                            <th class="text-right px-4 py-3">Manager Earnings</th>
+                            <th class="text-right px-4 py-3">RMs Earnings</th>
+                            <th class="text-right px-4 py-3">Affiliates Earnings</th>
                             <th class="text-left px-4 py-3">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @foreach($managers as $m)
                             @php
-                                $t = $commissionTotals[$m->id] ?? [];
-                                $pending  = $t['pending']  ?? 0;
-                                $approved = $t['approved'] ?? 0;
-                                $paid     = $t['paid']     ?? 0;
                                 $affCount = $affiliatesCounts[$m->id] ?? 0;
-                                $commCount = $commissionCounts[$m->id] ?? 0;
+                                $mgrTotals = $commissionTotals[$m->id] ?? [];
+                                $mgrLifetime = collect($mgrTotals)->filter(fn($v, $k) => $k !== 'reversed')->sum();
+                                $rmEarnings  = $rmEarningsByManager[$m->id] ?? 0;
+                                $affEarnings = $affEarningsByManager[$m->id] ?? 0;
                             @endphp
                             <tr class="hover:bg-gray-50/80 transition-colors">
                                 <td class="px-4 py-3 font-semibold">{{ $m->name ?? '—' }}</td>
-                                <td class="px-4 py-3">{{ $m->mobile }}</td>
-                                <td class="px-4 py-3 text-text-muted">{{ $m->email ?? '—' }}</td>
+                                <td class="px-4 py-3 text-text-muted">{{ $m->mobile }}</td>
                                 <td class="px-4 py-3 text-right">
                                     <span class="inline-flex items-center justify-center min-w-[2rem] px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold">{{ $m->rms_count }}</span>
                                 </td>
                                 <td class="px-4 py-3 text-right">
                                     <span class="inline-flex items-center justify-center min-w-[2rem] px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 text-xs font-bold">{{ $affCount }}</span>
                                 </td>
-                                <td class="px-4 py-3 text-right">
-                                    <span class="inline-flex items-center justify-center min-w-[2rem] px-2 py-0.5 rounded-full bg-gray-100 text-text-heading text-xs font-bold">{{ $commCount }}</span>
+                                <td class="px-4 py-3 text-right tabular-nums {{ $mgrLifetime > 0 ? 'text-brand-gold font-semibold' : 'text-gray-400' }}">
+                                    &#8377;{{ number_format($mgrLifetime, 2) }}
                                 </td>
-                                <td class="px-4 py-3 text-right tabular-nums {{ $pending > 0 ? 'text-amber-700 font-semibold' : 'text-gray-400' }}">&#8377;{{ number_format($pending, 0) }}</td>
-                                <td class="px-4 py-3 text-right tabular-nums {{ $approved > 0 ? 'text-blue-700 font-semibold' : 'text-gray-400' }}">&#8377;{{ number_format($approved, 0) }}</td>
-                                <td class="px-4 py-3 text-right tabular-nums {{ $paid > 0 ? 'text-green-700 font-semibold' : 'text-gray-400' }}">&#8377;{{ number_format($paid, 0) }}</td>
+                                <td class="px-4 py-3 text-right tabular-nums {{ $rmEarnings > 0 ? 'text-indigo-600 font-semibold' : 'text-gray-400' }}">
+                                    &#8377;{{ number_format($rmEarnings, 2) }}
+                                </td>
+                                <td class="px-4 py-3 text-right tabular-nums {{ $affEarnings > 0 ? 'text-purple-600 font-semibold' : 'text-gray-400' }}">
+                                    &#8377;{{ number_format($affEarnings, 2) }}
+                                </td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <a href="{{ route('admin.managers.show', $m) }}" class="text-emerald-600 hover:text-emerald-800 text-xs font-semibold">View</a>
                                     <a href="{{ route('admin.managers.edit', $m) }}" class="text-blue-600 hover:text-blue-800 text-xs font-semibold ml-2">Edit</a>

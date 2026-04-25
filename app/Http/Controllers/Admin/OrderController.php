@@ -67,6 +67,15 @@ class OrderController extends Controller
         return redirect()->back()->with('success', 'Payment status updated successfully');
     }
 
+    public function backfillCommissions(Order $order)
+    {
+        $added = app(CommissionService::class)->backfillForOrder($order);
+        $msg = $added > 0
+            ? "$added missing commission(s) created for order #{$order->order_number}."
+            : "No missing commissions to add for order #{$order->order_number}.";
+        return redirect()->back()->with('success', $msg);
+    }
+
     public function invoice(Order $order)
     {
         $order->load(['user', 'items.product']);

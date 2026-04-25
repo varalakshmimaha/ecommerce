@@ -19,7 +19,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('login') }}" class="space-y-6">
+        <form method="POST" action="{{ request()->is('admin/login') ? route('admin.login.store') : route('login') }}" class="space-y-6">
             @csrf
             <div>
                 <label for="mobile" class="block text-sm font-medium text-gray-700 mb-2">Mobile Number</label>

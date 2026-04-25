@@ -48,19 +48,28 @@
                     @endif
                 </div>
                 <h1 class="text-2xl md:text-3xl font-bold truncate">{{ $rm->name ?? 'User #'.$rm->id }}</h1>
-                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm opacity-90">
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-2 text-sm opacity-90">
                     <span class="inline-flex items-center gap-1.5">
-                        <svg class="w-4 h-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                        <svg class="w-4 h-4 opacity-70 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
                         {{ $rm->mobile ?? '—' }}
                     </span>
+                    <span class="opacity-40 text-xs">·</span>
                     <span class="inline-flex items-center gap-1.5">
-                        <svg class="w-4 h-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        <svg class="w-4 h-4 opacity-70 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                         {{ $rm->email ?? '—' }}
                     </span>
                     @if($rm->parent)
+                        <span class="opacity-40 text-xs">·</span>
                         <span class="inline-flex items-center gap-1.5">
-                            <svg class="w-4 h-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            Manager: <strong>{{ $rm->parent->name }}</strong>
+                            <svg class="w-4 h-4 opacity-70 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            Manager: <strong class="ml-1 font-semibold">{{ $rm->parent->name }}</strong>
+                        </span>
+                    @endif
+                    @if($rm->referral_code)
+                        <span class="opacity-40 text-xs">·</span>
+                        <span class="inline-flex items-center gap-1.5">
+                            <svg class="w-4 h-4 opacity-70 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                            Referral: <strong class="ml-1 font-mono tracking-wide">{{ $rm->referral_code }}</strong>
                         </span>
                     @endif
                 </div>
@@ -78,8 +87,8 @@
     @if(session('error'))<div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">{{ session('error') }}</div>@endif
 
     {{-- KPI strip --}}
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-4 flex items-center gap-3">
+    <div style="display:flex;gap:0.75rem;">
+        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-4 flex items-center gap-3 flex-1">
             <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center shrink-0">
                 <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
             </div>
@@ -88,40 +97,22 @@
                 <div class="text-xl font-bold text-text-heading leading-tight">{{ $summary['affiliates_count'] }}</div>
             </div>
         </div>
-        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-4 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-4 flex items-center gap-3 flex-1">
+            <div class="w-10 h-10 rounded-lg bg-brand-gold/10 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/></svg>
             </div>
             <div class="min-w-0">
-                <div class="text-[10px] text-text-muted uppercase font-bold tracking-wider">Orders</div>
-                <div class="text-xl font-bold text-text-heading leading-tight">{{ $summary['orders_count'] }}</div>
+                <div class="text-[10px] text-text-muted uppercase font-bold tracking-wider">Lifetime Earnings</div>
+                <div class="text-xl font-bold text-brand-gold leading-tight">&#8377;{{ number_format($rmTotals['lifetime'], 0) }}</div>
             </div>
         </div>
-        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-4 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
-                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            </div>
-            <div class="min-w-0">
-                <div class="text-[10px] text-text-muted uppercase font-bold tracking-wider">Pending</div>
-                <div class="text-xl font-bold text-amber-600 leading-tight">&#8377;{{ number_format($rmTotals['pending'], 0) }}</div>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-4 flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-            </div>
-            <div class="min-w-0">
-                <div class="text-[10px] text-text-muted uppercase font-bold tracking-wider">Approved</div>
-                <div class="text-xl font-bold text-blue-600 leading-tight">&#8377;{{ number_format($rmTotals['approved'], 0) }}</div>
-            </div>
-        </div>
-        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-4 flex items-center gap-3">
+        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-4 flex items-center gap-3 flex-1">
             <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center shrink-0">
                 <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             </div>
             <div class="min-w-0">
-                <div class="text-[10px] text-text-muted uppercase font-bold tracking-wider">Paid</div>
-                <div class="text-xl font-bold text-green-600 leading-tight">&#8377;{{ number_format($rmTotals['paid'], 0) }}</div>
+                <div class="text-[10px] text-text-muted uppercase font-bold tracking-wider">Wallet Balance</div>
+                <div class="text-xl font-bold text-green-600 leading-tight">&#8377;{{ number_format($rmTotals['wallet'], 0) }}</div>
             </div>
         </div>
     </div>
@@ -134,15 +125,15 @@
                 Affiliates
                 <span class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-brand-gold/15 text-brand-gold text-[10px] font-bold">{{ $summary['affiliates_count'] }}</span>
             </button>
-            <button type="button" data-tab="commissions" class="rm-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-text-muted hover:text-text-heading inline-flex items-center gap-2 whitespace-nowrap">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/></svg>
-                RM Commissions
-                <span class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-gray-100 text-text-muted text-[10px] font-bold">{{ $rmCommissions->count() }}</span>
+            <button type="button" data-tab="wallet" class="rm-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-text-muted hover:text-text-heading inline-flex items-center gap-2 whitespace-nowrap">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                Wallet History
+                <span class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-gray-100 text-text-muted text-[10px] font-bold">{{ $walletTransactions->count() }}</span>
             </button>
             <button type="button" data-tab="orders" class="rm-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-text-muted hover:text-text-heading inline-flex items-center gap-2 whitespace-nowrap">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-                Referrals Orders
-                <span class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-gray-100 text-text-muted text-[10px] font-bold">{{ $referralOrders->count() }}</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                Order History
+                <span class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-gray-100 text-text-muted text-[10px] font-bold">{{ $summary['orders_count'] }}</span>
             </button>
         </nav>
     </div>
@@ -161,25 +152,16 @@
                                 <th class="text-left px-4 py-2.5 font-semibold">Affiliate</th>
                                 <th class="text-left px-4 py-2.5 font-semibold">Mobile</th>
                                 <th class="text-left px-4 py-2.5 font-semibold">Ref Code</th>
-                                <th class="text-left px-4 py-2.5 font-semibold">Status</th>
                                 <th class="text-right px-4 py-2.5 font-semibold">Orders</th>
                                 <th class="text-right px-4 py-2.5 font-semibold">Refs</th>
-                                <th class="text-right px-4 py-2.5 font-semibold">Pending</th>
-                                <th class="text-right px-4 py-2.5 font-semibold">Approved</th>
-                                <th class="text-right px-4 py-2.5 font-semibold">Paid</th>
                                 <th class="px-4 py-2.5"></th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                             @foreach($affiliates as $aff)
                                 @php
-                                    $commTot = $affiliateCommissionTotals[$aff->id] ?? [];
-                                    $pending  = $commTot['pending']  ?? 0;
-                                    $approved = $commTot['approved'] ?? 0;
-                                    $paid     = $commTot['paid']     ?? 0;
                                     $ordCount = $affiliateOrderCounts[$aff->id] ?? 0;
                                     $refCount = $affiliateReferralCounts[$aff->id] ?? 0;
-                                    $stClass  = $statusBadge[$aff->affiliate_status] ?? 'bg-gray-100 text-gray-600 ring-gray-200';
                                     $affInitial = strtoupper(mb_substr($aff->name ?? 'A', 0, 1));
                                 @endphp
                                 <tr class="hover:bg-gray-50/80 transition-colors">
@@ -191,14 +173,8 @@
                                     </td>
                                     <td class="px-4 py-2.5 text-text-muted">{{ $aff->mobile }}</td>
                                     <td class="px-4 py-2.5 font-mono text-xs text-text-muted">{{ $aff->referral_code ?? '—' }}</td>
-                                    <td class="px-4 py-2.5">
-                                        <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase ring-1 {{ $stClass }}">{{ $aff->affiliate_status }}</span>
-                                    </td>
                                     <td class="px-4 py-2.5 text-right tabular-nums">{{ $ordCount }}</td>
                                     <td class="px-4 py-2.5 text-right tabular-nums">{{ $refCount }}</td>
-                                    <td class="px-4 py-2.5 text-right tabular-nums {{ $pending > 0 ? 'text-amber-700 font-semibold' : 'text-gray-400' }}">&#8377;{{ number_format($pending, 0) }}</td>
-                                    <td class="px-4 py-2.5 text-right tabular-nums {{ $approved > 0 ? 'text-blue-700 font-semibold' : 'text-gray-400' }}">&#8377;{{ number_format($approved, 0) }}</td>
-                                    <td class="px-4 py-2.5 text-right tabular-nums {{ $paid > 0 ? 'text-green-700 font-semibold' : 'text-gray-400' }}">&#8377;{{ number_format($paid, 0) }}</td>
                                     <td class="px-4 py-2.5 text-right">
                                         <a href="{{ route('admin.affiliates.show', $aff) }}" class="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-800 text-xs font-semibold">
                                             View
@@ -219,92 +195,231 @@
         </div>
     </div>
 
-    {{-- Tab panel: RM Commissions --}}
-    <div data-panel="commissions" class="rm-tab-panel hidden">
+    {{-- Tab panel: Wallet History --}}
+    <div data-panel="wallet" class="rm-tab-panel hidden space-y-5">
+
+        {{-- Summary cards --}}
+        <div style="display:flex;gap:1rem;">
+            <div class="bg-green-50 border border-green-200 rounded-xl p-4 text-center flex-1">
+                <div class="text-xs text-green-700 font-bold uppercase tracking-wider mb-1">Total Added</div>
+                <div class="text-2xl font-bold text-green-700 tabular-nums">&#8377;{{ number_format($walletTransactions->where('type','credit')->sum('amount'), 2) }}</div>
+            </div>
+            <div class="bg-red-50 border border-red-200 rounded-xl p-4 text-center flex-1">
+                <div class="text-xs text-red-700 font-bold uppercase tracking-wider mb-1">Total Removed</div>
+                <div class="text-2xl font-bold text-red-700 tabular-nums">&#8377;{{ number_format($walletTransactions->where('type','debit')->sum('amount'), 2) }}</div>
+            </div>
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center flex-1">
+                <div class="text-xs text-blue-700 font-bold uppercase tracking-wider mb-1">Wallet Balance</div>
+                <div class="text-2xl font-bold text-blue-700 tabular-nums">&#8377;{{ number_format($rmTotals['wallet'], 2) }}</div>
+            </div>
+        </div>
+
+        {{-- Wallet Transaction form --}}
+        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-6">
+            <h3 class="font-semibold text-text-heading mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                Wallet Transaction
+            </h3>
+            <form method="POST" action="{{ route('admin.rms.wallet', $rm) }}" class="flex flex-wrap gap-3 items-end">
+                @csrf
+                <div>
+                    <label class="block text-xs font-medium text-text-muted mb-1">Type *</label>
+                    <select name="type" id="rm_wallet_type" required onchange="rmToggleReqDir(this)"
+                            class="px-3 py-2 border border-ui-border rounded-lg text-sm bg-white min-w-[140px]">
+                        <option value="credit">➕ Add (Credit)</option>
+                        <option value="debit">➖ Remove (Debit)</option>
+                        <option value="request">📋 Request</option>
+                    </select>
+                </div>
+                <div id="rm_req_dir" class="hidden">
+                    <label class="block text-xs font-medium text-text-muted mb-1">Direction *</label>
+                    <select name="request_direction" id="rm_req_dir_select"
+                            class="px-3 py-2 border border-ui-border rounded-lg text-sm bg-white min-w-[140px]">
+                        <option value="credit">Credit (Receive)</option>
+                        <option value="debit">Debit (Send)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-text-muted mb-1">Amount (₹) *</label>
+                    <input type="number" name="amount" min="0.01" step="0.01" required placeholder="0.00"
+                           class="px-3 py-2 border border-ui-border rounded-lg text-sm w-36 tabular-nums">
+                </div>
+                <div class="flex-1 min-w-[200px]">
+                    <label class="block text-xs font-medium text-text-muted mb-1">Remark</label>
+                    <input type="text" name="remark" placeholder="Reason for this transaction (optional)" maxlength="500"
+                           class="w-full px-3 py-2 border border-ui-border rounded-lg text-sm">
+                </div>
+                <button type="submit"
+                    class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-5 py-2 rounded-lg font-semibold text-sm whitespace-nowrap">
+                    Apply
+                </button>
+            </form>
+            <script>
+            function rmToggleReqDir(sel) {
+                var div = document.getElementById('rm_req_dir');
+                var s   = document.getElementById('rm_req_dir_select');
+                var show = sel.value === 'request';
+                div.classList.toggle('hidden', !show);
+                s.required = show;
+            }
+            </script>
+        </div>
+
+        {{-- Transaction history --}}
         <div class="bg-white rounded-xl shadow-sm border border-ui-border overflow-hidden">
             <div class="px-5 py-4 border-b border-ui-border flex items-center justify-between">
-                <h3 class="font-semibold text-text-heading flex items-center gap-2">
-                    <svg class="w-4 h-4 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/></svg>
-                    RM's Own Commissions
-                </h3>
-                <span class="text-[10px] text-text-muted uppercase tracking-wider">Last 25</span>
+                <h3 class="font-semibold text-text-heading">Transaction History</h3>
+                <span class="text-xs text-text-muted">{{ $walletTransactions->count() }} transaction(s)</span>
             </div>
-            @if($rmCommissions->count())
+            @if($walletTransactions->count())
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
                         <thead class="bg-gray-50 text-text-muted text-[10px] uppercase tracking-wider">
                             <tr>
-                                <th class="text-left px-4 py-2.5 font-semibold">Order</th>
-                                <th class="text-right px-4 py-2.5 font-semibold">Base</th>
-                                <th class="text-right px-4 py-2.5 font-semibold">%</th>
-                                <th class="text-right px-4 py-2.5 font-semibold">Amount</th>
-                                <th class="text-left px-4 py-2.5 font-semibold">Status</th>
-                                <th class="text-left px-4 py-2.5 font-semibold">Date</th>
+                                <th class="text-left px-4 py-3 font-semibold">Type</th>
+                                <th class="text-right px-4 py-3 font-semibold">Amount</th>
+                                <th class="text-left px-4 py-3 font-semibold">Status</th>
+                                <th class="text-left px-4 py-3 font-semibold">Remark</th>
+                                <th class="text-left px-4 py-3 font-semibold">By</th>
+                                <th class="text-left px-4 py-3 font-semibold">Date</th>
+                                <th class="text-left px-4 py-3 font-semibold">Action</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
-                            @foreach($rmCommissions as $c)
+                            @foreach($walletTransactions as $tx)
                                 <tr class="hover:bg-gray-50/80">
-                                    <td class="px-4 py-2 font-mono text-xs">{{ optional($c->order)->order_number ?? '—' }}</td>
-                                    <td class="px-4 py-2 text-right tabular-nums text-text-muted">&#8377;{{ number_format($c->base_amount, 0) }}</td>
-                                    <td class="px-4 py-2 text-right tabular-nums text-text-muted text-xs">{{ number_format($c->percentage, 1) }}%</td>
-                                    <td class="px-4 py-2 text-right tabular-nums font-semibold">&#8377;{{ number_format($c->amount, 2) }}</td>
-                                    <td class="px-4 py-2">
-                                        @php $cb = $statusBadge[$c->status] ?? 'bg-gray-100 text-gray-600 ring-gray-200'; @endphp
-                                        <span class="inline-block px-2 py-0.5 rounded-full text-[10px] uppercase ring-1 {{ $cb }}">{{ $c->status }}</span>
+                                    <td class="px-4 py-3">
+                                        @if($tx->type === 'credit')
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700 uppercase">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>Credit
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700 uppercase">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>Debit
+                                            </span>
+                                        @endif
                                     </td>
-                                    <td class="px-4 py-2 text-text-muted text-xs">{{ $c->created_at?->format('d M Y') }}</td>
+                                    <td class="px-4 py-3 text-right tabular-nums font-semibold {{ $tx->type === 'credit' ? 'text-green-700' : 'text-red-600' }}">
+                                        {{ $tx->type === 'credit' ? '+' : '-' }}&#8377;{{ number_format($tx->amount, 2) }}
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        @if($tx->status === 'approved')
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-700 uppercase">Approved</span>
+                                        @elseif($tx->status === 'pending')
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 uppercase">Pending</span>
+                                        @else
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700 uppercase">Rejected</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-3 text-text-muted">{{ $tx->remark ?: '—' }}</td>
+                                    <td class="px-4 py-3 text-text-muted text-xs">{{ optional($tx->creator)->name ?? 'Admin' }}</td>
+                                    <td class="px-4 py-3 text-text-muted text-xs">{{ $tx->created_at?->format('d M Y, h:i A') }}</td>
+                                    <td class="px-4 py-3">
+                                        @if($tx->status === 'pending')
+                                            <div class="flex items-center gap-1">
+                                                <form method="POST" action="{{ route('admin.rms.wallet.approve', $tx) }}" class="inline">
+                                                    @csrf
+                                                    <button class="px-2 py-1 text-[10px] font-bold bg-green-600 hover:bg-green-700 text-white rounded">Approve</button>
+                                                </form>
+                                                <form method="POST" action="{{ route('admin.rms.wallet.reject', $tx) }}" class="inline">
+                                                    @csrf
+                                                    <button class="px-2 py-1 text-[10px] font-bold bg-red-600 hover:bg-red-700 text-white rounded">Reject</button>
+                                                </form>
+                                            </div>
+                                        @else
+                                            <span class="text-text-muted text-xs">—</span>
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
             @else
-                <div class="px-5 py-10 text-center text-sm text-text-muted">No commissions earned yet.</div>
+                <div class="px-5 py-10 text-center text-sm text-text-muted">No wallet transactions yet.</div>
             @endif
         </div>
     </div>
 
-    {{-- Tab panel: Referrals Orders --}}
+    {{-- Tab panel: Order History --}}
     <div data-panel="orders" class="rm-tab-panel hidden">
         <div class="bg-white rounded-xl shadow-sm border border-ui-border overflow-hidden">
             <div class="px-5 py-4 border-b border-ui-border flex items-center justify-between">
                 <h3 class="font-semibold text-text-heading flex items-center gap-2">
-                    <svg class="w-4 h-4 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-                    Orders from Affiliates
+                    <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    Order History
                 </h3>
-                <span class="text-[10px] text-text-muted uppercase tracking-wider">Last 25</span>
+                <span class="text-xs text-text-muted">{{ $summary['orders_count'] }} order(s) in hierarchy</span>
             </div>
-            @if($referralOrders->count())
+            @if($orderHistory->count())
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
                         <thead class="bg-gray-50 text-text-muted text-[10px] uppercase tracking-wider">
                             <tr>
-                                <th class="text-left px-4 py-2.5 font-semibold">Order #</th>
-                                <th class="text-left px-4 py-2.5 font-semibold">Customer</th>
-                                <th class="text-right px-4 py-2.5 font-semibold">Total</th>
-                                <th class="text-left px-4 py-2.5 font-semibold">Status</th>
-                                <th class="text-left px-4 py-2.5 font-semibold">Date</th>
+                                <th class="text-left px-4 py-3 font-semibold">Order #</th>
+                                <th class="text-left px-4 py-3 font-semibold">Date</th>
+                                <th class="text-left px-4 py-3 font-semibold">Customer</th>
+                                <th class="text-left px-4 py-3 font-semibold">Affiliate</th>
+                                <th class="text-right px-4 py-3 font-semibold">Order Total</th>
+                                <th class="text-right px-4 py-3 font-semibold">RM Earnings</th>
+                                <th class="text-left px-4 py-3 font-semibold">Status</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
-                            @foreach($referralOrders as $o)
-                                <tr class="hover:bg-gray-50/80">
-                                    <td class="px-4 py-2 font-mono text-xs">{{ $o->order_number }}</td>
-                                    <td class="px-4 py-2">{{ $o->name }}</td>
-                                    <td class="px-4 py-2 text-right tabular-nums font-semibold">&#8377;{{ number_format($o->total_amount, 0) }}</td>
-                                    <td class="px-4 py-2 uppercase text-xs text-text-muted">{{ $o->order_status }}</td>
-                                    <td class="px-4 py-2 text-text-muted text-xs">{{ $o->created_at?->format('d M Y') }}</td>
+                            @foreach($orderHistory as $order)
+                                @php
+                                    $commMap = $orderCommissionMap[$order->id] ?? [];
+                                    $affComm = $commMap['affiliate'] ?? null;
+                                    $rmComm  = $commMap['rm'] ?? null;
+                                    $affName = $affComm ? ($affiliateNameMap[$affComm['user_id']] ?? '—') : '—';
+                                    $orderStatusColors = [
+                                        'pending'   => 'bg-amber-100 text-amber-700',
+                                        'confirmed' => 'bg-blue-100 text-blue-700',
+                                        'shipped'   => 'bg-indigo-100 text-indigo-700',
+                                        'delivered' => 'bg-green-100 text-green-700',
+                                        'cancelled' => 'bg-red-100 text-red-700',
+                                    ];
+                                    $osBadge = $orderStatusColors[$order->order_status] ?? 'bg-gray-100 text-gray-600';
+                                @endphp
+                                <tr class="hover:bg-gray-50/80 transition-colors">
+                                    <td class="px-4 py-3 font-mono text-xs font-semibold text-text-heading">{{ $order->order_number ?? '#'.$order->id }}</td>
+                                    <td class="px-4 py-3 text-text-muted text-xs whitespace-nowrap">{{ $order->created_at?->format('d M Y') }}</td>
+                                    <td class="px-4 py-3">
+                                        <div class="font-medium text-text-heading text-xs">{{ $order->name ?? '—' }}</div>
+                                        <div class="text-[11px] text-text-muted">{{ $order->mobile ?? '—' }}</div>
+                                    </td>
+                                    <td class="px-4 py-3 text-xs text-text-muted">{{ $affName }}</td>
+                                    <td class="px-4 py-3 text-right tabular-nums font-semibold text-text-heading">&#8377;{{ number_format($order->total_amount, 2) }}</td>
+                                    <td class="px-4 py-3 text-right">
+                                        @if($rmComm)
+                                            <div class="tabular-nums text-xs font-semibold {{ $rmComm['status'] === 'reversed' ? 'text-gray-400 line-through' : 'text-indigo-700' }}">&#8377;{{ number_format($rmComm['amount'], 2) }}</div>
+                                        @else
+                                            <form method="POST" action="{{ route('admin.orders.backfill-commissions', $order) }}" class="inline">
+                                                @csrf
+                                                <button type="submit" title="Recalculate missing commissions"
+                                                    class="text-[10px] text-amber-600 hover:text-amber-800 underline font-semibold">
+                                                    Recalculate
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase {{ $osBadge }}">{{ $order->order_status }}</span>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
             @else
-                <div class="px-5 py-10 text-center text-sm text-text-muted">No orders from affiliates yet.</div>
+                <div class="px-5 py-12 text-center">
+                    <svg class="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    <p class="text-sm text-text-muted">No orders found in this RM's hierarchy yet.</p>
+                </div>
             @endif
         </div>
     </div>
+
 </div>
 
 <script>

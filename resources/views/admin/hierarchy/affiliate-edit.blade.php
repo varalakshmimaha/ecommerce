@@ -3,57 +3,183 @@
 @section('title', 'Edit Affiliate')
 
 @section('content')
-<div class="max-w-2xl">
+@php $profile = $user->affiliateProfile; @endphp
+<div class="max-w-4xl">
     <div class="mb-6">
         <div class="text-sm text-text-muted"><a href="{{ route('admin.affiliates.show', $user) }}" class="hover:underline">← {{ $user->name ?? 'User #'.$user->id }}</a></div>
         <h1 class="text-3xl font-bold text-text-heading mt-1">Edit Affiliate</h1>
     </div>
 
+    @if(session('success'))
+        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6 text-sm">{{ session('success') }}</div>
+    @endif
+    @if(session('error'))
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm">{{ session('error') }}</div>
+    @endif
     @if($errors->any())
         <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
             <ul class="list-disc list-inside text-sm">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
         </div>
     @endif
 
-    <form method="POST" action="{{ route('admin.affiliates.update', $user) }}" class="bg-white rounded-xl shadow-sm border border-ui-border p-6 space-y-4">
+    <form method="POST" action="{{ route('admin.affiliates.update', $user) }}" enctype="multipart/form-data" class="space-y-5">
         @csrf @method('PUT')
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-text-heading mb-1">Name *</label>
-                <input type="text" name="name" value="{{ old('name', $user->name) }}" required class="w-full px-3 py-2 border border-ui-border rounded-lg">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-text-heading mb-1">Mobile *</label>
-                <input type="text" name="mobile" value="{{ old('mobile', $user->mobile) }}" required maxlength="15" class="w-full px-3 py-2 border border-ui-border rounded-lg">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-text-heading mb-1">Email</label>
-                <input type="email" name="email" value="{{ old('email', $user->email) }}" class="w-full px-3 py-2 border border-ui-border rounded-lg">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-text-heading mb-1">Password <span class="text-xs text-text-muted">(leave blank to keep)</span></label>
-                <input type="text" name="password" minlength="6" class="w-full px-3 py-2 border border-ui-border rounded-lg">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-text-heading mb-1">Referral Code</label>
-                <input type="text" name="referral_code" value="{{ old('referral_code', $user->referral_code) }}" maxlength="20" class="w-full px-3 py-2 border border-ui-border rounded-lg font-mono uppercase">
-                <p class="text-xs text-text-muted mt-1">Change only if necessary. Existing commissions are unaffected.</p>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-text-heading mb-1">Parent (RM or Manager)</label>
-                <select name="parent_id" class="w-full px-3 py-2 border border-ui-border rounded-lg">
-                    <option value="">— none —</option>
-                    @foreach($parents as $p)
-                        <option value="{{ $p->id }}" {{ old('parent_id', $user->parent_id) == $p->id ? 'selected' : '' }}>
-                            [{{ strtoupper($p->role) }}] {{ $p->name }}
-                        </option>
-                    @endforeach
-                </select>
+
+        {{-- Account Details --}}
+        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-6">
+            <h2 class="text-base font-semibold text-text-heading mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                Account Details
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Name *</label>
+                    <input type="text" name="name" value="{{ old('name', $user->name) }}" required class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Mobile *</label>
+                    <input type="text" name="mobile" value="{{ old('mobile', $user->mobile) }}" required maxlength="15" class="w-full px-3 py-2 border border-ui-border rounded-lg font-mono">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Email</label>
+                    <input type="email" name="email" value="{{ old('email', $user->email) }}" class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Password <span class="text-xs text-text-muted">(leave blank to keep)</span></label>
+                    <input type="text" name="password" minlength="6" class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Referral Code</label>
+                    <input type="text" name="referral_code" value="{{ old('referral_code', $user->referral_code) }}" maxlength="20" class="w-full px-3 py-2 border border-ui-border rounded-lg font-mono uppercase">
+                    <p class="text-xs text-text-muted mt-1">Change only if necessary. Existing commissions are unaffected.</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Parent (RM or Manager)</label>
+                    <select name="parent_id" class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                        <option value="">— none —</option>
+                        @foreach($parents as $p)
+                            <option value="{{ $p->id }}" {{ old('parent_id', $user->parent_id) == $p->id ? 'selected' : '' }}>
+                                [{{ strtoupper($p->role) }}] {{ $p->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
         </div>
-        <div class="flex items-center gap-3 pt-2">
-            <button class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-2.5 rounded-lg font-semibold">Save Changes</button>
-            <a href="{{ route('admin.affiliates.show', $user) }}" class="text-text-muted hover:text-text-heading text-sm">Cancel</a>
+
+        {{-- Address --}}
+        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-6">
+            <h2 class="text-base font-semibold text-text-heading mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                Address
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-text-heading mb-1">Address *</label>
+                    <input type="text" name="address" value="{{ old('address', $profile->address ?? '') }}" required class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">City *</label>
+                    <input type="text" name="city" value="{{ old('city', $profile->city ?? '') }}" required class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">State *</label>
+                    <input type="text" name="state" value="{{ old('state', $profile->state ?? '') }}" required class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Pincode *</label>
+                    <input type="text" name="pincode" value="{{ old('pincode', $profile->pincode ?? '') }}" required maxlength="10" class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                </div>
+            </div>
+        </div>
+
+        {{-- Bank Details --}}
+        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-6">
+            <h2 class="text-base font-semibold text-text-heading mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                Bank Details
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Account Holder Name *</label>
+                    <input type="text" name="account_holder" value="{{ old('account_holder', $profile->account_holder ?? '') }}" required class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Bank Name *</label>
+                    <input type="text" name="bank_name" value="{{ old('bank_name', $profile->bank_name ?? '') }}" required class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Account Number *</label>
+                    <input type="text" name="account_number" value="{{ old('account_number', $profile->account_number ?? '') }}" required maxlength="30" class="w-full px-3 py-2 border border-ui-border rounded-lg font-mono">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">IFSC Code *</label>
+                    <input type="text" name="ifsc" value="{{ old('ifsc', $profile->ifsc ?? '') }}" required maxlength="20" class="w-full px-3 py-2 border border-ui-border rounded-lg font-mono uppercase">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">UPI ID <span class="text-text-muted font-normal text-xs">(optional)</span></label>
+                    <input type="text" name="upi_id" value="{{ old('upi_id', $profile->upi_id ?? '') }}" maxlength="100" class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                </div>
+            </div>
+        </div>
+
+        {{-- KYC Details --}}
+        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-6">
+            <h2 class="text-base font-semibold text-text-heading mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                KYC Details
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">PAN Number *</label>
+                    <input type="text" name="pan_number" value="{{ old('pan_number', $profile->pan_number ?? '') }}" required maxlength="20" class="w-full px-3 py-2 border border-ui-border rounded-lg font-mono uppercase">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Aadhaar Number *</label>
+                    <input type="text" name="aadhaar_number" value="{{ old('aadhaar_number', $profile->aadhaar_number ?? '') }}" required maxlength="12" pattern="\d{12}" class="w-full px-3 py-2 border border-ui-border rounded-lg font-mono">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-text-heading mb-1">
+                        KYC Document <span class="text-text-muted font-normal text-xs">(leave blank to keep existing)</span>
+                    </label>
+                    @if($profile && $profile->kyc_doc_path)
+                        <div class="mb-2 flex items-center gap-3">
+                            <a href="{{ asset('storage/' . $profile->kyc_doc_path) }}" target="_blank"
+                               class="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:underline">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                View current KYC document
+                            </a>
+                            @if($profile->kyc_verified)
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                    Verified
+                                </span>
+                            @else
+                                <span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Not Verified</span>
+                            @endif
+                        </div>
+                    @endif
+                    <input type="file" name="kyc_doc" accept=".jpg,.jpeg,.png,.pdf"
+                           class="w-full px-3 py-2 border border-ui-border rounded-lg text-sm">
+                    <p class="text-xs text-text-muted mt-1">Accepted: JPG, PNG, PDF — max 2MB</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" name="kyc_verified" value="1"
+                               {{ old('kyc_verified', $profile->kyc_verified ?? false) ? 'checked' : '' }}
+                               class="w-4 h-4 accent-brand-gold">
+                        <span class="text-sm font-medium text-text-heading">Mark KYC as Verified</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <button type="submit"
+                class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-2.5 rounded-lg font-semibold hover:shadow-lg transition-all">
+                Save Changes
+            </button>
+            <a href="{{ route('admin.affiliates.show', $user) }}" class="px-5 py-2.5 rounded-lg border border-ui-border text-text-muted text-sm hover:bg-gray-50 transition">Cancel</a>
         </div>
     </form>
 </div>

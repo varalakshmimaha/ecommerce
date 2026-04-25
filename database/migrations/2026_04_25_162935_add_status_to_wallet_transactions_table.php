@@ -1,0 +1,22 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('wallet_transactions', function (Blueprint $table) {
+            $table->enum('status', ['approved', 'pending', 'rejected'])->default('approved')->after('remark');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('wallet_transactions', function (Blueprint $table) {
+            $table->dropColumn('status');
+        });
+    }
+};

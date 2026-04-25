@@ -25,6 +25,7 @@ class User extends Authenticatable
         'otp',
         'otp_expires_at',
         'is_verified',
+        'permissions',
     ];
 
     protected $hidden = [
@@ -40,6 +41,7 @@ class User extends Authenticatable
         'is_admin' => 'boolean',
         'is_verified' => 'boolean',
         'password' => 'hashed',
+        'permissions' => 'array',
     ];
 
     public function orders()
@@ -84,15 +86,20 @@ class User extends Authenticatable
 
     public function uplineByRole(): array
     {
-        $chain = [];
-        $node = $this->parent;
-        $guard = 0;
-        while ($node && $guard++ < 10) {
+        $chain    = [];
+        $parentId = $this->parent_id;
+        $guard    = 0;
+
+        while ($parentId && $guard++ < 10) {
+            $node = User::select(['id', 'name', 'role', 'parent_id'])->find($parentId);
+            if (!$node) break;
+
             if (in_array($node->role, ['affiliate', 'rm', 'manager'], true) && !isset($chain[$node->role])) {
                 $chain[$node->role] = $node;
             }
-            $node = $node->parent;
+            $parentId = $node->parent_id;
         }
+
         return $chain;
     }
 }

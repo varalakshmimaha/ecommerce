@@ -8,6 +8,7 @@ use App\Models\Commission;
 use App\Models\Order;
 use App\Models\Referral;
 use App\Models\User;
+use App\Models\WalletTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -92,40 +93,61 @@ class AffiliateController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'mobile' => 'required|string|max:15|unique:users,mobile',
-            'email' => 'nullable|email|unique:users,email',
-            'password' => 'required|string|min:6',
-            'manager_id' => 'nullable|exists:users,id',
-            'rm_id' => 'nullable|exists:users,id',
+            'name'           => 'required|string|max:255',
+            'mobile'         => 'required|string|max:15|unique:users,mobile',
+            'email'          => 'required|email|unique:users,email',
+            'password'       => 'required|string|min:6',
+            'manager_id'     => 'required|exists:users,id',
+            'rm_id'          => 'required|exists:users,id',
+            'address'        => 'required|string|max:500',
+            'city'           => 'required|string|max:100',
+            'state'          => 'required|string|max:100',
+            'pincode'        => 'required|string|max:10',
+            'account_holder' => 'required|string|max:255',
+            'bank_name'      => 'required|string|max:255',
+            'account_number' => 'required|string|max:30',
+            'ifsc'           => 'required|string|max:20',
+            'upi_id'         => 'nullable|string|max:100',
+            'pan_number'     => 'required|string|max:20',
+            'aadhaar_number' => 'required|digits:12',
+            'kyc_doc'        => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
-        $parentId = null;
-        if (!empty($validated['rm_id'])) {
-            $rm = User::findOrFail($validated['rm_id']);
-            if ($rm->role !== 'rm') {
-                return back()->with('error', 'Selected RM is not a valid Relationship Manager.');
-            }
-            $parentId = $rm->id;
-        } elseif (!empty($validated['manager_id'])) {
-            $manager = User::findOrFail($validated['manager_id']);
-            if ($manager->role !== 'manager') {
-                return back()->with('error', 'Selected Manager is not valid.');
-            }
-            $parentId = $manager->id;
+        $rm = User::findOrFail($validated['rm_id']);
+        if ($rm->role !== 'rm') {
+            return back()->with('error', 'Selected RM is not a valid Relationship Manager.');
         }
 
         $user = User::create([
-            'name' => $validated['name'],
-            'mobile' => $validated['mobile'],
-            'email' => $validated['email'] ?? null,
-            'password' => Hash::make($validated['password']),
-            'role' => 'affiliate',
-            'parent_id' => $parentId,
+            'name'             => $validated['name'],
+            'mobile'           => $validated['mobile'],
+            'email'            => $validated['email'],
+            'password'         => Hash::make($validated['password']),
+            'role'             => 'affiliate',
+            'parent_id'        => $rm->id,
             'affiliate_status' => 'approved',
-            'approved_at' => now(),
-            'referral_code' => $this->generateReferralCode((object)['name' => $validated['name']]),
-            'is_verified' => true,
+            'approved_at'      => now(),
+            'referral_code'    => $this->generateReferralCode((object)['name' => $validated['name']]),
+            'is_verified'      => true,
+        ]);
+
+        $kycPath = $request->file('kyc_doc')->store('kyc', 'public');
+
+        AffiliateProfile::create([
+            'user_id'        => $user->id,
+            'address'        => $validated['address'],
+            'city'           => $validated['city'],
+            'state'          => $validated['state'],
+            'pincode'        => $validated['pincode'],
+            'account_holder' => $validated['account_holder'],
+            'bank_name'      => $validated['bank_name'],
+            'account_number' => $validated['account_number'],
+            'ifsc'           => $validated['ifsc'],
+            'upi_id'         => $validated['upi_id'] ?? null,
+            'pan_number'     => strtoupper($validated['pan_number']),
+            'aadhaar_number' => $validated['aadhaar_number'],
+            'kyc_doc_path'   => $kycPath,
+            'kyc_verified'   => false,
         ]);
 
         return redirect()->route('admin.affiliates.index')->with('success', "Affiliate created. Referral code: {$user->referral_code}");
@@ -133,30 +155,111 @@ class AffiliateController extends Controller
 
     public function show(User $user)
     {
-        $user->load(['parent:id,name,role', 'affiliateProfile']);
+        $user->load(['parent:id,name,role,parent_id', 'affiliateProfile']);
 
-        $commissions = Commission::with('order:id,order_number,total_amount,order_status,created_at')
-            ->where('beneficiary_user_id', $user->id)
-            ->orderByDesc('created_at')
-            ->limit(25)->get();
+        $rm      = $user->parent;
+        $manager = $rm ? User::find($rm->parent_id) : null;
 
         $totals = [
-            'pending' => (float) Commission::forUser($user->id)->pending()->sum('amount'),
-            'approved' => (float) Commission::forUser($user->id)->approved()->sum('amount'),
-            'paid' => (float) Commission::forUser($user->id)->paid()->sum('amount'),
+            'lifetime' => (float) Commission::forUser($user->id)->whereNotIn('status', ['reversed'])->sum('amount'),
+            'wallet'   => WalletTransaction::balanceFor($user->id),
         ];
 
-        $referredUsers = User::where('parent_id', $user->id)->orderByDesc('created_at')->limit(20)->get(['id','name','mobile','role','created_at']);
+        $walletTransactions = WalletTransaction::with('creator:id,name')
+            ->where('user_id', $user->id)
+            ->orderByDesc('created_at')
+            ->get();
+
+        $referredUsers      = User::where('parent_id', $user->id)->orderByDesc('created_at')->limit(50)->get(['id','name','mobile','role','created_at']);
         $referredUsersCount = User::where('parent_id', $user->id)->count();
 
-        $referredOrders = Order::whereIn('user_id', User::where('parent_id', $user->id)->pluck('id'))
-            ->orderByDesc('created_at')->limit(20)->get(['id','order_number','name','total_amount','order_status','created_at']);
+        // Order history — sourced directly from commissions so it always matches earnings
+        $orderHistory       = collect();
+        $orderCommissionMap = [];
 
-        return view('admin.hierarchy.affiliate-show', compact('user','commissions','totals','referredUsers','referredUsersCount','referredOrders'));
+        $commissionOrderIds = Commission::where('beneficiary_user_id', $user->id)
+            ->whereNotNull('order_id')
+            ->pluck('order_id')
+            ->unique()
+            ->values()
+            ->all();
+
+        if (!empty($commissionOrderIds)) {
+            $allHierarchyIds = array_values(array_filter([$user->id, $rm?->id, $manager?->id]));
+
+            $orderHistory = Order::whereIn('id', $commissionOrderIds)
+                ->orderByDesc('created_at')
+                ->get(['id', 'order_number', 'user_id', 'name', 'mobile', 'total_amount', 'order_status', 'created_at']);
+
+            $commRows = Commission::whereIn('order_id', $commissionOrderIds)
+                ->whereIn('beneficiary_user_id', $allHierarchyIds)
+                ->get(['order_id', 'beneficiary_user_id', 'beneficiary_role', 'amount', 'status']);
+
+            foreach ($commRows as $c) {
+                $orderCommissionMap[$c->order_id][$c->beneficiary_role] = [
+                    'amount'  => (float) $c->amount,
+                    'status'  => $c->status,
+                    'user_id' => $c->beneficiary_user_id,
+                ];
+            }
+        }
+
+        return view('admin.hierarchy.affiliate-show', compact(
+            'user', 'totals', 'walletTransactions',
+            'referredUsers', 'referredUsersCount',
+            'rm', 'manager',
+            'orderHistory', 'orderCommissionMap'
+        ));
+    }
+
+    public function walletTransaction(Request $request, User $user)
+    {
+        abort_unless($user->role === 'affiliate', 404);
+
+        $validated = $request->validate([
+            'type'              => 'required|in:credit,debit,request',
+            'request_direction' => 'required_if:type,request|nullable|in:credit,debit',
+            'amount'            => 'required|numeric|min:0.01',
+            'remark'            => 'nullable|string|max:500',
+        ]);
+
+        $isRequest = $validated['type'] === 'request';
+        $txType    = $isRequest ? $validated['request_direction'] : $validated['type'];
+        $status    = $isRequest ? 'pending' : 'approved';
+
+        WalletTransaction::create([
+            'user_id'    => $user->id,
+            'type'       => $txType,
+            'amount'     => $validated['amount'],
+            'remark'     => $validated['remark'] ?? null,
+            'created_by' => auth()->id(),
+            'status'     => $status,
+        ]);
+
+        $message = $isRequest
+            ? 'Wallet request for ₹' . number_format($validated['amount'], 2) . ' submitted as pending.'
+            : '₹' . number_format($validated['amount'], 2) . ' ' . ($txType === 'credit' ? 'added to' : 'removed from') . ' wallet.';
+
+        return redirect()->back()->with('success', $message);
+    }
+
+    public function approveWallet(WalletTransaction $transaction)
+    {
+        abort_unless($transaction->user->role === 'affiliate', 404);
+        $transaction->update(['status' => 'approved']);
+        return redirect()->back()->with('success', 'Wallet transaction approved.');
+    }
+
+    public function rejectWallet(WalletTransaction $transaction)
+    {
+        abort_unless($transaction->user->role === 'affiliate', 404);
+        $transaction->update(['status' => 'rejected']);
+        return redirect()->back()->with('success', 'Wallet transaction rejected.');
     }
 
     public function edit(User $user)
     {
+        $user->load('affiliateProfile');
         $parents = User::whereIn('role', ['rm', 'manager'])->orderBy('role')->orderBy('name')->get(['id', 'name', 'role']);
         return view('admin.hierarchy.affiliate-edit', compact('user', 'parents'));
     }
@@ -164,12 +267,25 @@ class AffiliateController extends Controller
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'mobile' => 'required|string|max:15|unique:users,mobile,' . $user->id,
-            'email' => 'nullable|email|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:6',
-            'parent_id' => 'nullable|exists:users,id',
-            'referral_code' => 'nullable|string|max:20|unique:users,referral_code,' . $user->id,
+            'name'           => 'required|string|max:255',
+            'mobile'         => 'required|string|max:15|unique:users,mobile,' . $user->id,
+            'email'          => 'nullable|email|unique:users,email,' . $user->id,
+            'password'       => 'nullable|string|min:6',
+            'parent_id'      => 'nullable|exists:users,id',
+            'referral_code'  => 'nullable|string|max:20|unique:users,referral_code,' . $user->id,
+            'address'        => 'required|string|max:500',
+            'city'           => 'required|string|max:100',
+            'state'          => 'required|string|max:100',
+            'pincode'        => 'required|string|max:10',
+            'account_holder' => 'required|string|max:255',
+            'bank_name'      => 'required|string|max:255',
+            'account_number' => 'required|string|max:30',
+            'ifsc'           => 'required|string|max:20',
+            'upi_id'         => 'nullable|string|max:100',
+            'pan_number'     => 'required|string|max:20',
+            'aadhaar_number' => 'required|digits:12',
+            'kyc_doc'        => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'kyc_verified'   => 'nullable',
         ]);
 
         if ($validated['parent_id'] ?? null) {
@@ -182,17 +298,36 @@ class AffiliateController extends Controller
             }
         }
 
-        $data = [
-            'name' => $validated['name'],
-            'mobile' => $validated['mobile'],
-            'email' => $validated['email'] ?? null,
-            'parent_id' => $validated['parent_id'] ?? null,
+        $userData = [
+            'name'          => $validated['name'],
+            'mobile'        => $validated['mobile'],
+            'email'         => $validated['email'] ?? null,
+            'parent_id'     => $validated['parent_id'] ?? null,
             'referral_code' => $validated['referral_code'] ?? $user->referral_code,
         ];
         if (!empty($validated['password'])) {
-            $data['password'] = Hash::make($validated['password']);
+            $userData['password'] = Hash::make($validated['password']);
         }
-        $user->update($data);
+        $user->update($userData);
+
+        $profileData = [
+            'address'        => $validated['address'],
+            'city'           => $validated['city'],
+            'state'          => $validated['state'],
+            'pincode'        => $validated['pincode'],
+            'account_holder' => $validated['account_holder'],
+            'bank_name'      => $validated['bank_name'],
+            'account_number' => $validated['account_number'],
+            'ifsc'           => strtoupper($validated['ifsc']),
+            'upi_id'         => $validated['upi_id'] ?? null,
+            'pan_number'     => strtoupper($validated['pan_number']),
+            'aadhaar_number' => $validated['aadhaar_number'],
+            'kyc_verified'   => $request->boolean('kyc_verified'),
+        ];
+        if ($request->hasFile('kyc_doc')) {
+            $profileData['kyc_doc_path'] = $request->file('kyc_doc')->store('kyc', 'public');
+        }
+        AffiliateProfile::updateOrCreate(['user_id' => $user->id], $profileData);
 
         return redirect()->route('admin.affiliates.show', $user)->with('success', 'Affiliate updated.');
     }

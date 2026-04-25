@@ -19,6 +19,14 @@ use App\Http\Controllers\Frontend\AddressController;
 use App\Http\Controllers\Frontend\Auth\AuthenticatedSessionController as FrontendAuthenticatedSessionController;
 use App\Http\Controllers\Frontend\Auth\RegisterController;
 use App\Http\Controllers\UserOrderController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+
+// Admin login at /admin/login
+Route::middleware('guest')->group(function () {
+    Route::get('/admin/login', [AuthenticatedSessionController::class, 'create'])->name('admin.login');
+    Route::post('/admin/login', [AuthenticatedSessionController::class, 'store'])->name('admin.login.store');
+});
+
 // Frontend Routes
 Route::get('/', function () {
     return view('frontend.home');
@@ -149,6 +157,7 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::post('/orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.update-status');
     Route::post('/orders/{order}/payment', [OrderController::class, 'verifyPayment'])->name('orders.verify-payment');
     Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
+    Route::post('/orders/{order}/backfill-commissions', [OrderController::class, 'backfillCommissions'])->name('orders.backfill-commissions');
     
     // Customers (non-admin users)
     Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
@@ -264,6 +273,9 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::get('/managers/{manager}/edit', [\App\Http\Controllers\Admin\ManagerController::class, 'edit'])->name('managers.edit');
     Route::put('/managers/{manager}', [\App\Http\Controllers\Admin\ManagerController::class, 'update'])->name('managers.update');
     Route::delete('/managers/{manager}', [\App\Http\Controllers\Admin\ManagerController::class, 'destroy'])->name('managers.destroy');
+    Route::post('/managers/{manager}/wallet', [\App\Http\Controllers\Admin\ManagerController::class, 'walletTransaction'])->name('managers.wallet');
+    Route::post('/managers/wallet/{transaction}/approve', [\App\Http\Controllers\Admin\ManagerController::class, 'approveWallet'])->name('managers.wallet.approve');
+    Route::post('/managers/wallet/{transaction}/reject', [\App\Http\Controllers\Admin\ManagerController::class, 'rejectWallet'])->name('managers.wallet.reject');
 
     // RMs CRUD
     Route::get('/rms', [\App\Http\Controllers\Admin\RmController::class, 'index'])->name('rms.index');
@@ -273,6 +285,9 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::get('/rms/{rm}/edit', [\App\Http\Controllers\Admin\RmController::class, 'edit'])->name('rms.edit');
     Route::put('/rms/{rm}', [\App\Http\Controllers\Admin\RmController::class, 'update'])->name('rms.update');
     Route::delete('/rms/{rm}', [\App\Http\Controllers\Admin\RmController::class, 'destroy'])->name('rms.destroy');
+    Route::post('/rms/{rm}/wallet', [\App\Http\Controllers\Admin\RmController::class, 'walletTransaction'])->name('rms.wallet');
+    Route::post('/rms/wallet/{transaction}/approve', [\App\Http\Controllers\Admin\RmController::class, 'approveWallet'])->name('rms.wallet.approve');
+    Route::post('/rms/wallet/{transaction}/reject', [\App\Http\Controllers\Admin\RmController::class, 'rejectWallet'])->name('rms.wallet.reject');
 
     // Commission Settings
     Route::get('/commission-settings', [\App\Http\Controllers\Admin\CommissionSettingController::class, 'index'])->name('commission-settings.index');
@@ -292,6 +307,19 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::get('/withdrawals/{withdrawal}', [\App\Http\Controllers\Admin\WithdrawalController::class, 'show'])->name('withdrawals.show');
     Route::delete('/withdrawals/{withdrawal}', [\App\Http\Controllers\Admin\WithdrawalController::class, 'destroy'])->name('withdrawals.destroy');
 
+    // Withdrawal Requests (user-initiated)
+    Route::get('/withdrawal-requests', [\App\Http\Controllers\Admin\WithdrawalRequestController::class, 'index'])->name('withdrawal-requests.index');
+    Route::post('/withdrawal-requests/{withdrawalRequest}/approve', [\App\Http\Controllers\Admin\WithdrawalRequestController::class, 'approve'])->name('withdrawal-requests.approve');
+    Route::post('/withdrawal-requests/{withdrawalRequest}/reject', [\App\Http\Controllers\Admin\WithdrawalRequestController::class, 'reject'])->name('withdrawal-requests.reject');
+
+    // Users
+    Route::get('/users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
+    Route::get('/users/create', [\App\Http\Controllers\Admin\UserController::class, 'create'])->name('users.create');
+    Route::post('/users', [\App\Http\Controllers\Admin\UserController::class, 'store'])->name('users.store');
+    Route::get('/users/{user}/edit', [\App\Http\Controllers\Admin\UserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('users.destroy');
+
     // Affiliates
     Route::get('/affiliates', [\App\Http\Controllers\Admin\AffiliateController::class, 'index'])->name('affiliates.index');
     Route::get('/affiliates/create', [\App\Http\Controllers\Admin\AffiliateController::class, 'create'])->name('affiliates.create');
@@ -300,6 +328,9 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::get('/affiliates/{user}/edit', [\App\Http\Controllers\Admin\AffiliateController::class, 'edit'])->name('affiliates.edit');
     Route::put('/affiliates/{user}', [\App\Http\Controllers\Admin\AffiliateController::class, 'update'])->name('affiliates.update');
     Route::delete('/affiliates/{user}', [\App\Http\Controllers\Admin\AffiliateController::class, 'destroy'])->name('affiliates.destroy');
+    Route::post('/affiliates/{user}/wallet', [\App\Http\Controllers\Admin\AffiliateController::class, 'walletTransaction'])->name('affiliates.wallet');
+    Route::post('/affiliates/wallet/{transaction}/approve', [\App\Http\Controllers\Admin\AffiliateController::class, 'approveWallet'])->name('affiliates.wallet.approve');
+    Route::post('/affiliates/wallet/{transaction}/reject', [\App\Http\Controllers\Admin\AffiliateController::class, 'rejectWallet'])->name('affiliates.wallet.reject');
     Route::post('/affiliates/{user}/approve', [\App\Http\Controllers\Admin\AffiliateController::class, 'approve'])->name('affiliates.approve');
     Route::post('/affiliates/{user}/reject', [\App\Http\Controllers\Admin\AffiliateController::class, 'reject'])->name('affiliates.reject');
     Route::post('/affiliates/{user}/verify-kyc', [\App\Http\Controllers\Admin\AffiliateController::class, 'verifyKyc'])->name('affiliates.verify-kyc');
@@ -309,6 +340,8 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
 // Affiliate / RM / Manager dashboard + team management
 Route::middleware('auth')->group(function () {
     Route::get('/affiliate/dashboard', [\App\Http\Controllers\Frontend\Affiliate\DashboardController::class, 'index'])->name('affiliate.dashboard');
+    Route::post('/affiliate/withdrawal-request', [\App\Http\Controllers\Frontend\WithdrawalRequestController::class, 'store'])->name('affiliate.withdrawal-request.store');
+    Route::post('/affiliate/wallet-request', [\App\Http\Controllers\Frontend\Affiliate\DashboardController::class, 'walletRequest'])->name('affiliate.wallet-request.store');
     Route::get('/my-team', [\App\Http\Controllers\Frontend\Affiliate\TeamController::class, 'index'])->name('team.index');
     Route::post('/my-team', [\App\Http\Controllers\Frontend\Affiliate\TeamController::class, 'store'])->name('team.store');
     Route::delete('/my-team/{member}', [\App\Http\Controllers\Frontend\Affiliate\TeamController::class, 'destroy'])->name('team.destroy');

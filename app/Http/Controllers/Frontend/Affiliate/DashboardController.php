@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Frontend\Affiliate;
 
 use App\Http\Controllers\Controller;
 use App\Models\Commission;
+use App\Models\WalletTransaction;
+use App\Models\WithdrawalRequest;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -31,6 +33,37 @@ class DashboardController extends Controller
 
         $referralsCount = \App\Models\User::where('parent_id', $user->id)->count();
 
-        return view('frontend.affiliate.dashboard', compact('commissions', 'totals', 'referralUrl', 'user', 'referralsCount'));
+        $walletBalance      = WalletTransaction::balanceFor($user->id);
+        $hasPendingRequest  = WithdrawalRequest::where('user_id', $user->id)->where('status', 'pending')->exists();
+        $withdrawalRequests = WithdrawalRequest::where('user_id', $user->id)->orderByDesc('created_at')->limit(10)->get();
+        $walletTransactions = WalletTransaction::where('user_id', $user->id)->orderByDesc('created_at')->limit(20)->get();
+
+        return view('frontend.affiliate.dashboard', compact(
+            'commissions', 'totals', 'referralUrl', 'user', 'referralsCount',
+            'walletBalance', 'hasPendingRequest', 'withdrawalRequests', 'walletTransactions'
+        ));
+    }
+
+    public function walletRequest(Request $request)
+    {
+        $user = $request->user();
+        abort_unless(in_array($user->role, ['affiliate', 'rm', 'manager'], true), 403);
+
+        $validated = $request->validate([
+            'direction' => 'required|in:credit,debit',
+            'amount'    => 'required|numeric|min:1',
+            'remark'    => 'nullable|string|max:500',
+        ]);
+
+        WalletTransaction::create([
+            'user_id'    => $user->id,
+            'type'       => $validated['direction'],
+            'amount'     => $validated['amount'],
+            'remark'     => $validated['remark'] ?? null,
+            'created_by' => $user->id,
+            'status'     => 'pending',
+        ]);
+
+        return redirect()->back()->with('success', 'Wallet request for ₹' . number_format($validated['amount'], 2) . ' submitted. Awaiting admin approval.');
     }
 }

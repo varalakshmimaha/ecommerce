@@ -24,7 +24,7 @@ class AddressController extends Controller
             'state' => 'required|string|max:100',
             'pincode' => 'required|string|max:10',
             'country' => 'required|string|max:100',
-            'is_default' => 'nullable|boolean',
+            'is_default' => 'nullable',
         ]);
         $data['user_id'] = Auth::id();
         $data['is_default'] = $request->boolean('is_default');
@@ -46,7 +46,7 @@ class AddressController extends Controller
             'state' => 'required|string|max:100',
             'pincode' => 'required|string|max:10',
             'country' => 'required|string|max:100',
-            'is_default' => 'nullable|boolean',
+            'is_default' => 'nullable',
         ]);
         $data['is_default'] = $request->boolean('is_default');
         if ($data['is_default']) {

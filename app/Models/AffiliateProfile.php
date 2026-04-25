@@ -13,7 +13,7 @@ class AffiliateProfile extends Model
         'user_id',
         'address', 'city', 'state', 'pincode',
         'bank_name', 'account_number', 'ifsc', 'account_holder',
-        'upi_id', 'pan_number', 'aadhaar_last4',
+        'upi_id', 'pan_number', 'aadhaar_number',
         'kyc_doc_path', 'kyc_verified', 'rejection_reason',
     ];
 

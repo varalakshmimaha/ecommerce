@@ -42,19 +42,12 @@
                             <th class="text-left px-4 py-3">Email</th>
                             <th class="text-left px-4 py-3">Manager</th>
                             <th class="text-right px-4 py-3">Affiliates</th>
-                            <th class="text-right px-4 py-3">Pending</th>
-                            <th class="text-right px-4 py-3">Approved</th>
-                            <th class="text-right px-4 py-3">Paid</th>
                             <th class="text-left px-4 py-3">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @foreach($rms as $rm)
                             @php
-                                $t = $commissionTotals[$rm->id] ?? [];
-                                $pending  = $t['pending']  ?? 0;
-                                $approved = $t['approved'] ?? 0;
-                                $paid     = $t['paid']     ?? 0;
                             @endphp
                             <tr class="hover:bg-gray-50/80 transition-colors">
                                 <td class="px-4 py-3 font-semibold">{{ $rm->name ?? '—' }}</td>
@@ -62,9 +55,6 @@
                                 <td class="px-4 py-3 text-text-muted">{{ $rm->email ?? '—' }}</td>
                                 <td class="px-4 py-3">{{ optional($rm->parent)->name ?? '—' }}</td>
                                 <td class="px-4 py-3 text-right font-semibold">{{ $rm->affiliates_count }}</td>
-                                <td class="px-4 py-3 text-right tabular-nums {{ $pending > 0 ? 'text-amber-700 font-semibold' : 'text-gray-400' }}">&#8377;{{ number_format($pending, 0) }}</td>
-                                <td class="px-4 py-3 text-right tabular-nums {{ $approved > 0 ? 'text-blue-700 font-semibold' : 'text-gray-400' }}">&#8377;{{ number_format($approved, 0) }}</td>
-                                <td class="px-4 py-3 text-right tabular-nums {{ $paid > 0 ? 'text-green-700 font-semibold' : 'text-gray-400' }}">&#8377;{{ number_format($paid, 0) }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <a href="{{ route('admin.rms.show', $rm) }}" class="text-emerald-600 hover:text-emerald-800 text-xs font-semibold">View</a>
                                     <a href="{{ route('admin.rms.edit', $rm) }}" class="text-blue-600 hover:text-blue-800 text-xs font-semibold ml-2">Edit</a>

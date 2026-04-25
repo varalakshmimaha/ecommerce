@@ -122,10 +122,10 @@
                                placeholder="ABCDE1234F">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-text-heading mb-1">Aadhaar Last 4 Digits *</label>
-                        <input type="text" name="aadhaar_last4" value="{{ old('aadhaar_last4', $profile->aadhaar_last4) }}" required maxlength="4" pattern="[0-9]{4}"
+                        <label class="block text-sm font-medium text-text-heading mb-1">Aadhaar Number *</label>
+                        <input type="text" name="aadhaar_number" value="{{ old('aadhaar_number', $profile->aadhaar_number) }}" required maxlength="12" pattern="[0-9]{12}" inputmode="numeric"
                                class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-gold focus:border-brand-gold"
-                               placeholder="1234">
+                               placeholder="123456789012">
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-text-heading mb-1">KYC Document * <span class="text-xs text-text-muted">(PAN or Aadhaar copy, max 2MB, jpg/png/pdf)</span></label>

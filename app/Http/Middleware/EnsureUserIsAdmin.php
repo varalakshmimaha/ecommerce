@@ -11,12 +11,15 @@ class EnsureUserIsAdmin
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (!Auth::check() || !Auth::user()->is_admin) {
-            // If logged in but not admin, redirect to user dashboard
-            if (Auth::check()) {
-                return redirect()->route('user.dashboard')->with('error', 'You do not have admin access.');
-            }
-            return redirect()->route('login');
+        if (!Auth::check()) {
+            return redirect()->route('admin.login');
+        }
+
+        $user = Auth::user();
+        $hasAccess = $user->is_admin || in_array($user->role, ['manager', 'rm'], true);
+
+        if (!$hasAccess) {
+            return redirect()->route('user.dashboard')->with('error', 'You do not have admin access.');
         }
 
         return $next($request);

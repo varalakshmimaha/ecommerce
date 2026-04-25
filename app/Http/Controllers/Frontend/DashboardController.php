@@ -7,6 +7,8 @@ use App\Models\Commission;
 use App\Models\Order;
 use App\Models\Query;
 use App\Models\User;
+use App\Models\WalletTransaction;
+use App\Models\WithdrawalRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -84,7 +86,17 @@ class DashboardController extends Controller
             ->limit(15)
             ->get();
 
-        return view('frontend.dashboard', compact('user', 'upline', 'referrals', 'referralLink', 'commissionTotals', 'recentCommissions', 'baseByReferral', 'commByReferral'));
+        $walletBalance      = WalletTransaction::balanceFor($user->id);
+        $hasPendingRequest  = WithdrawalRequest::where('user_id', $user->id)->where('status', 'pending')->exists();
+        $withdrawalRequests = WithdrawalRequest::where('user_id', $user->id)->orderByDesc('created_at')->limit(10)->get();
+        $totalRequested     = (float) WithdrawalRequest::where('user_id', $user->id)->sum('amount');
+        $referralsCount     = $referrals->count();
+
+        return view('frontend.dashboard', compact(
+            'user', 'upline', 'referrals', 'referralLink', 'commissionTotals',
+            'recentCommissions', 'baseByReferral', 'commByReferral',
+            'walletBalance', 'hasPendingRequest', 'withdrawalRequests', 'totalRequested', 'referralsCount'
+        ));
     }
 
     public function profile()

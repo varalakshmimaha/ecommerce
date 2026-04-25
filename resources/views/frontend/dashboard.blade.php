@@ -345,47 +345,122 @@
 
                 @if(in_array($user->role, ['affiliate','rm','manager']))
                     {{-- Earnings KPI strip --}}
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden">
+                    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+                        <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden flex-1" style="min-width:140px;">
                             <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#ea580c;"></div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2 mb-2">
                                 <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background:#ffedd5;">
                                     <svg class="w-4 h-4" style="color:#c2410c;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
                                 </div>
                                 <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#9a3412;">Lifetime</div>
                             </div>
-                            <div class="text-xl font-bold text-text-heading tabular-nums mt-2">&#8377;{{ number_format($commissionTotals['lifetime'], 2) }}</div>
+                            <div class="text-xl font-bold text-text-heading tabular-nums">&#8377;{{ number_format($commissionTotals['lifetime'], 2) }}</div>
                         </div>
-                        <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden">
+                        <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden flex-1" style="min-width:140px;">
                             <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#10b981;"></div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2 mb-2">
                                 <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background:#d1fae5;">
-                                    <svg class="w-4 h-4" style="color:#059669;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    <svg class="w-4 h-4" style="color:#059669;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                                 </div>
-                                <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#047857;">Paid</div>
+                                <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#047857;">Wallet Balance</div>
                             </div>
-                            <div class="text-xl font-bold text-text-heading tabular-nums mt-2">&#8377;{{ number_format($commissionTotals['paid'], 2) }}</div>
+                            <div class="text-xl font-bold tabular-nums" style="color:#059669;">&#8377;{{ number_format($walletBalance, 2) }}</div>
                         </div>
-                        <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden">
+                        <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden flex-1" style="min-width:140px;">
                             <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#f59e0b;"></div>
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2 mb-2">
                                 <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background:#fef3c7;">
-                                    <svg class="w-4 h-4" style="color:#d97706;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    <svg class="w-4 h-4" style="color:#d97706;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                                 </div>
-                                <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#b45309;">Pending</div>
+                                <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#b45309;">Total Requested</div>
                             </div>
-                            <div class="text-xl font-bold text-text-heading tabular-nums mt-2">&#8377;{{ number_format($commissionTotals['pending'], 2) }}</div>
+                            <div class="text-xl font-bold tabular-nums" style="color:#d97706;">&#8377;{{ number_format($totalRequested, 2) }}</div>
                         </div>
-                        <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden">
-                            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#3b82f6;"></div>
-                            <div class="flex items-center gap-2">
-                                <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background:#dbeafe;">
-                                    <svg class="w-4 h-4" style="color:#2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden flex-1" style="min-width:140px;">
+                            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#8b5cf6;"></div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background:#ede9fe;">
+                                    <svg class="w-4 h-4" style="color:#7c3aed;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                                 </div>
-                                <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#1d4ed8;">Approved</div>
+                                <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#6d28d9;">Referrals</div>
                             </div>
-                            <div class="text-xl font-bold text-text-heading tabular-nums mt-2">&#8377;{{ number_format($commissionTotals['approved'], 2) }}</div>
+                            <div class="text-xl font-bold text-text-heading tabular-nums">{{ $referralsCount }}</div>
                         </div>
+                    </div>
+
+                    {{-- Wallet Withdrawal Request --}}
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                            <h3 class="font-semibold text-text-heading flex items-center gap-2">
+                                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                Request Wallet Withdrawal
+                            </h3>
+                            @if($hasPendingRequest)
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-xs font-semibold">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Request Pending
+                                </span>
+                            @endif
+                        </div>
+
+                        @if($hasPendingRequest)
+                            <p class="text-sm text-text-muted">Your pending request is being reviewed. You can submit a new request once it is processed.</p>
+                        @else
+                            <form method="POST" action="{{ route('affiliate.withdrawal-request.store') }}" class="flex flex-wrap gap-3 items-end">
+                                @csrf
+                                <div>
+                                    <label class="block text-xs font-medium text-text-muted mb-1">Amount (₹) *</label>
+                                    <input type="number" name="amount" min="1" step="0.01" required
+                                           placeholder="0.00"
+                                           class="px-3 py-2 border border-gray-200 rounded-lg text-sm w-36 tabular-nums focus:outline-none focus:ring-2 focus:ring-green-400">
+                                    <div class="text-[10px] text-text-muted mt-1">Available: &#8377;{{ number_format($walletBalance, 2) }}</div>
+                                </div>
+                                <div class="flex-1 min-w-[180px]">
+                                    <label class="block text-xs font-medium text-text-muted mb-1">Note (optional)</label>
+                                    <input type="text" name="notes" placeholder="Any note for admin" maxlength="500"
+                                           class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-400">
+                                </div>
+                                <button type="submit" style="background-color:#16a34a;color:#ffffff;"
+                                        class="px-5 py-2 rounded-lg font-semibold text-sm whitespace-nowrap hover:opacity-90">
+                                    Request Withdrawal
+                                </button>
+                            </form>
+                        @endif
+
+                        @if($withdrawalRequests->count())
+                            <div class="mt-5 pt-4 border-t border-gray-100">
+                                <div class="text-xs font-semibold text-text-muted uppercase tracking-wide mb-3">My Withdrawal Requests</div>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-sm">
+                                        <thead class="text-text-muted text-[10px] uppercase tracking-wider">
+                                            <tr>
+                                                <th class="text-left pb-2">Date</th>
+                                                <th class="text-right pb-2">Amount</th>
+                                                <th class="text-left pb-2 pl-4">Status</th>
+                                                <th class="text-left pb-2 pl-4">Note / Reason</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-50">
+                                            @foreach($withdrawalRequests as $wr)
+                                                @php $wrBadge = ['pending'=>'bg-amber-100 text-amber-700','approved'=>'bg-green-100 text-green-700','rejected'=>'bg-red-100 text-red-700'][$wr->status] ?? 'bg-gray-100 text-gray-600'; @endphp
+                                                <tr>
+                                                    <td class="py-2 text-xs text-text-muted whitespace-nowrap">{{ $wr->created_at?->format('d M Y') }}</td>
+                                                    <td class="py-2 text-right tabular-nums font-semibold">&#8377;{{ number_format($wr->amount, 2) }}</td>
+                                                    <td class="py-2 pl-4"><span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase {{ $wrBadge }}">{{ $wr->status }}</span></td>
+                                                    <td class="py-2 pl-4 text-xs text-text-muted">
+                                                        @if($wr->status === 'rejected' && $wr->rejection_reason)
+                                                            <span class="text-red-600">{{ $wr->rejection_reason }}</span>
+                                                        @else
+                                                            {{ $wr->notes ?: '—' }}
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        @endif
                     </div>
 
                     @php

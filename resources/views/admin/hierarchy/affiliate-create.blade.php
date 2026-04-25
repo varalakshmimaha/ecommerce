@@ -3,7 +3,7 @@
 @section('title', 'Add Affiliate')
 
 @section('content')
-<div class="max-w-2xl">
+<div class="max-w-4xl">
     <div class="mb-6">
         <h1 class="text-3xl font-bold text-text-heading">Add Affiliate</h1>
         <p class="text-text-muted mt-1">Create an approved affiliate directly. A referral code will be auto-generated.</p>
@@ -17,91 +17,160 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('admin.affiliates.store') }}" class="bg-white rounded-xl shadow-sm border border-ui-border p-6 space-y-4">
+    <form method="POST" enctype="multipart/form-data" action="{{ route('admin.affiliates.store') }}" class="space-y-6">
         @csrf
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-                <label class="block text-sm font-medium text-text-heading mb-1">Name *</label>
-                <input type="text" name="name" value="{{ old('name') }}" required
-                       class="w-full px-3 py-2 border border-ui-border rounded-lg">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-text-heading mb-1">Mobile *</label>
-                <input type="text" name="mobile" value="{{ old('mobile') }}" required maxlength="15"
-                       class="w-full px-3 py-2 border border-ui-border rounded-lg">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-text-heading mb-1">Email</label>
-                <input type="email" name="email" value="{{ old('email') }}"
-                       class="w-full px-3 py-2 border border-ui-border rounded-lg">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-text-heading mb-1">Temporary Password *</label>
-                <input type="text" name="password" value="{{ old('password') }}" required minlength="6"
-                       class="w-full px-3 py-2 border border-ui-border rounded-lg">
-                <p class="text-xs text-text-muted mt-1">Share this with the affiliate. They can change it later.</p>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-text-heading mb-1">Manager</label>
-                <select name="manager_id" id="manager-select" class="w-full px-3 py-2 border border-ui-border rounded-lg">
-                    <option value="">— none —</option>
-                    @foreach($managers as $m)
-                        <option value="{{ $m->id }}" {{ old('manager_id') == $m->id ? 'selected' : '' }}>
-                            {{ $m->name }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-text-heading mb-1">Relationship Manager</label>
-                <select name="rm_id" id="rm-select" class="w-full px-3 py-2 border border-ui-border rounded-lg">
-                    <option value="">— none —</option>
-                    @foreach($rms as $r)
-                        <option value="{{ $r->id }}" data-manager="{{ $r->parent_id }}" {{ old('rm_id') == $r->id ? 'selected' : '' }}>
-                            {{ $r->name }}
-                        </option>
-                    @endforeach
-                </select>
-                <p class="text-xs text-text-muted mt-1">RM becomes the direct parent. If no RM is selected, the Manager becomes the parent.</p>
+        {{-- Account Details --}}
+        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-6">
+            <h2 class="text-base font-semibold text-text-heading mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                Account Details
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Name *</label>
+                    <input type="text" name="name" value="{{ old('name') }}" required class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Mobile *</label>
+                    <input type="text" name="mobile" value="{{ old('mobile') }}" required maxlength="15" class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Email *</label>
+                    <input type="email" name="email" value="{{ old('email') }}" required class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Temporary Password *</label>
+                    <input type="text" name="password" value="{{ old('password') }}" required minlength="6" class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                    <p class="text-xs text-text-muted mt-1">Share this with the affiliate. They can change it later.</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Manager *</label>
+                    <select name="manager_id" id="manager-select" required class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                        <option value="">— select manager —</option>
+                        @foreach($managers as $m)
+                            <option value="{{ $m->id }}" {{ old('manager_id') == $m->id ? 'selected' : '' }}>{{ $m->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Relationship Manager *</label>
+                    <select name="rm_id" id="rm-select" required class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                        <option value="">— select RM —</option>
+                        @foreach($rms as $r)
+                            <option value="{{ $r->id }}" data-manager="{{ $r->parent_id }}" {{ old('rm_id') == $r->id ? 'selected' : '' }}>{{ $r->name }}</option>
+                        @endforeach
+                    </select>
+                    <p class="text-xs text-text-muted mt-1">RM becomes the direct parent.</p>
+                </div>
             </div>
         </div>
 
-        <script>
-            (function () {
-                const managerSel = document.getElementById('manager-select');
-                const rmSel = document.getElementById('rm-select');
-                if (!managerSel || !rmSel) return;
+        {{-- Address --}}
+        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-6">
+            <h2 class="text-base font-semibold text-text-heading mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                Address
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-text-heading mb-1">Address *</label>
+                    <input type="text" name="address" value="{{ old('address') }}" required class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">City *</label>
+                    <input type="text" name="city" value="{{ old('city') }}" required class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">State *</label>
+                    <input type="text" name="state" value="{{ old('state') }}" required class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Pincode *</label>
+                    <input type="text" name="pincode" value="{{ old('pincode') }}" required maxlength="10" class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                </div>
+            </div>
+        </div>
 
-                const allRmOptions = Array.from(rmSel.querySelectorAll('option[value]')).filter(o => o.value !== '');
+        {{-- Bank Details --}}
+        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-6">
+            <h2 class="text-base font-semibold text-text-heading mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                Bank / Account Details
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Account Holder Name *</label>
+                    <input type="text" name="account_holder" value="{{ old('account_holder') }}" required class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Bank Name *</label>
+                    <input type="text" name="bank_name" value="{{ old('bank_name') }}" required class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Account Number *</label>
+                    <input type="text" name="account_number" value="{{ old('account_number') }}" required class="w-full px-3 py-2 border border-ui-border rounded-lg font-mono">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">IFSC Code *</label>
+                    <input type="text" name="ifsc" value="{{ old('ifsc') }}" required class="w-full px-3 py-2 border border-ui-border rounded-lg font-mono uppercase">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">UPI ID <span class="text-text-muted font-normal">(optional)</span></label>
+                    <input type="text" name="upi_id" value="{{ old('upi_id') }}" class="w-full px-3 py-2 border border-ui-border rounded-lg">
+                </div>
+            </div>
+        </div>
 
-                function filterRms() {
-                    const mid = managerSel.value;
-                    const currentRm = rmSel.value;
+        {{-- KYC Details --}}
+        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-6">
+            <h2 class="text-base font-semibold text-text-heading mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                KYC Details
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">PAN Number *</label>
+                    <input type="text" name="pan_number" value="{{ old('pan_number') }}" required maxlength="20" class="w-full px-3 py-2 border border-ui-border rounded-lg font-mono uppercase">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-text-heading mb-1">Aadhaar Number * <span class="text-text-muted font-normal">(12 digits)</span></label>
+                    <input type="text" name="aadhaar_number" value="{{ old('aadhaar_number') }}" required maxlength="12" minlength="12" pattern="\d{12}" class="w-full px-3 py-2 border border-ui-border rounded-lg font-mono">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-text-heading mb-1">KYC Document * <span class="text-text-muted font-normal">(PAN / Aadhaar copy — JPG, PNG, PDF, max 2MB)</span></label>
+                    <input type="file" name="kyc_doc" required accept=".jpg,.jpeg,.png,.pdf" class="w-full px-3 py-2 border border-ui-border rounded-lg text-sm">
+                </div>
+            </div>
+        </div>
 
-                    allRmOptions.forEach(opt => {
-                        const managerOfRm = opt.getAttribute('data-manager') || '';
-                        const show = !mid || managerOfRm === mid;
-                        opt.hidden = !show;
-                        opt.disabled = !show;
-                    });
-
-                    // If currently selected RM is hidden after filter, reset
-                    const currentOpt = allRmOptions.find(o => o.value === currentRm);
-                    if (currentOpt && currentOpt.hidden) {
-                        rmSel.value = '';
-                    }
-                }
-
-                managerSel.addEventListener('change', filterRms);
-                filterRms();
-            })();
-        </script>
-
-        <div class="flex items-center gap-3 pt-2">
+        <div class="flex items-center gap-3">
             <button type="submit" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-2.5 rounded-lg font-semibold">Create Affiliate</button>
             <a href="{{ route('admin.affiliates.index') }}" class="text-text-muted hover:text-text-heading text-sm">Cancel</a>
         </div>
     </form>
 </div>
+
+<script>
+(function () {
+    const managerSel = document.getElementById('manager-select');
+    const rmSel = document.getElementById('rm-select');
+    if (!managerSel || !rmSel) return;
+    const allRmOptions = Array.from(rmSel.querySelectorAll('option[value]')).filter(o => o.value !== '');
+    function filterRms() {
+        const mid = managerSel.value;
+        const currentRm = rmSel.value;
+        allRmOptions.forEach(opt => {
+            const managerOfRm = opt.getAttribute('data-manager') || '';
+            const show = !mid || managerOfRm === mid;
+            opt.hidden = !show;
+            opt.disabled = !show;
+        });
+        const currentOpt = allRmOptions.find(o => o.value === currentRm);
+        if (currentOpt && currentOpt.hidden) rmSel.value = '';
+    }
+    managerSel.addEventListener('change', filterRms);
+    filterRms();
+})();
+</script>
 @endsection
