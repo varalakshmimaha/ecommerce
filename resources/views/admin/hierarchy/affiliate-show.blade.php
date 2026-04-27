@@ -603,7 +603,6 @@
             @endif
         </div>
     </div>
-    @endif
 
     {{-- Tab panel: Referrals --}}
     @if($showRefTab)
