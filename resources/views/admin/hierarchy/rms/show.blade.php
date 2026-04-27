@@ -15,12 +15,9 @@
         'reversed' => 'bg-gray-200 text-gray-600 ring-gray-200',
         'none'     => 'bg-gray-100 text-gray-600 ring-gray-200',
     ];
-    $isAdmin       = auth()->user()->is_admin;
-    $isSelf        = auth()->id() === $rm->id;
-    $rPerms        = $rm->permissions ?? [];
-    $showAffTab    = $isAdmin || ($isSelf && ($rPerms['show_affiliates'] ?? true) !== false);
-    $showOrdersTab = $isAdmin || ($isSelf && ($rPerms['show_orders']    ?? true) !== false);
-    $rmFirstTab    = $showAffTab ? 'affiliates' : 'wallet';
+    $isAdmin = auth()->user()->is_admin;
+    $isSelf  = auth()->id() === $rm->id;
+    $rPerms  = $rm->permissions ?? [];
 @endphp
 
 <div class="space-y-5">
@@ -94,37 +91,22 @@
 
     @if(auth()->user()->is_admin)
     @php
-        $affOn = ($rPerms['show_affiliates'] ?? true) !== false;
-        $ordOn = ($rPerms['show_orders']     ?? true) !== false;
+        $referralsOn = ($rPerms['show_referrals'] ?? true) !== false;
     @endphp
     <div class="bg-white rounded-xl shadow-sm border border-ui-border px-5 py-4 flex flex-wrap items-center gap-4">
         <span class="text-xs font-bold text-text-muted uppercase tracking-wider">Feature Access</span>
-        {{-- Affiliates toggle --}}
-        <div class="flex items-center gap-3 flex-1 min-w-[200px] justify-between p-3 rounded-lg border {{ $affOn ? 'border-orange-200 bg-orange-50' : 'border-gray-200 bg-gray-50' }}" id="rm-aff-card">
+        {{-- Earnings & Referrals toggle --}}
+        <div class="flex items-center gap-3 flex-1 min-w-[200px] justify-between p-3 rounded-lg border {{ $referralsOn ? 'border-orange-200 bg-orange-50' : 'border-gray-200 bg-gray-50' }}" id="rm-referrals-card">
             <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 {{ $affOn ? 'text-brand-gold' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                <svg class="w-4 h-4 {{ $referralsOn ? 'text-brand-gold' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
                 <div>
-                    <div class="text-xs font-semibold text-text-heading">Affiliates Tab</div>
-                    <div class="text-[10px] text-text-muted">Visible to RM when ON</div>
+                    <div class="text-xs font-semibold text-text-heading">Earnings &amp; Referrals</div>
+                    <div class="text-[10px] text-text-muted">Show KPI cards, wallet &amp; referrals on frontend</div>
                 </div>
             </div>
-            <button type="button" id="toggle-rm-affiliates" data-rm="{{ $rm->id }}" data-section="show_affiliates" data-state="{{ $affOn ? 'on' : 'off' }}" onclick="toggleRmSection(this)"
-                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {{ $affOn ? 'bg-brand-gold' : 'bg-gray-300' }}">
-                <span class="inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $affOn ? 'translate-x-5' : 'translate-x-0' }}"></span>
-            </button>
-        </div>
-        {{-- Orders toggle --}}
-        <div class="flex items-center gap-3 flex-1 min-w-[200px] justify-between p-3 rounded-lg border {{ $ordOn ? 'border-orange-200 bg-orange-50' : 'border-gray-200 bg-gray-50' }}" id="rm-ord-card">
-            <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 {{ $ordOn ? 'text-brand-gold' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                <div>
-                    <div class="text-xs font-semibold text-text-heading">Orders Tab</div>
-                    <div class="text-[10px] text-text-muted">Visible to RM when ON</div>
-                </div>
-            </div>
-            <button type="button" id="toggle-rm-orders" data-rm="{{ $rm->id }}" data-section="show_orders" data-state="{{ $ordOn ? 'on' : 'off' }}" onclick="toggleRmSection(this)"
-                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {{ $ordOn ? 'bg-brand-gold' : 'bg-gray-300' }}">
-                <span class="inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $ordOn ? 'translate-x-5' : 'translate-x-0' }}"></span>
+            <button type="button" id="toggle-rm-referrals" data-rm="{{ $rm->id }}" data-section="show_referrals" data-state="{{ $referralsOn ? 'on' : 'off' }}" onclick="toggleRmSection(this)"
+                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {{ $referralsOn ? 'bg-brand-gold' : 'bg-gray-300' }}">
+                <span class="inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $referralsOn ? 'translate-x-5' : 'translate-x-0' }}"></span>
             </button>
         </div>
     </div>
@@ -155,7 +137,7 @@
                 <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             </div>
             <div class="min-w-0">
-                <div class="text-[10px] text-text-muted uppercase font-bold tracking-wider">Wallet Balance</div>
+                <div class="text-[10px] text-text-muted uppercase font-bold tracking-wider">Available Balance</div>
                 <div class="text-xl font-bold text-green-600 leading-tight">&#8377;{{ number_format($rmTotals['wallet'], 2) }}</div>
             </div>
         </div>
@@ -164,30 +146,25 @@
     {{-- Tabs nav --}}
     <div class="border-b border-ui-border">
         <nav class="flex gap-1 -mb-px overflow-x-auto" id="rm-tabs" role="tablist">
-            @if($showAffTab)
-            <button type="button" data-tab="affiliates" class="rm-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 {{ $rmFirstTab === 'affiliates' ? 'border-brand-gold text-brand-gold' : 'border-transparent text-text-muted hover:text-text-heading' }} inline-flex items-center gap-2 whitespace-nowrap">
+            <button type="button" data-tab="affiliates" class="rm-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-brand-gold text-brand-gold inline-flex items-center gap-2 whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                 Affiliates
                 <span class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-brand-gold/15 text-brand-gold text-[10px] font-bold">{{ $summary['affiliates_count'] }}</span>
             </button>
-            @endif
-            <button type="button" data-tab="wallet" class="rm-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 {{ $rmFirstTab === 'wallet' ? 'border-brand-gold text-brand-gold' : 'border-transparent text-text-muted hover:text-text-heading' }} inline-flex items-center gap-2 whitespace-nowrap">
+            <button type="button" data-tab="wallet" class="rm-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-text-muted hover:text-text-heading inline-flex items-center gap-2 whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                 Wallet History
                 <span class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-gray-100 text-text-muted text-[10px] font-bold">{{ $walletTransactions->count() }}</span>
             </button>
-            @if($showOrdersTab)
             <button type="button" data-tab="orders" class="rm-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-text-muted hover:text-text-heading inline-flex items-center gap-2 whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                 Order History
                 <span class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-gray-100 text-text-muted text-[10px] font-bold">{{ $summary['orders_count'] }}</span>
             </button>
-            @endif
         </nav>
     </div>
 
     {{-- Tab panel: Affiliates --}}
-    @if($showAffTab)
     <div data-panel="affiliates" class="rm-tab-panel">
         <div class="bg-white rounded-xl shadow-sm border border-ui-border overflow-hidden">
             <div class="px-5 py-4 border-b border-ui-border">
@@ -243,10 +220,9 @@
             @endif
         </div>
     </div>
-    @endif
 
     {{-- Tab panel: Wallet History --}}
-    <div data-panel="wallet" class="rm-tab-panel {{ $rmFirstTab === 'wallet' ? '' : 'hidden' }} space-y-5">
+    <div data-panel="wallet" class="rm-tab-panel hidden space-y-5">
 
         {{-- Summary cards --}}
         <div style="display:flex;gap:1rem;flex-wrap:wrap;">
@@ -294,35 +270,6 @@
                     Apply
                 </button>
             </form>
-        </div>
-        @elseif(auth()->id() === $rm->id)
-        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-6">
-            <h3 class="font-semibold text-text-heading mb-4 flex items-center gap-2">
-                <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                Request Withdrawal
-            </h3>
-            @if($rmTotals['wallet'] > 0)
-            <form method="POST" action="{{ route('affiliate.wallet-request.store') }}" class="flex flex-wrap gap-3 items-end">
-                @csrf
-                <div>
-                    <label class="block text-xs font-medium text-text-muted mb-1">Amount (max &#8377;{{ number_format($rmTotals['wallet'], 2) }})</label>
-                    <input type="number" name="amount" min="1" step="0.01" max="{{ $rmTotals['wallet'] }}" required
-                        placeholder="0.00"
-                        class="px-3 py-2 border border-ui-border rounded-lg text-sm w-44 tabular-nums">
-                </div>
-                <div class="flex-1 min-w-[200px]">
-                    <label class="block text-xs font-medium text-text-muted mb-1">Remark (optional)</label>
-                    <input type="text" name="remark" placeholder="e.g. Bank transfer" maxlength="500"
-                        class="w-full px-3 py-2 border border-ui-border rounded-lg text-sm">
-                </div>
-                <button type="submit"
-                    class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-5 py-2 rounded-lg font-semibold text-sm whitespace-nowrap">
-                    Request
-                </button>
-            </form>
-            @else
-            <p class="text-sm text-text-muted">No wallet balance available to withdraw.</p>
-            @endif
         </div>
         @endif
 
@@ -403,7 +350,6 @@
     </div>
 
     {{-- Tab panel: Order History --}}
-    @if($showOrdersTab)
     <div data-panel="orders" class="rm-tab-panel hidden">
         <div class="bg-white rounded-xl shadow-sm border border-ui-border overflow-hidden">
             <div class="px-5 py-4 border-b border-ui-border flex items-center justify-between">

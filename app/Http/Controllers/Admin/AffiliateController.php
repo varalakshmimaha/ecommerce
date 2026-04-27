@@ -260,7 +260,7 @@ class AffiliateController extends Controller
         abort_unless(auth()->user()->is_admin, 403);
         abort_unless($user->role === 'affiliate', 404);
         $section = $request->input('section');
-        $allowed = ['show_orders', 'show_referrals'];
+        $allowed = ['show_referrals'];
         if (!in_array($section, $allowed, true)) {
             return response()->json(['success' => false, 'message' => 'Invalid section.'], 422);
         }

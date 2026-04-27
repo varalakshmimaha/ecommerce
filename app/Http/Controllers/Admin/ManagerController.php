@@ -268,7 +268,7 @@ class ManagerController extends Controller
         abort_unless($manager->role === 'manager', 404);
 
         $section = $request->input('section');
-        $allowed = ['show_rms', 'show_orders'];
+        $allowed = ['show_referrals'];
         if (!in_array($section, $allowed, true)) {
             return response()->json(['success' => false, 'message' => 'Invalid section.'], 422);
         }

@@ -171,7 +171,7 @@
                         <label class="flex items-center gap-3 cursor-pointer select-none">
                             <input type="checkbox" id="use-wallet-checkbox" class="accent-brand-gold w-5 h-5">
                             <div>
-                                <div class="font-semibold text-green-900">Use Wallet Balance</div>
+                                <div class="font-semibold text-green-900">Use Available Balance</div>
                                 <div class="text-sm text-green-700">Available: <span id="wallet-available-display">₹0.00</span></div>
                             </div>
                         </label>

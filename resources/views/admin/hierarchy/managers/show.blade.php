@@ -74,42 +74,25 @@
     {{-- Feature Access Toggles (admin only) --}}
     @if(auth()->user()->is_admin)
     @php
-        $perms = $manager->permissions ?? [];
-        $rmsOn    = ($perms['show_rms']    ?? true) !== false;
-        $ordersOn = ($perms['show_orders'] ?? true) !== false;
+        $perms       = $manager->permissions ?? [];
+        $referralsOn = ($perms['show_referrals'] ?? true) !== false;
     @endphp
     <div class="bg-white rounded-xl shadow-sm border border-ui-border px-5 py-4 flex flex-wrap items-center gap-4">
         <span class="text-xs font-bold text-text-muted uppercase tracking-wider">Feature Access</span>
-        {{-- RMs toggle --}}
-        <div class="flex items-center gap-3 flex-1 min-w-[200px] justify-between p-3 rounded-lg border {{ $rmsOn ? 'border-orange-200 bg-orange-50' : 'border-gray-200 bg-gray-50' }}">
+        {{-- Earnings & Referrals toggle --}}
+        <div class="flex items-center gap-3 flex-1 min-w-[200px] justify-between p-3 rounded-lg border {{ $referralsOn ? 'border-orange-200 bg-orange-50' : 'border-gray-200 bg-gray-50' }}">
             <div>
-                <div class="text-sm font-semibold text-text-heading">RMs</div>
-                <div class="text-xs text-text-muted">Show Relationship Managers section</div>
+                <div class="text-sm font-semibold text-text-heading">Earnings &amp; Referrals</div>
+                <div class="text-xs text-text-muted">Show KPI cards, wallet &amp; referrals on frontend</div>
             </div>
             <button type="button"
-                id="toggle-rms"
+                id="toggle-referrals"
                 data-manager="{{ $manager->id }}"
-                data-section="show_rms"
-                data-state="{{ $rmsOn ? 'on' : 'off' }}"
+                data-section="show_referrals"
+                data-state="{{ $referralsOn ? 'on' : 'off' }}"
                 onclick="toggleSection(this)"
-                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {{ $rmsOn ? 'bg-brand-gold' : 'bg-gray-300' }}">
-                <span class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $rmsOn ? 'translate-x-5' : 'translate-x-0' }}"></span>
-            </button>
-        </div>
-        {{-- Orders toggle --}}
-        <div class="flex items-center gap-3 flex-1 min-w-[200px] justify-between p-3 rounded-lg border {{ $ordersOn ? 'border-orange-200 bg-orange-50' : 'border-gray-200 bg-gray-50' }}">
-            <div>
-                <div class="text-sm font-semibold text-text-heading">Orders</div>
-                <div class="text-xs text-text-muted">Show Order History section</div>
-            </div>
-            <button type="button"
-                id="toggle-orders"
-                data-manager="{{ $manager->id }}"
-                data-section="show_orders"
-                data-state="{{ $ordersOn ? 'on' : 'off' }}"
-                onclick="toggleSection(this)"
-                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {{ $ordersOn ? 'bg-brand-gold' : 'bg-gray-300' }}">
-                <span class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $ordersOn ? 'translate-x-5' : 'translate-x-0' }}"></span>
+                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {{ $referralsOn ? 'bg-brand-gold' : 'bg-gray-300' }}">
+                <span class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $referralsOn ? 'translate-x-5' : 'translate-x-0' }}"></span>
             </button>
         </div>
     </div>
@@ -149,47 +132,35 @@
                 <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             </div>
             <div class="min-w-0">
-                <div class="text-[10px] text-text-muted uppercase font-bold tracking-wider">Wallet Balance</div>
+                <div class="text-[10px] text-text-muted uppercase font-bold tracking-wider">Available Balance</div>
                 <div class="text-xl font-bold text-green-600 leading-tight">&#8377;{{ number_format($managerTotals['wallet'], 2) }}</div>
             </div>
         </div>
     </div>
 
     {{-- Tabs --}}
-    @php
-        $isAdmin    = auth()->user()->is_admin;
-        $isSelf     = auth()->id() === $manager->id;
-        $mPerms     = $manager->permissions ?? [];
-        $showRmsTab    = $isAdmin || ($isSelf && ($mPerms['show_rms']    ?? true) !== false);
-        $showOrdersTab = $isAdmin || ($isSelf && ($mPerms['show_orders'] ?? true) !== false);
-        $firstTab   = $showRmsTab ? 'rms' : 'wallet';
-    @endphp
     <div class="border-b border-ui-border">
         <nav class="flex gap-1 -mb-px overflow-x-auto" id="mgr-tabs" role="tablist">
-            @if($showRmsTab)
-            <button type="button" data-tab="rms" class="mgr-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 {{ $firstTab === 'rms' ? 'border-brand-gold text-brand-gold' : 'border-transparent text-text-muted hover:text-text-heading' }} inline-flex items-center gap-2 whitespace-nowrap">
+            <button type="button" data-tab="rms" class="mgr-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-brand-gold text-brand-gold inline-flex items-center gap-2 whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                 RMs
                 <span class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-brand-gold/15 text-brand-gold text-[10px] font-bold">{{ $summary['rms_count'] }}</span>
             </button>
-            @endif
-            <button type="button" data-tab="wallet" class="mgr-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 {{ $firstTab === 'wallet' ? 'border-brand-gold text-brand-gold' : 'border-transparent text-text-muted hover:text-text-heading' }} inline-flex items-center gap-2 whitespace-nowrap">
+            <button type="button" data-tab="wallet" class="mgr-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-text-muted hover:text-text-heading inline-flex items-center gap-2 whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                 Wallet History
                 <span class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-gray-100 text-text-muted text-[10px] font-bold">{{ $walletTransactions->count() }}</span>
             </button>
-            @if($showOrdersTab)
             <button type="button" data-tab="orders" class="mgr-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-text-muted hover:text-text-heading inline-flex items-center gap-2 whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                 Order History
                 <span class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-gray-100 text-text-muted text-[10px] font-bold">{{ $summary['orders_count'] }}</span>
             </button>
-            @endif
         </nav>
     </div>
 
     {{-- Tab panel: RMs --}}
-    <div data-panel="rms" class="mgr-tab-panel {{ $firstTab !== 'rms' ? 'hidden' : '' }}">
+    <div data-panel="rms" class="mgr-tab-panel">
         <div class="bg-white rounded-xl shadow-sm border border-ui-border overflow-hidden">
             <div class="px-5 py-4 border-b border-ui-border flex items-center justify-between">
                 <h3 class="font-semibold text-text-heading flex items-center gap-2">
@@ -303,35 +274,6 @@
                     Apply
                 </button>
             </form>
-        </div>
-@elseif(auth()->id() === $manager->id)
-        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-6">
-            <h3 class="font-semibold text-text-heading mb-4 flex items-center gap-2">
-                <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                Request Withdrawal
-            </h3>
-            @if($managerTotals['wallet'] > 0)
-            <form method="POST" action="{{ route('affiliate.wallet-request.store') }}" class="flex flex-wrap gap-3 items-end">
-                @csrf
-                <div>
-                    <label class="block text-xs font-medium text-text-muted mb-1">Amount (max &#8377;{{ number_format($managerTotals['wallet'], 2) }})</label>
-                    <input type="number" name="amount" min="1" step="0.01" max="{{ $managerTotals['wallet'] }}" required
-                        placeholder="0.00"
-                        class="px-3 py-2 border border-ui-border rounded-lg text-sm w-44 tabular-nums">
-                </div>
-                <div class="flex-1 min-w-[200px]">
-                    <label class="block text-xs font-medium text-text-muted mb-1">Remark (optional)</label>
-                    <input type="text" name="remark" placeholder="e.g. Bank transfer" maxlength="500"
-                        class="w-full px-3 py-2 border border-ui-border rounded-lg text-sm">
-                </div>
-                <button type="submit"
-                    class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-5 py-2 rounded-lg font-semibold text-sm whitespace-nowrap">
-                    Request
-                </button>
-            </form>
-            @else
-            <p class="text-sm text-text-muted">No wallet balance available to withdraw.</p>
-            @endif
         </div>
 @endif
 

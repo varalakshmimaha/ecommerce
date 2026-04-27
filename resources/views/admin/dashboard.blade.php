@@ -120,7 +120,7 @@
             </div>
         </div>
 
-        {{-- Total Wallet Balance --}}
+        {{-- Total Available Balance --}}
         <div class="bg-white rounded-xl shadow-sm border border-ui-border p-5 flex items-center gap-4">
             <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(5,150,105,0.1);">
                 <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -128,7 +128,7 @@
                 </svg>
             </div>
             <div class="min-w-0">
-                <div class="text-[11px] text-text-muted uppercase font-bold tracking-wider">Total Wallet Balance</div>
+                <div class="text-[11px] text-text-muted uppercase font-bold tracking-wider">Total Available Balance</div>
                 <div class="text-2xl font-bold text-green-600 tabular-nums mt-0.5">&#8377;{{ number_format($stats['total_wallet'], 2) }}</div>
                 <div class="text-xs text-text-muted mt-0.5">Across all members</div>
             </div>

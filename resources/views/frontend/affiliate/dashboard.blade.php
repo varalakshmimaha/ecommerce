@@ -57,37 +57,8 @@
             </div>
         </div>
 
-        {{-- Wallet Request --}}
+        {{-- Wallet Transaction History --}}
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
-            <h2 class="font-semibold text-text-heading mb-4 flex items-center gap-2">
-                <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                Wallet Request
-            </h2>
-            <form method="POST" action="{{ route('affiliate.wallet-request.store') }}" class="flex flex-wrap gap-3 items-end">
-                @csrf
-                <div>
-                    <label class="block text-xs font-medium text-text-muted mb-1">Direction *</label>
-                    <select name="direction" required
-                            class="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white min-w-[150px] focus:outline-none focus:ring-2 focus:ring-brand-gold">
-                        <option value="credit">Credit (Receive)</option>
-                        <option value="debit">Debit (Send)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-text-muted mb-1">Amount (₹) *</label>
-                    <input type="number" name="amount" min="1" step="0.01" required placeholder="0.00"
-                           class="px-3 py-2 border border-gray-200 rounded-lg text-sm w-36 tabular-nums focus:outline-none focus:ring-2 focus:ring-brand-gold">
-                </div>
-                <div class="flex-1 min-w-[200px]">
-                    <label class="block text-xs font-medium text-text-muted mb-1">Remark (optional)</label>
-                    <input type="text" name="remark" placeholder="Reason for request" maxlength="500"
-                           class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold">
-                </div>
-                <button type="submit"
-                        class="px-5 py-2 rounded-lg font-semibold text-sm text-white whitespace-nowrap bg-brand-gold hover:opacity-90">
-                    Submit Request
-                </button>
-            </form>
             @if($walletTransactions->count())
                 <div class="mt-5 border-t border-gray-100 pt-4">
                     <div class="text-xs text-text-muted uppercase font-semibold tracking-wide mb-3">My Wallet Transactions</div>
@@ -130,11 +101,11 @@
             @endif
         </div>
 
-        {{-- Wallet Balance + Withdrawal Request --}}
+        {{-- Available Balance + Withdrawal Request --}}
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
             <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
                 <div>
-                    <div class="text-xs text-text-muted uppercase font-semibold tracking-wide mb-1">Wallet Balance</div>
+                    <div class="text-xs text-text-muted uppercase font-semibold tracking-wide mb-1">Available Balance</div>
                     <div class="text-3xl font-bold text-green-600 tabular-nums">&#8377;{{ number_format($walletBalance, 2) }}</div>
                 </div>
                 @if($hasPendingRequest)
@@ -145,30 +116,6 @@
                 @endif
             </div>
 
-            @if(!$hasPendingRequest && $walletBalance > 0)
-                <form method="POST" action="{{ route('affiliate.withdrawal-request.store') }}" class="flex flex-wrap gap-3 items-end border-t border-gray-100 pt-5">
-                    @csrf
-                    <div>
-                        <label class="block text-xs font-medium text-text-muted mb-1">Withdraw Amount (₹) *</label>
-                        <input type="number" name="amount" min="1" step="0.01" max="{{ $walletBalance }}" required
-                               placeholder="0.00"
-                               class="px-3 py-2 border border-gray-200 rounded-lg text-sm w-40 tabular-nums focus:outline-none focus:ring-2 focus:ring-green-400">
-                    </div>
-                    <div class="flex-1 min-w-[200px]">
-                        <label class="block text-xs font-medium text-text-muted mb-1">Note (optional)</label>
-                        <input type="text" name="notes" placeholder="Any note for admin" maxlength="500"
-                               class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-400">
-                    </div>
-                    <button type="submit"
-                            class="px-5 py-2 rounded-lg font-semibold text-sm text-white whitespace-nowrap"
-                            style="background-color:#16a34a;"
-                            onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-                        Request Withdrawal
-                    </button>
-                </form>
-            @elseif($walletBalance <= 0)
-                <div class="border-t border-gray-100 pt-4 text-sm text-text-muted">No wallet balance available for withdrawal.</div>
-            @endif
 
             @if($withdrawalRequests->count())
                 <div class="mt-5 border-t border-gray-100 pt-4">

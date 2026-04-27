@@ -7,8 +7,8 @@
 @php
     $perms           = auth()->user()->permissions ?? [];
     $isAffiliate     = auth()->user()->role === 'affiliate';
-    $canSeeOrders    = !$isAffiliate || ($perms['show_orders']    ?? true) !== false;
-    $canSeeReferrals = !$isAffiliate || ($perms['show_referrals'] ?? true) !== false;
+    $isEarner        = in_array(auth()->user()->role, ['affiliate', 'rm', 'manager']);
+    $canSeeReferrals = !$isEarner   || ($perms['show_referrals'] ?? true) !== false;
 @endphp
 
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-white">
@@ -55,7 +55,6 @@
                         Profile
                     </span>
                 </button>
-                @if($canSeeOrders)
                 <button onclick="switchTab('orders')" id="tab-orders" class="tab-btn px-6 py-3 rounded-lg font-semibold transition-all duration-300 text-text-muted hover:text-brand-gold hover:bg-gray-50">
                     <span class="flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -64,7 +63,6 @@
                         My Orders
                     </span>
                 </button>
-                @endif
                 <button onclick="switchTab('addresses')" id="tab-addresses" class="tab-btn px-6 py-3 rounded-lg font-semibold transition-all duration-300 text-text-muted hover:text-brand-gold hover:bg-gray-50">
                     <span class="flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -154,7 +152,6 @@
             </div>
         </div>
         <!-- Orders Tab -->
-        @if($canSeeOrders)
         <div id="content-orders" class="tab-content hidden">
             <div class="grid gap-6">
                 @forelse($user->orders ?? [] as $order)
@@ -209,7 +206,6 @@
                 @endforelse
             </div>
         </div>
-        @endif
         <!-- Addresses Tab -->
         <div id="content-addresses" class="tab-content hidden">
             <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 animate-fade-in">
@@ -390,6 +386,7 @@
 
                     {{-- Commission KPI strip --}}
                     <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+                        {{-- Lifetime Earnings --}}
                         <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden flex-1" style="min-width:140px;">
                             <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#ea580c;"></div>
                             <div class="flex items-center gap-2 mb-2">
@@ -401,17 +398,31 @@
                             <div class="text-xl font-bold text-text-heading tabular-nums">&#8377;{{ number_format($commissionTotals['lifetime'], 2) }}</div>
                             <div style="font-size:10px;color:#6b7280;margin-top:3px;">Total commissions earned</div>
                         </div>
+                        {{-- Current Balance --}}
                         <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden flex-1" style="min-width:140px;">
                             <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#10b981;"></div>
                             <div class="flex items-center gap-2 mb-2">
                                 <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background:#d1fae5;">
                                     <svg class="w-4 h-4" style="color:#059669;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                                 </div>
-                                <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#047857;">Wallet Balance</div>
+                                <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#047857;">Current Balance</div>
                             </div>
                             <div class="text-xl font-bold tabular-nums" style="color:#059669;">&#8377;{{ number_format($walletBalance, 2) }}</div>
-                            <div style="font-size:10px;color:#6b7280;margin-top:3px;">Available to withdraw</div>
+                            <div style="font-size:10px;color:#6b7280;margin-top:3px;">Available in wallet</div>
                         </div>
+                        {{-- Wallet Points (pending commissions) --}}
+                        <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden flex-1" style="min-width:140px;">
+                            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#f59e0b;"></div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background:#fef3c7;">
+                                    <svg class="w-4 h-4" style="color:#d97706;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/></svg>
+                                </div>
+                                <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#92400e;">Wallet Points</div>
+                            </div>
+                            <div class="text-xl font-bold tabular-nums" style="color:#d97706;">&#8377;{{ number_format($commissionTotals['pending'], 2) }}</div>
+                            <div style="font-size:10px;color:#6b7280;margin-top:3px;">Pending commissions</div>
+                        </div>
+                        {{-- Referrals --}}
                         <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden flex-1" style="min-width:140px;">
                             <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#8b5cf6;"></div>
                             <div class="flex items-center gap-2 mb-2">
@@ -421,6 +432,7 @@
                                 <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#6d28d9;">Referrals</div>
                             </div>
                             <div class="text-xl font-bold text-text-heading tabular-nums">{{ $referralsCount }}</div>
+                            <div style="font-size:10px;color:#6b7280;margin-top:3px;">Direct referrals</div>
                         </div>
                     </div>
 
@@ -524,7 +536,7 @@
 
                         {{-- Wallet KPI Cards --}}
                         <div style="display:flex;gap:1rem;flex-wrap:wrap;">
-                            <div style="flex:1;min-width:200px;background:#fffbeb;border:1px solid #fde68a;border-radius:1rem;padding:1.25rem;display:flex;align-items:center;gap:1rem;box-shadow:0 1px 3px rgba(0,0,0,.06);">
+                            <div style="flex:1;min-width:150px;background:#fffbeb;border:1px solid #fde68a;border-radius:1rem;padding:1.25rem;display:flex;align-items:center;gap:1rem;box-shadow:0 1px 3px rgba(0,0,0,.06);">
                                 <div style="width:48px;height:48px;border-radius:.75rem;background:#fef3c7;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                                     <svg style="width:24px;height:24px;color:#d97706;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
                                 </div>
@@ -534,45 +546,36 @@
                                     <div style="font-size:10px;color:#6b7280;margin-top:2px;">Total commissions earned</div>
                                 </div>
                             </div>
-                            <div style="flex:1;min-width:200px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:1rem;padding:1.25rem;display:flex;align-items:center;gap:1rem;box-shadow:0 1px 3px rgba(0,0,0,.06);">
+                            <div style="flex:1;min-width:150px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:1rem;padding:1.25rem;display:flex;align-items:center;gap:1rem;box-shadow:0 1px 3px rgba(0,0,0,.06);">
                                 <div style="width:48px;height:48px;border-radius:.75rem;background:#dcfce7;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                                     <svg style="width:24px;height:24px;color:#16a34a;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                                 </div>
                                 <div style="flex:1;">
-                                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#15803d;margin-bottom:4px;">Valid Balance</div>
+                                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#15803d;margin-bottom:4px;">Current Balance</div>
                                     <div style="font-size:1.5rem;font-weight:800;color:#16a34a;font-variant-numeric:tabular-nums;">&#8377;{{ number_format($walletBalance, 2) }}</div>
-                                    <div style="font-size:10px;color:#6b7280;margin-top:2px;">Available to request</div>
+                                    <div style="font-size:10px;color:#6b7280;margin-top:2px;">Available in wallet</div>
                                 </div>
                             </div>
-                        </div>
-
-                        {{-- Withdrawal Request Form --}}
-                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                            <h3 class="font-bold text-text-heading flex items-center gap-2 mb-5">
-                                <svg class="w-4 h-4 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
-                                Request Withdrawal
-                            </h3>
-                            <form method="POST" action="{{ route('affiliate.wallet-request.store') }}" style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px;">
-                                @csrf
-                                <div style="display:flex;flex-direction:column;gap:6px;">
-                                    <label style="font-size:12px;font-weight:600;color:#6b7280;">Amount (&#8377;) *</label>
-                                    <input type="number" name="amount" min="1" step="0.01" required placeholder="0.00"
-                                           max="{{ $walletBalance }}"
-                                           style="width:180px;height:42px;padding:0 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;box-sizing:border-box;">
+                            <div style="flex:1;min-width:150px;background:#fffbeb;border:1px solid #fcd34d;border-radius:1rem;padding:1.25rem;display:flex;align-items:center;gap:1rem;box-shadow:0 1px 3px rgba(0,0,0,.06);">
+                                <div style="width:48px;height:48px;border-radius:.75rem;background:#fef9c3;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    <svg style="width:24px;height:24px;color:#ca8a04;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/></svg>
                                 </div>
-                                <div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:6px;">
-                                    <label style="font-size:12px;font-weight:600;color:#6b7280;">Remark (optional)</label>
-                                    <input type="text" name="remark" placeholder="e.g. Bank transfer request" maxlength="500"
-                                           style="width:100%;height:42px;padding:0 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;box-sizing:border-box;">
+                                <div style="flex:1;">
+                                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#92400e;margin-bottom:4px;">Wallet Points</div>
+                                    <div style="font-size:1.5rem;font-weight:800;color:#ca8a04;font-variant-numeric:tabular-nums;">&#8377;{{ number_format($commissionTotals['pending'], 2) }}</div>
+                                    <div style="font-size:10px;color:#6b7280;margin-top:2px;">Pending commissions</div>
                                 </div>
-                                <button type="submit"
-                                        style="height:42px;padding:0 28px;border-radius:8px;font-weight:700;font-size:14px;color:#fff;border:none;cursor:pointer;white-space:nowrap;background:linear-gradient(135deg,#f59e0b,#dc2626);">
-                                    Request
-                                </button>
-                            </form>
-                            @if($walletBalance <= 0)
-                                <p style="margin-top:10px;font-size:12px;color:#9ca3af;">No valid balance available to request. Earn commissions from delivered orders.</p>
-                            @endif
+                            </div>
+                            <div style="flex:1;min-width:150px;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:1rem;padding:1.25rem;display:flex;align-items:center;gap:1rem;box-shadow:0 1px 3px rgba(0,0,0,.06);">
+                                <div style="width:48px;height:48px;border-radius:.75rem;background:#ede9fe;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    <svg style="width:24px;height:24px;color:#7c3aed;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                                </div>
+                                <div style="flex:1;">
+                                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#5b21b6;margin-bottom:4px;">Referrals</div>
+                                    <div style="font-size:1.5rem;font-weight:800;color:#7c3aed;font-variant-numeric:tabular-nums;">{{ $referralsCount }}</div>
+                                    <div style="font-size:10px;color:#6b7280;margin-top:2px;">Direct referrals</div>
+                                </div>
+                            </div>
                         </div>
 
                         {{-- Transaction History --}}
