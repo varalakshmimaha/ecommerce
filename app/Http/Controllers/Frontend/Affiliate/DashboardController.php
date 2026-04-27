@@ -50,41 +50,27 @@ class DashboardController extends Controller
         abort_unless(in_array($user->role, ['affiliate', 'rm', 'manager'], true), 403);
 
         $validated = $request->validate([
-            'direction' => 'required|in:credit,debit,withdrawal',
-            'amount'    => 'required|numeric|min:1',
-            'remark'    => 'nullable|string|max:500',
+            'amount' => 'required|numeric|min:1',
+            'remark' => 'nullable|string|max:500',
         ]);
 
         $amount = (float) $validated['amount'];
 
-        if ($validated['direction'] === 'withdrawal') {
-            // Withdrawal → pending request, needs admin approval
-            WithdrawalRequest::create([
-                'user_id'      => $user->id,
-                'amount'       => $amount,
-                'notes'        => $validated['remark'] ?? null,
-                'request_type' => 'withdrawal',
-                'status'       => 'pending',
-            ]);
-
+        $walletBalance = WalletTransaction::balanceFor($user->id);
+        if ($amount > $walletBalance + 0.001) {
             return redirect()->route('user.dashboard', ['tab' => 'wallet'])
-                ->with('success', 'Withdrawal request of ₹' . number_format($amount, 2) . ' submitted. Awaiting admin approval.');
+                ->with('error', 'Requested amount exceeds your valid balance of ₹' . number_format($walletBalance, 2) . '.');
         }
 
-        // Add (Credit) or Remove (Debit) → immediate approved wallet transaction
-        WalletTransaction::create([
-            'user_id'    => $user->id,
-            'type'       => $validated['direction'], // 'credit' or 'debit'
-            'amount'     => $amount,
-            'remark'     => $validated['remark'] ?? null,
-            'created_by' => $user->id,
-            'status'     => 'approved',
+        WithdrawalRequest::create([
+            'user_id'      => $user->id,
+            'amount'       => $amount,
+            'notes'        => $validated['remark'] ?? null,
+            'request_type' => 'withdrawal',
+            'status'       => 'pending',
         ]);
 
-        $msg = $validated['direction'] === 'credit'
-            ? '₹' . number_format($amount, 2) . ' added to your wallet.'
-            : '₹' . number_format($amount, 2) . ' removed from your wallet.';
-
-        return redirect()->route('user.dashboard', ['tab' => 'wallet'])->with('success', $msg);
+        return redirect()->route('user.dashboard', ['tab' => 'wallet'])
+            ->with('success', 'Withdrawal request of ₹' . number_format($amount, 2) . ' submitted. Awaiting admin approval.');
     }
 }

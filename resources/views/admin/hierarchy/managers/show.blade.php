@@ -71,6 +71,50 @@
     @if(session('success'))<div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">{{ session('success') }}</div>@endif
     @if(session('error'))<div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">{{ session('error') }}</div>@endif
 
+    {{-- Feature Access Toggles (admin only) --}}
+    @if(auth()->user()->is_admin)
+    @php
+        $perms = $manager->permissions ?? [];
+        $rmsOn    = ($perms['show_rms']    ?? true) !== false;
+        $ordersOn = ($perms['show_orders'] ?? true) !== false;
+    @endphp
+    <div class="bg-white rounded-xl shadow-sm border border-ui-border px-5 py-4 flex flex-wrap items-center gap-4">
+        <span class="text-xs font-bold text-text-muted uppercase tracking-wider">Feature Access</span>
+        {{-- RMs toggle --}}
+        <div class="flex items-center gap-3 flex-1 min-w-[200px] justify-between p-3 rounded-lg border {{ $rmsOn ? 'border-orange-200 bg-orange-50' : 'border-gray-200 bg-gray-50' }}">
+            <div>
+                <div class="text-sm font-semibold text-text-heading">RMs</div>
+                <div class="text-xs text-text-muted">Show Relationship Managers section</div>
+            </div>
+            <button type="button"
+                id="toggle-rms"
+                data-manager="{{ $manager->id }}"
+                data-section="show_rms"
+                data-state="{{ $rmsOn ? 'on' : 'off' }}"
+                onclick="toggleSection(this)"
+                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {{ $rmsOn ? 'bg-brand-gold' : 'bg-gray-300' }}">
+                <span class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $rmsOn ? 'translate-x-5' : 'translate-x-0' }}"></span>
+            </button>
+        </div>
+        {{-- Orders toggle --}}
+        <div class="flex items-center gap-3 flex-1 min-w-[200px] justify-between p-3 rounded-lg border {{ $ordersOn ? 'border-orange-200 bg-orange-50' : 'border-gray-200 bg-gray-50' }}">
+            <div>
+                <div class="text-sm font-semibold text-text-heading">Orders</div>
+                <div class="text-xs text-text-muted">Show Order History section</div>
+            </div>
+            <button type="button"
+                id="toggle-orders"
+                data-manager="{{ $manager->id }}"
+                data-section="show_orders"
+                data-state="{{ $ordersOn ? 'on' : 'off' }}"
+                onclick="toggleSection(this)"
+                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {{ $ordersOn ? 'bg-brand-gold' : 'bg-gray-300' }}">
+                <span class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $ordersOn ? 'translate-x-5' : 'translate-x-0' }}"></span>
+            </button>
+        </div>
+    </div>
+    @endif
+
     {{-- KPI strip --}}
     <div class="grid grid-cols-4 gap-3">
         <div class="bg-white rounded-xl shadow-sm border border-ui-border p-4 flex items-center gap-3">
@@ -97,7 +141,7 @@
             </div>
             <div class="min-w-0">
                 <div class="text-[10px] text-text-muted uppercase font-bold tracking-wider">Lifetime Earnings</div>
-                <div class="text-xl font-bold text-brand-gold leading-tight">&#8377;{{ number_format($managerTotals['lifetime'], 0) }}</div>
+                <div class="text-xl font-bold text-brand-gold leading-tight">&#8377;{{ number_format($managerTotals['lifetime'], 2) }}</div>
             </div>
         </div>
         <div class="bg-white rounded-xl shadow-sm border border-ui-border p-4 flex items-center gap-3">
@@ -106,34 +150,46 @@
             </div>
             <div class="min-w-0">
                 <div class="text-[10px] text-text-muted uppercase font-bold tracking-wider">Wallet Balance</div>
-                <div class="text-xl font-bold text-green-600 leading-tight">&#8377;{{ number_format($managerTotals['wallet'], 0) }}</div>
+                <div class="text-xl font-bold text-green-600 leading-tight">&#8377;{{ number_format($managerTotals['wallet'], 2) }}</div>
             </div>
         </div>
     </div>
 
     {{-- Tabs --}}
+    @php
+        $isAdmin    = auth()->user()->is_admin;
+        $isSelf     = auth()->id() === $manager->id;
+        $mPerms     = $manager->permissions ?? [];
+        $showRmsTab    = $isAdmin || ($isSelf && ($mPerms['show_rms']    ?? true) !== false);
+        $showOrdersTab = $isAdmin || ($isSelf && ($mPerms['show_orders'] ?? true) !== false);
+        $firstTab   = $showRmsTab ? 'rms' : 'wallet';
+    @endphp
     <div class="border-b border-ui-border">
         <nav class="flex gap-1 -mb-px overflow-x-auto" id="mgr-tabs" role="tablist">
-            <button type="button" data-tab="rms" class="mgr-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-brand-gold text-brand-gold inline-flex items-center gap-2 whitespace-nowrap">
+            @if($showRmsTab)
+            <button type="button" data-tab="rms" class="mgr-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 {{ $firstTab === 'rms' ? 'border-brand-gold text-brand-gold' : 'border-transparent text-text-muted hover:text-text-heading' }} inline-flex items-center gap-2 whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                 RMs
                 <span class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-brand-gold/15 text-brand-gold text-[10px] font-bold">{{ $summary['rms_count'] }}</span>
             </button>
-            <button type="button" data-tab="wallet" class="mgr-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-text-muted hover:text-text-heading inline-flex items-center gap-2 whitespace-nowrap">
+            @endif
+            <button type="button" data-tab="wallet" class="mgr-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 {{ $firstTab === 'wallet' ? 'border-brand-gold text-brand-gold' : 'border-transparent text-text-muted hover:text-text-heading' }} inline-flex items-center gap-2 whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                 Wallet History
                 <span class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-gray-100 text-text-muted text-[10px] font-bold">{{ $walletTransactions->count() }}</span>
             </button>
+            @if($showOrdersTab)
             <button type="button" data-tab="orders" class="mgr-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-text-muted hover:text-text-heading inline-flex items-center gap-2 whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                 Order History
                 <span class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-gray-100 text-text-muted text-[10px] font-bold">{{ $summary['orders_count'] }}</span>
             </button>
+            @endif
         </nav>
     </div>
 
     {{-- Tab panel: RMs --}}
-    <div data-panel="rms" class="mgr-tab-panel">
+    <div data-panel="rms" class="mgr-tab-panel {{ $firstTab !== 'rms' ? 'hidden' : '' }}">
         <div class="bg-white rounded-xl shadow-sm border border-ui-border overflow-hidden">
             <div class="px-5 py-4 border-b border-ui-border flex items-center justify-between">
                 <h3 class="font-semibold text-text-heading flex items-center gap-2">
@@ -202,44 +258,34 @@
     <div data-panel="wallet" class="mgr-tab-panel hidden space-y-5">
 
         {{-- Current balance summary --}}
-        <div style="display:flex;gap:1rem;">
-            <div class="bg-green-50 border border-green-200 rounded-xl p-4 text-center flex-1">
-                <div class="text-xs text-green-700 font-bold uppercase tracking-wider mb-1">Total Added</div>
-                <div class="text-2xl font-bold text-green-700 tabular-nums">&#8377;{{ number_format($walletTransactions->where('type','credit')->sum('amount'), 2) }}</div>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center flex-1" style="min-width:150px;">
+                <div class="text-xs text-amber-700 font-bold uppercase tracking-wider mb-1">Lifetime Earnings</div>
+                <div class="text-2xl font-bold text-amber-700 tabular-nums">&#8377;{{ number_format($managerTotals['lifetime'] ?? 0, 2) }}</div>
+                <div class="text-[10px] text-amber-600 mt-1">Total commissions earned</div>
             </div>
-            <div class="bg-red-50 border border-red-200 rounded-xl p-4 text-center flex-1">
-                <div class="text-xs text-red-700 font-bold uppercase tracking-wider mb-1">Total Removed</div>
-                <div class="text-2xl font-bold text-red-700 tabular-nums">&#8377;{{ number_format($walletTransactions->where('type','debit')->sum('amount'), 2) }}</div>
-            </div>
-            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center flex-1">
-                <div class="text-xs text-blue-700 font-bold uppercase tracking-wider mb-1">Wallet Balance</div>
-                <div class="text-2xl font-bold text-blue-700 tabular-nums">&#8377;{{ number_format($managerTotals['wallet'], 2) }}</div>
+            <div class="bg-green-50 border border-green-200 rounded-xl p-4 text-center flex-1" style="min-width:150px;">
+                <div class="text-xs text-green-700 font-bold uppercase tracking-wider mb-1">Valid Balance</div>
+                <div class="text-2xl font-bold text-green-700 tabular-nums">&#8377;{{ number_format($managerTotals['wallet'], 2) }}</div>
+                <div class="text-[10px] text-green-600 mt-1">Available to withdraw</div>
             </div>
         </div>
 
-        {{-- Add / Remove form --}}
+        {{-- Wallet form: admin sees Add/Remove; manager sees own Request --}}
+        @if(auth()->user()->is_admin)
         <div class="bg-white rounded-xl shadow-sm border border-ui-border p-6">
             <h3 class="font-semibold text-text-heading mb-4 flex items-center gap-2">
                 <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                Wallet Transaction
+                Wallet Transaction <span class="text-xs font-normal text-text-muted ml-1">(Admin only)</span>
             </h3>
             <form method="POST" action="{{ route('admin.managers.wallet', $manager) }}" class="flex flex-wrap gap-3 items-end">
                 @csrf
                 <div>
                     <label class="block text-xs font-medium text-text-muted mb-1">Type *</label>
-                    <select name="type" id="mgr_wallet_type" required onchange="mgrToggleReqDir(this)"
+                    <select name="type" id="mgr_wallet_type" required
                             class="px-3 py-2 border border-ui-border rounded-lg text-sm bg-white min-w-[140px]">
                         <option value="credit">➕ Add (Credit)</option>
                         <option value="debit">➖ Remove (Debit)</option>
-                        <option value="request">📋 Request</option>
-                    </select>
-                </div>
-                <div id="mgr_req_dir" class="hidden">
-                    <label class="block text-xs font-medium text-text-muted mb-1">Direction *</label>
-                    <select name="request_direction" id="mgr_req_dir_select"
-                            class="px-3 py-2 border border-ui-border rounded-lg text-sm bg-white min-w-[140px]">
-                        <option value="credit">Credit (Receive)</option>
-                        <option value="debit">Debit (Send)</option>
                     </select>
                 </div>
                 <div>
@@ -257,16 +303,37 @@
                     Apply
                 </button>
             </form>
-            <script>
-            function mgrToggleReqDir(sel) {
-                var div = document.getElementById('mgr_req_dir');
-                var s   = document.getElementById('mgr_req_dir_select');
-                var show = sel.value === 'request';
-                div.classList.toggle('hidden', !show);
-                s.required = show;
-            }
-            </script>
         </div>
+@elseif(auth()->id() === $manager->id)
+        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-6">
+            <h3 class="font-semibold text-text-heading mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                Request Withdrawal
+            </h3>
+            @if($managerTotals['wallet'] > 0)
+            <form method="POST" action="{{ route('affiliate.wallet-request.store') }}" class="flex flex-wrap gap-3 items-end">
+                @csrf
+                <div>
+                    <label class="block text-xs font-medium text-text-muted mb-1">Amount (max &#8377;{{ number_format($managerTotals['wallet'], 2) }})</label>
+                    <input type="number" name="amount" min="1" step="0.01" max="{{ $managerTotals['wallet'] }}" required
+                        placeholder="0.00"
+                        class="px-3 py-2 border border-ui-border rounded-lg text-sm w-44 tabular-nums">
+                </div>
+                <div class="flex-1 min-w-[200px]">
+                    <label class="block text-xs font-medium text-text-muted mb-1">Remark (optional)</label>
+                    <input type="text" name="remark" placeholder="e.g. Bank transfer" maxlength="500"
+                        class="w-full px-3 py-2 border border-ui-border rounded-lg text-sm">
+                </div>
+                <button type="submit"
+                    class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-5 py-2 rounded-lg font-semibold text-sm whitespace-nowrap">
+                    Request
+                </button>
+            </form>
+            @else
+            <p class="text-sm text-text-muted">No wallet balance available to withdraw.</p>
+            @endif
+        </div>
+@endif
 
         {{-- Transaction history --}}
         <div class="bg-white rounded-xl shadow-sm border border-ui-border overflow-hidden">
@@ -455,5 +522,59 @@
         activate(initial);
     }
 })();
+
+// Per-manager section toggle (admin only)
+async function toggleSection(btn) {
+    const managerId = btn.dataset.manager;
+    const section   = btn.dataset.section;
+    const isOn      = btn.dataset.state === 'on';
+    const newState  = !isOn;
+    const isRms     = section === 'show_rms';
+
+    btn.disabled = true;
+    try {
+        const res = await fetch(`/admin/managers/${managerId}/toggle-section`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+            },
+            body: JSON.stringify({ section, value: newState })
+        });
+        const json = await res.json();
+        if (json.success) {
+            btn.dataset.state = newState ? 'on' : 'off';
+
+            // Button color
+            if (newState) {
+                btn.classList.remove('bg-gray-300');
+                btn.classList.add('bg-brand-gold');
+            } else {
+                btn.classList.remove('bg-brand-gold');
+                btn.classList.add('bg-gray-300');
+            }
+
+            // Thumb position
+            const thumb = btn.querySelector('span');
+            if (thumb) {
+                if (newState) { thumb.classList.remove('translate-x-0'); thumb.classList.add('translate-x-5'); }
+                else          { thumb.classList.remove('translate-x-5'); thumb.classList.add('translate-x-0'); }
+            }
+
+            // Card background
+            const card = btn.closest('.rounded-lg');
+            if (card) {
+                if (newState) {
+                    card.classList.remove('border-gray-200', 'bg-gray-50');
+                    card.classList.add('border-orange-200', 'bg-orange-50');
+                } else {
+                    card.classList.remove('border-orange-200', 'bg-orange-50');
+                    card.classList.add('border-gray-200', 'bg-gray-50');
+                }
+            }
+        }
+    } catch(e) {}
+    btn.disabled = false;
+}
 </script>
 @endsection

@@ -120,48 +120,20 @@
             </div>
         </div>
 
-        {{-- Pending Withdrawals --}}
-        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-5 flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(8,145,178,0.1);">
-                <svg class="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-                </svg>
-            </div>
-            <div class="min-w-0">
-                <div class="text-[11px] text-text-muted uppercase font-bold tracking-wider">Pending Withdrawals</div>
-                <div class="text-2xl font-bold text-text-heading tabular-nums mt-0.5">{{ number_format($stats['pending_withdrawals']) }}</div>
-                <a href="{{ route('admin.withdrawal-requests.index') }}" class="text-xs text-brand-gold hover:underline mt-0.5 block">Review →</a>
-            </div>
-        </div>
-    </div>
-
-    {{-- Row 3: Commission + Wallet highlights --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson rounded-xl p-5 text-white flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-            </div>
-            <div>
-                <div class="text-[11px] text-white/70 uppercase font-bold tracking-wider">Pending Commissions</div>
-                <div class="text-3xl font-bold tabular-nums mt-1">&#8377;{{ number_format($stats['pending_commissions'], 2) }}</div>
-                <a href="{{ route('admin.commissions.index') }}" class="text-xs text-white/80 hover:text-white mt-0.5 block">View commissions →</a>
-            </div>
-        </div>
-
+        {{-- Total Wallet Balance --}}
         <div class="bg-white rounded-xl shadow-sm border border-ui-border p-5 flex items-center gap-4">
             <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(5,150,105,0.1);">
                 <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
             </div>
-            <div>
+            <div class="min-w-0">
                 <div class="text-[11px] text-text-muted uppercase font-bold tracking-wider">Total Wallet Balance</div>
-                <div class="text-3xl font-bold text-green-600 tabular-nums mt-1">&#8377;{{ number_format($stats['total_wallet'], 2) }}</div>
+                <div class="text-2xl font-bold text-green-600 tabular-nums mt-0.5">&#8377;{{ number_format($stats['total_wallet'], 2) }}</div>
                 <div class="text-xs text-text-muted mt-0.5">Across all members</div>
             </div>
         </div>
+
     </div>
 
     {{-- Recent Orders --}}

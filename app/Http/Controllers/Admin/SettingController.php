@@ -27,7 +27,7 @@ class SettingController extends Controller
             'bank_ifsc' => Setting::get('bank_ifsc'),
             'bank_account_holder' => Setting::get('bank_account_holder'),
             'enable_favourites' => Setting::get('enable_favourites', 'false'),
-            'enable_compare' => Setting::get('enable_compare', 'false'),
+            'enable_compare'    => Setting::get('enable_compare', 'false'),
         ];
 
         $footerSections = FooterSection::with('links')->orderBy('sort_order')->get();
@@ -51,7 +51,7 @@ class SettingController extends Controller
             'bank_ifsc' => 'nullable|string|max:20',
             'bank_account_holder' => 'nullable|string|max:255',
             'enable_favourites' => 'nullable|in:true,false',
-            'enable_compare' => 'nullable|in:true,false',
+            'enable_compare'    => 'nullable|in:true,false',
         ]);
 
         foreach ($validated as $key => $value) {

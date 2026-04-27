@@ -8,7 +8,6 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\WalletTransaction;
-use App\Models\WithdrawalRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -24,12 +23,18 @@ class AdminController extends Controller
         $user = Auth::user();
 
         if (!$user->is_admin) {
-            if ($user->role === 'manager') {
-                return redirect()->route('admin.managers.show', $user);
-            }
-            if ($user->role === 'rm') {
-                return redirect()->route('admin.rms.show', $user);
-            }
+            $walletBalance    = WalletTransaction::balanceFor($user->id);
+            $lifetimeEarnings = (float) Commission::where('beneficiary_user_id', $user->id)
+                ->whereIn('status', ['pending', 'approved'])
+                ->sum('amount');
+            $totalOrders      = Order::where('user_id', $user->id)->count();
+            $recentOrders     = Order::where('user_id', $user->id)
+                ->latest()->take(5)
+                ->get(['id', 'order_number', 'total_amount', 'wallet_used', 'payment_method', 'order_status', 'payment_status', 'created_at']);
+
+            return view('admin.dashboard-user', compact(
+                'user', 'walletBalance', 'lifetimeEarnings', 'totalOrders', 'recentOrders'
+            ));
         }
 
         $stats = [
@@ -42,10 +47,8 @@ class AdminController extends Controller
             'total_affiliates'   => User::where('role', 'affiliate')->count(),
             'total_rms'          => User::where('role', 'rm')->count(),
             'total_managers'     => User::where('role', 'manager')->count(),
-            'pending_commissions'=> (float) Commission::where('status', 'pending')->sum('amount'),
             'total_wallet'       => (float) WalletTransaction::where('type', 'credit')->where('status', 'approved')->sum('amount')
                                   - (float) WalletTransaction::where('type', 'debit')->where('status', 'approved')->sum('amount'),
-            'pending_withdrawals'=> WithdrawalRequest::where('status', 'pending')->count(),
         ];
 
         $recentOrders = Order::latest()->take(8)->get(['id', 'order_number', 'name', 'mobile', 'total_amount', 'order_status', 'payment_status', 'created_at']);

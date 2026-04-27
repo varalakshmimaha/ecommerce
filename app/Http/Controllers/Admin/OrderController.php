@@ -11,7 +11,12 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
+        $authUser = auth()->user();
         $query = Order::with(['user', 'items.product']);
+
+        if (!$authUser->is_admin) {
+            $query->where('user_id', $authUser->id);
+        }
 
         if ($request->has('status')) {
             $query->where('order_status', $request->status);
@@ -22,7 +27,8 @@ class OrderController extends Controller
         }
 
         $orders = $query->orderBy('created_at', 'desc')->paginate(20);
-        return view('admin.orders.index', compact('orders'));
+        $isNonAdmin = !$authUser->is_admin;
+        return view('admin.orders.index', compact('orders', 'isNonAdmin'));
     }
 
     public function show(Order $order)

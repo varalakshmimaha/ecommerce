@@ -6,8 +6,17 @@
 <section class="bg-gradient-to-br from-gray-50 to-white py-10 min-h-screen">
     <div class="container mx-auto px-4 max-w-3xl">
         <div class="mb-6">
-            <h1 class="text-3xl font-bold text-text-heading">Affiliate Application</h1>
-            <p class="text-text-muted mt-1">Fill in your KYC and bank details below. Approval usually takes 1–2 business days.</p>
+            @if(auth()->user()?->affiliate_status === 'pending' && !(auth()->user()?->affiliateProfile?->pan_number))
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-100 text-amber-700 text-xs font-bold rounded-full uppercase tracking-wider mb-3">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                    KYC Required to Activate Account
+                </div>
+                <h1 class="text-3xl font-bold text-text-heading">Complete Your KYC</h1>
+                <p class="text-text-muted mt-1">You registered via a referral code. Please submit your KYC and bank details so the admin can verify and activate your affiliate account.</p>
+            @else
+                <h1 class="text-3xl font-bold text-text-heading">Affiliate Application</h1>
+                <p class="text-text-muted mt-1">Fill in your KYC and bank details below. Approval usually takes 1–2 business days.</p>
+            @endif
         </div>
 
         @if($user->affiliate_status === 'rejected' && $profile->rejection_reason)

@@ -8,8 +8,10 @@ use App\Models\Commission;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\WalletTransaction;
+use App\Models\WithdrawalRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class ManagerController extends Controller
 {
@@ -136,6 +138,7 @@ class ManagerController extends Controller
             'role'             => 'manager',
             'affiliate_status' => 'none',
             'is_verified'      => true,
+            'referral_code'    => $this->generateReferralCode($validated['name']),
         ]);
 
         $kycPath = $request->file('kyc_doc')->store('kyc', 'public');
@@ -163,6 +166,7 @@ class ManagerController extends Controller
     public function show(User $manager)
     {
         abort_unless($manager->role === 'manager', 404);
+        abort_unless(auth()->user()->is_admin || auth()->id() === $manager->id, 403);
 
         $rms = User::where('parent_id', $manager->id)
             ->where('role', 'rm')
@@ -258,35 +262,57 @@ class ManagerController extends Controller
         ));
     }
 
+    public function toggleSection(Request $request, User $manager)
+    {
+        abort_unless(auth()->user()->is_admin, 403);
+        abort_unless($manager->role === 'manager', 404);
+
+        $section = $request->input('section');
+        $allowed = ['show_rms', 'show_orders'];
+        if (!in_array($section, $allowed, true)) {
+            return response()->json(['success' => false, 'message' => 'Invalid section.'], 422);
+        }
+
+        $perms = $manager->permissions ?? [];
+        $perms[$section] = (bool) $request->input('value', true);
+        $manager->permissions = $perms;
+        $manager->save();
+
+        return response()->json(['success' => true, 'section' => $section, 'value' => $perms[$section]]);
+    }
+
     public function walletTransaction(Request $request, User $manager)
     {
         abort_unless($manager->role === 'manager', 404);
 
         $validated = $request->validate([
-            'type'              => 'required|in:credit,debit,request',
-            'request_direction' => 'required_if:type,request|nullable|in:credit,debit',
-            'amount'            => 'required|numeric|min:0.01',
-            'remark'            => 'nullable|string|max:500',
+            'type'   => 'required|in:credit,debit,request',
+            'amount' => 'required|numeric|min:0.01',
+            'remark' => 'nullable|string|max:500',
         ]);
 
-        $isRequest = $validated['type'] === 'request';
-        $txType    = $isRequest ? $validated['request_direction'] : $validated['type'];
-        $status    = $isRequest ? 'pending' : 'approved';
+        if ($validated['type'] === 'request') {
+            WithdrawalRequest::create([
+                'user_id'      => $manager->id,
+                'amount'       => $validated['amount'],
+                'notes'        => $validated['remark'] ?? null,
+                'request_type' => 'credit',
+                'status'       => 'pending',
+            ]);
+            return redirect()->back()->with('success', 'Credit request for ₹' . number_format($validated['amount'], 2) . ' submitted. Approve it from Withdrawal Requests.');
+        }
 
         WalletTransaction::create([
             'user_id'    => $manager->id,
-            'type'       => $txType,
+            'type'       => $validated['type'],
             'amount'     => $validated['amount'],
             'remark'     => $validated['remark'] ?? null,
             'created_by' => auth()->id(),
-            'status'     => $status,
+            'status'     => 'approved',
         ]);
 
-        $message = $isRequest
-            ? 'Wallet request for ₹' . number_format($validated['amount'], 2) . ' submitted as pending.'
-            : '₹' . number_format($validated['amount'], 2) . ' ' . ($txType === 'credit' ? 'added to' : 'removed from') . ' wallet.';
-
-        return redirect()->back()->with('success', $message);
+        $msg = '₹' . number_format($validated['amount'], 2) . ' ' . ($validated['type'] === 'credit' ? 'added to' : 'removed from') . ' wallet.';
+        return redirect()->back()->with('success', $msg);
     }
 
     public function approveWallet(WalletTransaction $transaction)
@@ -369,5 +395,14 @@ class ManagerController extends Controller
         // Demote instead of hard-delete — their RMs / commissions stay linked.
         $manager->update(['role' => 'customer', 'parent_id' => null]);
         return redirect()->route('admin.managers.index')->with('success', 'Manager removed (demoted to customer).');
+    }
+
+    private function generateReferralCode(string $name): string
+    {
+        $base = strtoupper(Str::of($name)->slug('')->substr(0, 3)->padLeft(3, 'X'));
+        do {
+            $code = $base . strtoupper(Str::random(5));
+        } while (User::where('referral_code', $code)->exists());
+        return $code;
     }
 }

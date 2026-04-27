@@ -40,7 +40,6 @@ class User extends Authenticatable
         'approved_at' => 'datetime',
         'is_admin' => 'boolean',
         'is_verified' => 'boolean',
-        'password' => 'hashed',
         'permissions' => 'array',
     ];
 
@@ -81,7 +80,10 @@ class User extends Authenticatable
 
     public function isStaff(): bool
     {
-        return in_array($this->role, ['affiliate', 'rm', 'manager'], true);
+        if ($this->role === 'affiliate') {
+            return $this->affiliate_status === 'approved';
+        }
+        return in_array($this->role, ['rm', 'manager'], true);
     }
 
     public function uplineByRole(): array
@@ -91,10 +93,15 @@ class User extends Authenticatable
         $guard    = 0;
 
         while ($parentId && $guard++ < 10) {
-            $node = User::select(['id', 'name', 'role', 'parent_id'])->find($parentId);
+            $node = User::select(['id', 'name', 'role', 'parent_id', 'affiliate_status'])->find($parentId);
             if (!$node) break;
 
             if (in_array($node->role, ['affiliate', 'rm', 'manager'], true) && !isset($chain[$node->role])) {
+                // Pending/unapproved affiliates do not earn commission; keep walking up to find the approved one
+                if ($node->role === 'affiliate' && $node->affiliate_status !== 'approved') {
+                    $parentId = $node->parent_id;
+                    continue;
+                }
                 $chain[$node->role] = $node;
             }
             $parentId = $node->parent_id;

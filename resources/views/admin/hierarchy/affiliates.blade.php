@@ -55,7 +55,6 @@
                             <th class="text-left px-4 py-3">Parent</th>
                             <th class="text-left px-4 py-3">Status</th>
                             <th class="text-right px-4 py-3">Refs</th>
-                            <th class="text-right px-4 py-3">Paid</th>
                             <th class="text-left px-4 py-3">Actions</th>
                         </tr>
                     </thead>
@@ -64,7 +63,6 @@
                             @php
                                 $profile = $a->affiliateProfile;
                                 $t = $commissionTotals[$a->id] ?? [];
-                                $paid = $t['paid'] ?? 0;
                                 $refs = $referralCounts[$a->id] ?? 0;
                                 $st = $a->affiliate_status;
                                 $badge = [
@@ -105,7 +103,6 @@
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 text-right font-semibold">{{ $refs }}</td>
-                                <td class="px-4 py-3 text-right tabular-nums {{ $paid > 0 ? 'text-green-700 font-semibold' : 'text-gray-400' }}">&#8377;{{ number_format($paid, 0) }}</td>
                                 <td class="px-4 py-3 whitespace-nowrap">
                                     <a href="{{ route('admin.affiliates.show', $a) }}" class="text-emerald-600 hover:text-emerald-800 text-xs font-semibold">View</a>
                                     <a href="{{ route('admin.affiliates.edit', $a) }}" class="text-blue-600 hover:text-blue-800 text-xs font-semibold ml-2">Edit</a>

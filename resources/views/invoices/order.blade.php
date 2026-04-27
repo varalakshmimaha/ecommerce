@@ -221,11 +221,24 @@
                                 </div>
                             @endif
 
+                            @if((float)$order->wallet_used > 0)
+                            <div class="flex justify-between text-green-700 font-medium">
+                                <span>Wallet Applied:</span>
+                                <span>-₹{{ number_format($order->wallet_used, 2) }}</span>
+                            </div>
+                            @endif
+
                             <div class="border-t-2 border-[#D4AF37]/50 pt-3 mt-3">
                                 <div class="flex justify-between items-center">
                                     <span class="text-xl font-bold text-gray-900">Grand Total:</span>
                                     <span class="text-2xl font-bold text-brand-gold">₹{{ number_format($order->total_amount, 2) }}</span>
                                 </div>
+                                @if((float)$order->wallet_used > 0)
+                                <div class="flex justify-between items-center mt-2">
+                                    <span class="text-base font-semibold text-gray-700">Amount Payable:</span>
+                                    <span class="text-lg font-bold text-red-600">₹{{ number_format($order->remaining_payable, 2) }}</span>
+                                </div>
+                                @endif
                             </div>
                         </div>
                     </div>

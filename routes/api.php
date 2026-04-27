@@ -29,7 +29,7 @@ Route::get('/settings/features', function () {
         'success' => true,
         'data' => [
             'enable_favourites' => \App\Models\Setting::get('enable_favourites', 'false') === 'true',
-            'enable_compare' => \App\Models\Setting::get('enable_compare', 'false') === 'true',
+            'enable_compare'    => \App\Models\Setting::get('enable_compare', 'false') === 'true',
         ]
     ]);
 });
@@ -52,6 +52,7 @@ Route::post('/checkout/calculate', [CheckoutController::class, 'calculateTotal']
 Route::post('/checkout/place-order', [CheckoutController::class, 'placeOrder']);
 Route::post('/checkout/create-razorpay-order', [CheckoutController::class, 'createRazorpayOrder']);
 Route::post('/checkout/verify-razorpay-payment', [CheckoutController::class, 'verifyRazorpayPayment']);
+Route::post('/checkout/verify-wallet-order', [CheckoutController::class, 'verifyWalletOrder']);
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {

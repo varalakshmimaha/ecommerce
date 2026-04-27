@@ -16,7 +16,7 @@ class EnsureUserIsAdmin
         }
 
         $user = Auth::user();
-        $hasAccess = $user->is_admin || in_array($user->role, ['manager', 'rm'], true);
+        $hasAccess = $user->is_admin || in_array($user->role, ['manager', 'rm', 'affiliate'], true);
 
         if (!$hasAccess) {
             return redirect()->route('user.dashboard')->with('error', 'You do not have admin access.');

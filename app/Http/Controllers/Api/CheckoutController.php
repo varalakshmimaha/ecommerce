@@ -19,6 +19,7 @@ use App\Mail\NewUserCredentials;
 use Illuminate\Support\Facades\Hash;
 use Razorpay\Api\Api;
 use App\Services\CommissionService;
+use App\Models\WalletTransaction;
 
 class CheckoutController extends Controller
 {
@@ -115,6 +116,10 @@ class CheckoutController extends Controller
             $shippingCharge = (float) Setting::get('shipping_charge', 0);
             $totalAmount = $subtotal + $gstAmount + $shippingCharge;
 
+            // Wallet deduction (affiliate / rm / manager roles only)
+            $walletUsed = 0.0;
+            $remainingPayable = $totalAmount;
+
             // Handle payment proof upload
             $paymentProofPath = null;
             if ($request->hasFile('payment_proof')) {
@@ -163,6 +168,15 @@ class CheckoutController extends Controller
                 }
             }
 
+            // Compute wallet contribution for eligible roles (only if user explicitly opted in)
+            $useWallet = filter_var($request->input('use_wallet', false), FILTER_VALIDATE_BOOLEAN);
+            $userModel = \App\Models\User::find($userId);
+            if ($useWallet && $userModel && in_array($userModel->role, ['affiliate', 'rm', 'manager'])) {
+                $walletBalance = WalletTransaction::balanceFor($userId);
+                $walletUsed = min($walletBalance, $totalAmount);
+                $remainingPayable = $totalAmount - $walletUsed;
+            }
+
             // Create order
             $address = null;
             if ($request->address_id) {
@@ -193,6 +207,8 @@ class CheckoutController extends Controller
                 'gst_amount' => $gstAmount,
                 'shipping_charge' => $shippingCharge,
                 'total_amount' => $totalAmount,
+                'wallet_used' => $walletUsed,
+                'remaining_payable' => $remainingPayable,
                 'payment_status' => 'pending',
                 'order_status' => 'pending',
                 'payment_method' => $request->payment_method,
@@ -225,6 +241,17 @@ class CheckoutController extends Controller
             }
 
             app(CommissionService::class)->generateForOrder($order);
+
+            if ($walletUsed > 0) {
+                WalletTransaction::create([
+                    'user_id'    => $userId,
+                    'type'       => 'debit',
+                    'amount'     => $walletUsed,
+                    'remark'     => 'Wallet applied to order #' . $order->order_number,
+                    'created_by' => null,
+                    'status'     => 'approved',
+                ]);
+            }
 
             DB::commit();
 
@@ -321,12 +348,36 @@ class CheckoutController extends Controller
         $shippingCharge = (float) Setting::get('shipping_charge', 0);
         $totalAmount = $subtotal + $gstAmount + $shippingCharge;
 
+        $walletBalance = 0.0;
+        $walletUsed = 0.0;
+        $remainingPayable = $totalAmount;
+
+        $useWallet = filter_var($request->input('use_wallet', false), FILTER_VALIDATE_BOOLEAN);
+
+        $token = $request->bearerToken();
+        if ($token) {
+            $sanctumToken = \Laravel\Sanctum\PersonalAccessToken::findToken($token);
+            if ($sanctumToken) {
+                $authUser = \App\Models\User::find($sanctumToken->tokenable_id);
+                if ($authUser && in_array($authUser->role, ['affiliate', 'rm', 'manager'])) {
+                    $walletBalance = WalletTransaction::balanceFor($authUser->id);
+                    if ($useWallet && $walletBalance > 0) {
+                        $walletUsed = min($walletBalance, $totalAmount);
+                        $remainingPayable = $totalAmount - $walletUsed;
+                    }
+                }
+            }
+        }
+
         return response()->json([
-            'subtotal' => $subtotal,
-            'gst_amount' => $gstAmount,
+            'subtotal'        => $subtotal,
+            'gst_amount'      => $gstAmount,
             'shipping_charge' => $shippingCharge,
-            'total_amount' => $totalAmount,
-            'items' => $items,
+            'total_amount'    => $totalAmount,
+            'wallet_balance'  => $walletBalance,
+            'wallet_used'     => $walletUsed,
+            'remaining_payable' => $remainingPayable,
+            'items'           => $items,
         ]);
     }
 
@@ -398,6 +449,20 @@ class CheckoutController extends Controller
             $shippingCharge = (float) Setting::get('shipping_charge', 0);
             $totalAmount = $subtotal + $gstAmount + $shippingCharge;
 
+            // Wallet contribution for Razorpay orders (only if user explicitly opted in)
+            $useWallet = filter_var($request->input('use_wallet', false), FILTER_VALIDATE_BOOLEAN);
+            $walletUsed = 0.0;
+            $remainingPayable = $totalAmount;
+            $userId = auth()->id();
+            if ($useWallet && $userId) {
+                $userModel = \App\Models\User::find($userId);
+                if ($userModel && in_array($userModel->role, ['affiliate', 'rm', 'manager'])) {
+                    $walletBalance = WalletTransaction::balanceFor($userId);
+                    $walletUsed = min($walletBalance, $totalAmount);
+                    $remainingPayable = $totalAmount - $walletUsed;
+                }
+            }
+
             // Get Razorpay settings
             $razorpaySettings = PaymentSetting::getSettings('razorpay');
             
@@ -410,15 +475,15 @@ class CheckoutController extends Controller
             // Create Razorpay order
             $api = new Api($razorpaySettings['key_id'], $razorpaySettings['key_secret']);
             
+            $chargeAmount = $remainingPayable > 0 ? $remainingPayable : $totalAmount;
             $razorpayOrder = $api->order->create([
                 'receipt' => 'receipt_' . time(),
-                'amount' => $totalAmount * 100, // Convert to paise
+                'amount' => (int) round($chargeAmount * 100), // paise
                 'currency' => 'INR',
                 'payment_capture' => 1
             ]);
 
             // Create order in database with pending status
-            $userId = auth()->id();
             $order = Order::create([
                 'user_id' => $userId,
                 'razorpay_order_id' => $razorpayOrder['id'],
@@ -431,6 +496,8 @@ class CheckoutController extends Controller
                 'gst_amount' => $gstAmount,
                 'shipping_charge' => $shippingCharge,
                 'total_amount' => $totalAmount,
+                'wallet_used' => $walletUsed,
+                'remaining_payable' => $remainingPayable,
                 'payment_status' => 'pending',
                 'order_status' => 'pending',
                 'payment_method' => 'razorpay',
@@ -458,7 +525,10 @@ class CheckoutController extends Controller
                 'success' => true,
                 'razorpay_order_id' => $razorpayOrder['id'],
                 'order_id' => $order->id,
-                'amount' => $totalAmount,
+                'amount' => $chargeAmount,
+                'total_amount' => $totalAmount,
+                'wallet_used' => $walletUsed,
+                'remaining_payable' => $remainingPayable,
                 'key_id' => $razorpaySettings['key_id']
             ]);
 
@@ -466,6 +536,48 @@ class CheckoutController extends Controller
             return response()->json([
                 'error' => 'Failed to create Razorpay order: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    public function verifyWalletOrder(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'order_id' => 'required|exists:orders,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        try {
+            $order = Order::findOrFail($request->order_id);
+
+            if ((float) $order->remaining_payable > 0) {
+                return response()->json(['success' => false, 'error' => 'Payment still required.'], 400);
+            }
+
+            DB::transaction(function () use ($order) {
+                $order->update([
+                    'payment_status' => 'verified',
+                    'order_status'   => 'confirmed',
+                ]);
+
+                if ((float) $order->wallet_used > 0) {
+                    WalletTransaction::create([
+                        'user_id'    => $order->user_id,
+                        'type'       => 'debit',
+                        'amount'     => $order->wallet_used,
+                        'remark'     => 'Wallet applied to order #' . $order->order_number,
+                        'created_by' => null,
+                        'status'     => 'approved',
+                    ]);
+                }
+            });
+
+            return response()->json(['success' => true, 'order_number' => $order->order_number]);
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
 
@@ -493,12 +605,24 @@ class CheckoutController extends Controller
             
             // Verify payment status and order ID
             if ($payment->status === 'captured' && $payment->order_id === $request->razorpay_order_id) {
-                // Update order status
-                $order->update([
-                    'razorpay_payment_id' => $request->razorpay_payment_id,
-                    'payment_status' => 'verified',
-                    'order_status' => 'confirmed'
-                ]);
+                DB::transaction(function () use ($order, $request) {
+                    $order->update([
+                        'razorpay_payment_id' => $request->razorpay_payment_id,
+                        'payment_status' => 'verified',
+                        'order_status' => 'confirmed',
+                    ]);
+
+                    if ((float) $order->wallet_used > 0) {
+                        WalletTransaction::create([
+                            'user_id'    => $order->user_id,
+                            'type'       => 'debit',
+                            'amount'     => $order->wallet_used,
+                            'remark'     => 'Wallet applied to order #' . $order->order_number,
+                            'created_by' => null,
+                            'status'     => 'approved',
+                        ]);
+                    }
+                });
 
                 return response()->json([
                     'success' => true,

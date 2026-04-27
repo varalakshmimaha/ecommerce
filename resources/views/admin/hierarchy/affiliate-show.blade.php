@@ -12,6 +12,11 @@
         'rejected' => 'bg-red-100 text-red-700 border-red-200',
         'none' => 'bg-gray-100 text-gray-600 border-gray-200',
     ][$user->affiliate_status] ?? 'bg-gray-100 text-gray-600 border-gray-200';
+    $isAdmin    = auth()->user()->is_admin;
+    $isSelf     = auth()->id() === $user->id;
+    $aPerms     = $user->permissions ?? [];
+    $showOrdTab = $isAdmin || ($isSelf && ($aPerms['show_orders']    ?? true) !== false);
+    $showRefTab = $isAdmin || ($isSelf && ($aPerms['show_referrals'] ?? true) !== false);
 @endphp
 
 <div class="space-y-6">
@@ -54,6 +59,44 @@
     @if(session('success'))<div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">{{ session('success') }}</div>@endif
     @if(session('error'))<div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">{{ session('error') }}</div>@endif
 
+    @if(auth()->user()->is_admin)
+    @php
+        $ordOn = ($aPerms['show_orders']    ?? true) !== false;
+        $refOn = ($aPerms['show_referrals'] ?? true) !== false;
+    @endphp
+    <div class="bg-white rounded-xl shadow-sm border border-ui-border px-5 py-4 flex flex-wrap items-center gap-4">
+        <span class="text-xs font-bold text-text-muted uppercase tracking-wider">Feature Access</span>
+        {{-- Orders toggle --}}
+        <div class="flex items-center gap-3 flex-1 min-w-[200px] justify-between p-3 rounded-lg border {{ $ordOn ? 'border-orange-200 bg-orange-50' : 'border-gray-200 bg-gray-50' }}" id="aff-ord-card">
+            <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 {{ $ordOn ? 'text-brand-gold' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                <div>
+                    <div class="text-xs font-semibold text-text-heading">Orders Tab</div>
+                    <div class="text-[10px] text-text-muted">Visible to Affiliate when ON</div>
+                </div>
+            </div>
+            <button type="button" id="toggle-aff-orders" data-user="{{ $user->id }}" data-section="show_orders" data-state="{{ $ordOn ? 'on' : 'off' }}" onclick="toggleAffSection(this)"
+                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {{ $ordOn ? 'bg-brand-gold' : 'bg-gray-300' }}">
+                <span class="inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $ordOn ? 'translate-x-5' : 'translate-x-0' }}"></span>
+            </button>
+        </div>
+        {{-- Referrals toggle --}}
+        <div class="flex items-center gap-3 flex-1 min-w-[200px] justify-between p-3 rounded-lg border {{ $refOn ? 'border-orange-200 bg-orange-50' : 'border-gray-200 bg-gray-50' }}" id="aff-ref-card">
+            <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 {{ $refOn ? 'text-brand-gold' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                <div>
+                    <div class="text-xs font-semibold text-text-heading">Referrals Tab</div>
+                    <div class="text-[10px] text-text-muted">Visible to Affiliate when ON</div>
+                </div>
+            </div>
+            <button type="button" id="toggle-aff-referrals" data-user="{{ $user->id }}" data-section="show_referrals" data-state="{{ $refOn ? 'on' : 'off' }}" onclick="toggleAffSection(this)"
+                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {{ $refOn ? 'bg-brand-gold' : 'bg-gray-300' }}">
+                <span class="inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $refOn ? 'translate-x-5' : 'translate-x-0' }}"></span>
+            </button>
+        </div>
+    </div>
+    @endif
+
     {{-- Referral Card --}}
     @if($referralLink)
         <div class="bg-gradient-to-br from-brand-gold via-brand-amber to-brand-crimson rounded-xl shadow-sm p-6 text-white">
@@ -87,7 +130,7 @@
             </div>
             <div class="min-w-0">
                 <div class="text-[10px] text-text-muted uppercase font-bold tracking-wider">Lifetime Earnings</div>
-                <div class="text-xl font-bold text-brand-gold leading-tight">&#8377;{{ number_format($totals['lifetime'], 0) }}</div>
+                <div class="text-xl font-bold text-brand-gold leading-tight">&#8377;{{ number_format($totals['lifetime'], 2) }}</div>
             </div>
         </div>
         <div class="bg-white rounded-xl shadow-sm border border-ui-border p-4 flex items-center gap-3 flex-1">
@@ -96,7 +139,7 @@
             </div>
             <div class="min-w-0">
                 <div class="text-[10px] text-text-muted uppercase font-bold tracking-wider">Wallet Balance</div>
-                <div class="text-xl font-bold text-green-600 leading-tight">&#8377;{{ number_format($totals['wallet'], 0) }}</div>
+                <div class="text-xl font-bold text-green-600 leading-tight">&#8377;{{ number_format($totals['wallet'], 2) }}</div>
             </div>
         </div>
         <div class="bg-white rounded-xl shadow-sm border border-ui-border p-4 flex items-center gap-3 flex-1">
@@ -122,16 +165,20 @@
                 My Wallet
                 <span class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-gray-100 text-text-muted text-[10px] font-bold">{{ $walletTransactions->count() }}</span>
             </button>
+            @if($showOrdTab)
             <button type="button" data-tab="orders" class="aff-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-text-muted hover:text-text-heading inline-flex items-center gap-2 whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                 Orders
                 <span class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-gray-100 text-text-muted text-[10px] font-bold">{{ $orderHistory->count() }}</span>
             </button>
+            @endif
+            @if($showRefTab)
             <button type="button" data-tab="referrals" class="aff-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-text-muted hover:text-text-heading inline-flex items-center gap-2 whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
                 Referrals
                 <span class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-gray-100 text-text-muted text-[10px] font-bold">{{ $referredUsersCount }}</span>
             </button>
+            @endif
         </nav>
     </div>
 
@@ -372,43 +419,33 @@
 
     {{-- Tab panel: My Wallet --}}
     <div data-panel="wallet" class="aff-tab-panel hidden space-y-5">
-        <div style="display:flex;gap:1rem;">
-            <div class="bg-green-50 border border-green-200 rounded-xl p-4 text-center flex-1">
-                <div class="text-xs text-green-700 font-bold uppercase tracking-wider mb-1">Total Added</div>
-                <div class="text-2xl font-bold text-green-700 tabular-nums">&#8377;{{ number_format($walletTransactions->where('type','credit')->sum('amount'), 2) }}</div>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center flex-1" style="min-width:150px;">
+                <div class="text-xs text-amber-700 font-bold uppercase tracking-wider mb-1">Lifetime Earnings</div>
+                <div class="text-2xl font-bold text-amber-700 tabular-nums">&#8377;{{ number_format($totals['lifetime'], 2) }}</div>
+                <div class="text-[10px] text-amber-600 mt-1">Total commissions earned</div>
             </div>
-            <div class="bg-red-50 border border-red-200 rounded-xl p-4 text-center flex-1">
-                <div class="text-xs text-red-700 font-bold uppercase tracking-wider mb-1">Total Removed</div>
-                <div class="text-2xl font-bold text-red-700 tabular-nums">&#8377;{{ number_format($walletTransactions->where('type','debit')->sum('amount'), 2) }}</div>
-            </div>
-            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center flex-1">
-                <div class="text-xs text-blue-700 font-bold uppercase tracking-wider mb-1">Wallet Balance</div>
-                <div class="text-2xl font-bold text-blue-700 tabular-nums">&#8377;{{ number_format($totals['wallet'], 2) }}</div>
+            <div class="bg-green-50 border border-green-200 rounded-xl p-4 text-center flex-1" style="min-width:150px;">
+                <div class="text-xs text-green-700 font-bold uppercase tracking-wider mb-1">Valid Balance</div>
+                <div class="text-2xl font-bold text-green-700 tabular-nums">&#8377;{{ number_format($totals['wallet'], 2) }}</div>
+                <div class="text-[10px] text-green-600 mt-1">Available to withdraw</div>
             </div>
         </div>
 
+        @if(auth()->user()->is_admin)
         <div class="bg-white rounded-xl shadow-sm border border-ui-border p-6">
             <h3 class="font-semibold text-text-heading mb-4 flex items-center gap-2">
                 <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                Wallet Transaction
+                Wallet Transaction <span class="text-xs font-normal text-text-muted ml-1">(Admin only)</span>
             </h3>
             <form method="POST" action="{{ route('admin.affiliates.wallet', $user) }}" class="flex flex-wrap gap-3 items-end">
                 @csrf
                 <div>
                     <label class="block text-xs font-medium text-text-muted mb-1">Type *</label>
-                    <select name="type" id="aff_wallet_type" required onchange="affToggleReqDir(this)"
+                    <select name="type" id="aff_wallet_type" required
                             class="px-3 py-2 border border-ui-border rounded-lg text-sm bg-white min-w-[140px]">
                         <option value="credit">➕ Add (Credit)</option>
                         <option value="debit">➖ Remove (Debit)</option>
-                        <option value="request">📋 Request</option>
-                    </select>
-                </div>
-                <div id="aff_req_dir" class="hidden">
-                    <label class="block text-xs font-medium text-text-muted mb-1">Direction *</label>
-                    <select name="request_direction" id="aff_req_dir_select"
-                            class="px-3 py-2 border border-ui-border rounded-lg text-sm bg-white min-w-[140px]">
-                        <option value="credit">Credit (Receive)</option>
-                        <option value="debit">Debit (Send)</option>
                     </select>
                 </div>
                 <div>
@@ -425,16 +462,37 @@
                     Apply
                 </button>
             </form>
-            <script>
-            function affToggleReqDir(sel) {
-                var div = document.getElementById('aff_req_dir');
-                var s   = document.getElementById('aff_req_dir_select');
-                var show = sel.value === 'request';
-                div.classList.toggle('hidden', !show);
-                s.required = show;
-            }
-            </script>
         </div>
+        @elseif(auth()->id() === $user->id)
+        <div class="bg-white rounded-xl shadow-sm border border-ui-border p-6">
+            <h3 class="font-semibold text-text-heading mb-4 flex items-center gap-2">
+                <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                Request Withdrawal
+            </h3>
+            @if($totals['wallet'] > 0)
+            <form method="POST" action="{{ route('affiliate.wallet-request.store') }}" class="flex flex-wrap gap-3 items-end">
+                @csrf
+                <div>
+                    <label class="block text-xs font-medium text-text-muted mb-1">Amount (max &#8377;{{ number_format($totals['wallet'], 2) }})</label>
+                    <input type="number" name="amount" min="1" step="0.01" max="{{ $totals['wallet'] }}" required
+                        placeholder="0.00"
+                        class="px-3 py-2 border border-ui-border rounded-lg text-sm w-44 tabular-nums">
+                </div>
+                <div class="flex-1 min-w-[200px]">
+                    <label class="block text-xs font-medium text-text-muted mb-1">Remark (optional)</label>
+                    <input type="text" name="remark" placeholder="e.g. Bank transfer" maxlength="500"
+                        class="w-full px-3 py-2 border border-ui-border rounded-lg text-sm">
+                </div>
+                <button type="submit"
+                    class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-5 py-2 rounded-lg font-semibold text-sm whitespace-nowrap">
+                    Request
+                </button>
+            </form>
+            @else
+            <p class="text-sm text-text-muted">No wallet balance available to withdraw.</p>
+            @endif
+        </div>
+        @endif
 
         <div class="bg-white rounded-xl shadow-sm border border-ui-border overflow-hidden">
             <div class="px-5 py-4 border-b border-ui-border flex items-center justify-between">
@@ -512,6 +570,7 @@
     </div>
 
     {{-- Tab panel: Orders --}}
+    @if($showOrdTab)
     <div data-panel="orders" class="aff-tab-panel hidden">
         <div class="bg-white rounded-xl shadow-sm border border-ui-border overflow-hidden">
             <div class="px-5 py-4 border-b border-ui-border flex items-center justify-between">
@@ -594,8 +653,10 @@
             @endif
         </div>
     </div>
+    @endif
 
     {{-- Tab panel: Referrals --}}
+    @if($showRefTab)
     <div data-panel="referrals" class="aff-tab-panel hidden">
         <div class="bg-white rounded-xl shadow-sm border border-ui-border overflow-hidden">
             <div class="px-5 py-4 border-b border-ui-border">
@@ -629,6 +690,7 @@
             @endif
         </div>
     </div>
+    @endif
 </div>
 
 <script>
@@ -655,5 +717,56 @@
         activate(initial);
     }
 })();
+
+async function toggleAffSection(btn) {
+    const userId  = btn.dataset.user;
+    const section = btn.dataset.section;
+    const isOn    = btn.dataset.state === 'on';
+    const newState = !isOn;
+    btn.disabled = true;
+    try {
+        const res = await fetch(`/admin/affiliates/${userId}/toggle-section`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+            },
+            body: JSON.stringify({ section, value: newState })
+        });
+        const json = await res.json();
+        if (json.success) {
+            btn.dataset.state = newState ? 'on' : 'off';
+
+            // Button color
+            if (newState) { btn.classList.remove('bg-gray-300'); btn.classList.add('bg-brand-gold'); }
+            else          { btn.classList.remove('bg-brand-gold'); btn.classList.add('bg-gray-300'); }
+
+            // Thumb position
+            const thumb = btn.querySelector('span');
+            if (thumb) {
+                if (newState) { thumb.classList.remove('translate-x-0'); thumb.classList.add('translate-x-5'); }
+                else          { thumb.classList.remove('translate-x-5'); thumb.classList.add('translate-x-0'); }
+            }
+
+            // Card background
+            const card = btn.closest('[id^="aff-"]');
+            if (card) {
+                if (newState) {
+                    card.classList.remove('border-gray-200', 'bg-gray-50');
+                    card.classList.add('border-orange-200', 'bg-orange-50');
+                } else {
+                    card.classList.remove('border-orange-200', 'bg-orange-50');
+                    card.classList.add('border-gray-200', 'bg-gray-50');
+                }
+                const icon = card.querySelector('svg');
+                if (icon) {
+                    if (newState) { icon.classList.remove('text-gray-400'); icon.classList.add('text-brand-gold'); }
+                    else          { icon.classList.remove('text-brand-gold'); icon.classList.add('text-gray-400'); }
+                }
+            }
+        }
+    } catch(e) {}
+    btn.disabled = false;
+}
 </script>
 @endsection

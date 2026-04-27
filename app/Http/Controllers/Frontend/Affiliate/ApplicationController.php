@@ -14,7 +14,11 @@ class ApplicationController extends Controller
         $user = $request->user();
 
         if ($user->affiliate_status === 'pending') {
-            return redirect()->route('become.affiliate')->with('info', 'Your application is already under review.');
+            $profile = $user->affiliateProfile;
+            // Allow access if KYC not filled yet (self-registered via referral code)
+            if ($profile && $profile->pan_number) {
+                return redirect()->route('become.affiliate')->with('info', 'Your application is already under review.');
+            }
         }
         if ($user->affiliate_status === 'approved' && $user->role === 'affiliate') {
             return redirect()->route('affiliate.dashboard');
@@ -30,7 +34,11 @@ class ApplicationController extends Controller
         $user = $request->user();
 
         if ($user->affiliate_status === 'pending') {
-            return redirect()->route('become.affiliate')->with('info', 'Your application is already under review.');
+            $profile = $user->affiliateProfile;
+            // Block only if KYC already submitted
+            if ($profile && $profile->pan_number) {
+                return redirect()->route('become.affiliate')->with('info', 'Your application is already under review.');
+            }
         }
 
         $validated = $request->validate([
@@ -88,6 +96,6 @@ class ApplicationController extends Controller
         $user->affiliate_status = 'pending';
         $user->save();
 
-        return redirect()->route('become.affiliate')->with('success', 'Application submitted. Our team will review it shortly.');
+        return redirect()->route('user.dashboard')->with('success', 'KYC submitted successfully! Our team will review and approve your account shortly.');
     }
 }

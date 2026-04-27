@@ -36,6 +36,8 @@ class Order extends Model
         'tracking_id',
         'tracking_url',
         'notes',
+        'wallet_used',
+        'remaining_payable',
     ];
 
     public function addresses()
@@ -48,6 +50,8 @@ class Order extends Model
         'gst_amount' => 'decimal:2',
         'shipping_charge' => 'decimal:2',
         'total_amount' => 'decimal:2',
+        'wallet_used' => 'decimal:2',
+        'remaining_payable' => 'decimal:2',
     ];
 
     protected static function boot()

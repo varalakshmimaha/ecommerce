@@ -6,6 +6,7 @@ use App\Models\Commission;
 use App\Models\CommissionSetting;
 use App\Models\Order;
 use App\Models\User;
+use App\Models\WalletTransaction;
 use Illuminate\Support\Facades\DB;
 
 class CommissionService
@@ -78,21 +79,70 @@ class CommissionService
             'updated_at' => $now,
         ], $rows);
 
-        return DB::table('commissions')->insert($payload) ? count($payload) : 0;
+        $inserted = DB::table('commissions')->insert($payload) ? count($payload) : 0;
+
+        // If the order is already delivered, immediately approve the backfilled commissions
+        if ($inserted > 0 && $order->order_status === 'delivered') {
+            $this->approveForOrder($order);
+        }
+
+        return $inserted;
     }
 
     public function approveForOrder(Order $order): int
     {
-        return Commission::where('order_id', $order->id)
+        $commissions = Commission::where('order_id', $order->id)
             ->where('status', 'pending')
-            ->update(['status' => 'approved', 'updated_at' => now()]);
+            ->get();
+
+        if ($commissions->isEmpty()) {
+            return 0;
+        }
+
+        DB::transaction(function () use ($commissions, $order) {
+            foreach ($commissions as $commission) {
+                WalletTransaction::create([
+                    'user_id'    => $commission->beneficiary_user_id,
+                    'type'       => 'credit',
+                    'amount'     => $commission->amount,
+                    'remark'     => 'Commission from order #' . $order->order_number,
+                    'created_by' => null,
+                    'status'     => 'approved',
+                ]);
+                $commission->update(['status' => 'approved', 'updated_at' => now()]);
+            }
+        });
+
+        return $commissions->count();
     }
 
     public function reverseForOrder(Order $order): int
     {
-        return Commission::where('order_id', $order->id)
+        $commissions = Commission::where('order_id', $order->id)
             ->whereIn('status', ['pending', 'approved'])
-            ->update(['status' => 'reversed', 'updated_at' => now()]);
+            ->get();
+
+        if ($commissions->isEmpty()) {
+            return 0;
+        }
+
+        DB::transaction(function () use ($commissions, $order) {
+            foreach ($commissions as $commission) {
+                if ($commission->status === 'approved') {
+                    WalletTransaction::create([
+                        'user_id'    => $commission->beneficiary_user_id,
+                        'type'       => 'debit',
+                        'amount'     => $commission->amount,
+                        'remark'     => 'Commission reversed (order #' . $order->order_number . ' cancelled)',
+                        'created_by' => null,
+                        'status'     => 'approved',
+                    ]);
+                }
+                $commission->update(['status' => 'reversed', 'updated_at' => now()]);
+            }
+        });
+
+        return $commissions->count();
     }
 
     private function selfPurchaseRows(User $buyer, float $base): array

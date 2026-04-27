@@ -113,9 +113,19 @@
                         <span>₹{{ number_format($order->shipping_charge, 2) }}</span>
                     </div>
                     <div class="flex justify-between font-bold text-lg border-t pt-2">
-                        <span>Total:</span>
+                        <span>Order Total:</span>
                         <span>₹{{ number_format($order->total_amount, 2) }}</span>
                     </div>
+                    @if((float)$order->wallet_used > 0)
+                    <div class="flex justify-between text-green-700 font-medium">
+                        <span>Wallet Applied:</span>
+                        <span>-₹{{ number_format($order->wallet_used, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-lg border-t pt-2">
+                        <span>Amount Payable:</span>
+                        <span class="text-red-700">₹{{ number_format($order->remaining_payable, 2) }}</span>
+                    </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -123,6 +133,16 @@
     
     <div class="admin-card">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Update Order Status</h3>
+        @if($order->payment_status !== 'verified')
+            <div style="background:#fef9c3;border:1px solid #fde047;color:#854d0e;padding:12px 16px;border-radius:8px;font-size:14px;">
+                <strong>Payment not verified.</strong> Order status can only be changed after payment is verified.
+                @if($order->payment_status === 'rejected')
+                    The payment for this order has been <strong>rejected</strong>.
+                @else
+                    Please verify the payment first using the section below.
+                @endif
+            </div>
+        @else
         <form action="{{ route('admin.orders.update-status', $order) }}" method="POST" class="space-y-4">
             @csrf
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -151,6 +171,7 @@
             </div>
             <button type="submit" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Update Status</button>
         </form>
+        @endif
     </div>
     
     @if($order->payment_status === 'pending')

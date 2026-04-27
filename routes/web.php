@@ -273,6 +273,7 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::get('/managers/{manager}/edit', [\App\Http\Controllers\Admin\ManagerController::class, 'edit'])->name('managers.edit');
     Route::put('/managers/{manager}', [\App\Http\Controllers\Admin\ManagerController::class, 'update'])->name('managers.update');
     Route::delete('/managers/{manager}', [\App\Http\Controllers\Admin\ManagerController::class, 'destroy'])->name('managers.destroy');
+    Route::post('/managers/{manager}/toggle-section', [\App\Http\Controllers\Admin\ManagerController::class, 'toggleSection'])->name('managers.toggle-section');
     Route::post('/managers/{manager}/wallet', [\App\Http\Controllers\Admin\ManagerController::class, 'walletTransaction'])->name('managers.wallet');
     Route::post('/managers/wallet/{transaction}/approve', [\App\Http\Controllers\Admin\ManagerController::class, 'approveWallet'])->name('managers.wallet.approve');
     Route::post('/managers/wallet/{transaction}/reject', [\App\Http\Controllers\Admin\ManagerController::class, 'rejectWallet'])->name('managers.wallet.reject');
@@ -288,6 +289,7 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::post('/rms/{rm}/wallet', [\App\Http\Controllers\Admin\RmController::class, 'walletTransaction'])->name('rms.wallet');
     Route::post('/rms/wallet/{transaction}/approve', [\App\Http\Controllers\Admin\RmController::class, 'approveWallet'])->name('rms.wallet.approve');
     Route::post('/rms/wallet/{transaction}/reject', [\App\Http\Controllers\Admin\RmController::class, 'rejectWallet'])->name('rms.wallet.reject');
+    Route::post('/rms/{rm}/toggle-section', [\App\Http\Controllers\Admin\RmController::class, 'toggleSection'])->name('rms.toggle-section');
 
     // Commission Settings
     Route::get('/commission-settings', [\App\Http\Controllers\Admin\CommissionSettingController::class, 'index'])->name('commission-settings.index');
@@ -337,6 +339,7 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::post('/affiliates/{user}/reject', [\App\Http\Controllers\Admin\AffiliateController::class, 'reject'])->name('affiliates.reject');
     Route::post('/affiliates/{user}/verify-kyc', [\App\Http\Controllers\Admin\AffiliateController::class, 'verifyKyc'])->name('affiliates.verify-kyc');
     Route::put('/affiliates/{user}/parent', [\App\Http\Controllers\Admin\AffiliateController::class, 'assignParent'])->name('affiliates.assign-parent');
+    Route::post('/affiliates/{user}/toggle-section', [\App\Http\Controllers\Admin\AffiliateController::class, 'toggleSection'])->name('affiliates.toggle-section');
 });
 
 // Affiliate / RM / Manager dashboard + team management

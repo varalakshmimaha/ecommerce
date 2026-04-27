@@ -8,6 +8,7 @@ use App\Models\Commission;
 use App\Models\Order;
 use App\Models\User;
 use App\Models\WalletTransaction;
+use App\Models\WithdrawalRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -105,6 +106,13 @@ class RmController extends Controller
     public function show(User $rm)
     {
         abort_unless($rm->role === 'rm', 404);
+        $auth = auth()->user();
+        abort_unless(
+            $auth->is_admin ||
+            $auth->id === $rm->id ||
+            ($auth->role === 'manager' && $rm->parent_id === $auth->id),
+            403
+        );
 
         $rm->load('parent:id,name,role');
 
@@ -207,30 +215,49 @@ class RmController extends Controller
         abort_unless($rm->role === 'rm', 404);
 
         $validated = $request->validate([
-            'type'              => 'required|in:credit,debit,request',
-            'request_direction' => 'required_if:type,request|nullable|in:credit,debit',
-            'amount'            => 'required|numeric|min:0.01',
-            'remark'            => 'nullable|string|max:500',
+            'type'   => 'required|in:credit,debit,request',
+            'amount' => 'required|numeric|min:0.01',
+            'remark' => 'nullable|string|max:500',
         ]);
 
-        $isRequest = $validated['type'] === 'request';
-        $txType    = $isRequest ? $validated['request_direction'] : $validated['type'];
-        $status    = $isRequest ? 'pending' : 'approved';
+        if ($validated['type'] === 'request') {
+            WithdrawalRequest::create([
+                'user_id'      => $rm->id,
+                'amount'       => $validated['amount'],
+                'notes'        => $validated['remark'] ?? null,
+                'request_type' => 'credit',
+                'status'       => 'pending',
+            ]);
+            return redirect()->back()->with('success', 'Credit request for ₹' . number_format($validated['amount'], 2) . ' submitted. Approve it from Withdrawal Requests.');
+        }
 
         WalletTransaction::create([
             'user_id'    => $rm->id,
-            'type'       => $txType,
+            'type'       => $validated['type'],
             'amount'     => $validated['amount'],
             'remark'     => $validated['remark'] ?? null,
             'created_by' => auth()->id(),
-            'status'     => $status,
+            'status'     => 'approved',
         ]);
 
-        $message = $isRequest
-            ? 'Wallet request for ₹' . number_format($validated['amount'], 2) . ' submitted as pending.'
-            : '₹' . number_format($validated['amount'], 2) . ' ' . ($txType === 'credit' ? 'added to' : 'removed from') . ' wallet.';
+        $msg = '₹' . number_format($validated['amount'], 2) . ' ' . ($validated['type'] === 'credit' ? 'added to' : 'removed from') . ' wallet.';
+        return redirect()->back()->with('success', $msg);
+    }
 
-        return redirect()->back()->with('success', $message);
+    public function toggleSection(Request $request, User $rm)
+    {
+        abort_unless(auth()->user()->is_admin, 403);
+        abort_unless($rm->role === 'rm', 404);
+        $section = $request->input('section');
+        $allowed = ['show_affiliates', 'show_orders'];
+        if (!in_array($section, $allowed, true)) {
+            return response()->json(['success' => false, 'message' => 'Invalid section.'], 422);
+        }
+        $perms = $rm->permissions ?? [];
+        $perms[$section] = (bool) $request->input('value', true);
+        $rm->permissions = $perms;
+        $rm->save();
+        return response()->json(['success' => true, 'section' => $section, 'value' => $perms[$section]]);
     }
 
     public function approveWallet(WalletTransaction $transaction)

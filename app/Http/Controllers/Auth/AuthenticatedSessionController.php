@@ -28,7 +28,7 @@ class AuthenticatedSessionController extends Controller
             ])->onlyInput('mobile');
         }
 
-        $hasAdminAccess = $user->is_admin || in_array($user->role, ['manager', 'rm'], true);
+        $hasAdminAccess = $user->is_admin || in_array($user->role, ['manager', 'rm', 'affiliate'], true);
 
         if (!$hasAdminAccess) {
             return back()->withErrors([
@@ -39,16 +39,6 @@ class AuthenticatedSessionController extends Controller
         Auth::login($user);
 
         $request->session()->regenerate();
-
-        // Redirect manager/rm to their own profile page
-        if (!$user->is_admin) {
-            if ($user->role === 'manager') {
-                return redirect()->route('admin.managers.show', $user);
-            }
-            if ($user->role === 'rm') {
-                return redirect()->route('admin.rms.show', $user);
-            }
-        }
 
         return redirect()->intended(route('admin.dashboard'));
     }

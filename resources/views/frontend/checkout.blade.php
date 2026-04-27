@@ -35,6 +35,16 @@
                         <span>Total:</span>
                         <span id="total-amount" class="text-brand-gold">₹0.00</span>
                     </div>
+                    <div id="wallet-row" class="hidden">
+                        <div class="flex justify-between mb-1 text-green-700 font-medium">
+                            <span>Wallet Applied:</span>
+                            <span id="wallet-used-display">-₹0.00</span>
+                        </div>
+                        <div class="flex justify-between font-bold text-base border-t pt-2 mt-1">
+                            <span>Amount to Pay:</span>
+                            <span id="remaining-payable" class="text-brand-crimson">₹0.00</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -151,9 +161,22 @@
                 <div class="card p-6">
                     <h2 class="text-xl font-bold text-text-heading mb-4">Payment Method</h2>
                     
-                    <div id="payment-methods" class="space-y-4 mb-6">
+                    <div id="payment-methods" class="space-y-4 mb-4">
                         <!-- Payment methods will be loaded here -->
                     </div>
+
+                    @auth
+                    <!-- Wallet toggle — only shown when the user has a wallet balance -->
+                    <div id="wallet-toggle-section" class="hidden mb-6 p-4 border border-green-200 rounded-lg bg-green-50">
+                        <label class="flex items-center gap-3 cursor-pointer select-none">
+                            <input type="checkbox" id="use-wallet-checkbox" class="accent-brand-gold w-5 h-5">
+                            <div>
+                                <div class="font-semibold text-green-900">Use Wallet Balance</div>
+                                <div class="text-sm text-green-700">Available: <span id="wallet-available-display">₹0.00</span></div>
+                            </div>
+                        </label>
+                    </div>
+                    @endauth
 
                     <!-- Manual Payment Section (shown when manual is selected) -->
                     <div id="manual-payment-section" class="hidden space-y-4">
@@ -400,6 +423,16 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
+    let useWallet = false;
+
+    @auth
+    // Wire up wallet toggle checkbox
+    document.getElementById('use-wallet-checkbox')?.addEventListener('change', function() {
+        useWallet = this.checked;
+        loadOrderSummary();
+    });
+    @endauth
+
     // Load order summary
     function loadOrderSummary() {
         const items = cart.map(item => ({
@@ -408,7 +441,7 @@ document.addEventListener('DOMContentLoaded', function() {
             variation_id: item.variation_id || null,
             attributes: item.attributes || []
         }));
-        
+
         fetch(`${API_BASE}/checkout/calculate`, {
             method: 'POST',
             headers: {
@@ -419,7 +452,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 'Authorization': `Bearer {{ auth()->user()->createToken("checkout")->plainTextToken }}`
                 @endauth
             },
-            body: JSON.stringify({ items })
+            body: JSON.stringify({ items, use_wallet: useWallet })
         })
         .then(res => res.json())
         .then(data => {
@@ -427,6 +460,24 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('gst-amount').textContent = `₹${parseFloat(data.gst_amount).toFixed(2)}`;
             document.getElementById('shipping').textContent = `₹${parseFloat(data.shipping_charge).toFixed(2)}`;
             document.getElementById('total-amount').textContent = `₹${parseFloat(data.total_amount).toFixed(2)}`;
+
+            // Show/hide wallet toggle based on available balance
+            @auth
+            const walletToggleSection = document.getElementById('wallet-toggle-section');
+            if (data.wallet_balance > 0 && walletToggleSection) {
+                walletToggleSection.classList.remove('hidden');
+                document.getElementById('wallet-available-display').textContent = `₹${parseFloat(data.wallet_balance).toFixed(2)}`;
+            }
+            @endauth
+
+            // Wallet breakdown
+            if (data.wallet_used > 0) {
+                document.getElementById('wallet-row').classList.remove('hidden');
+                document.getElementById('wallet-used-display').textContent = `-₹${parseFloat(data.wallet_used).toFixed(2)}`;
+                document.getElementById('remaining-payable').textContent = `₹${parseFloat(data.remaining_payable).toFixed(2)}`;
+            } else {
+                document.getElementById('wallet-row').classList.add('hidden');
+            }
             
             // Load product details for summary
             Promise.all(cart.map(item => 
@@ -495,9 +546,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeof selectedAddressId !== 'undefined' && selectedAddressId) {
             formData.append('address_id', selectedAddressId);
         }
-        // Add selected payment method
+        // Add selected payment method and wallet opt-in flag
         formData.append('payment_method', selectedPaymentMethod);
-        
+        formData.append('use_wallet', useWallet ? '1' : '0');
+
         // For Razorpay, handle payment flow
         if (selectedPaymentMethod === 'razorpay') {
             // Create Razorpay order first
@@ -519,13 +571,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         attributes: item.attributes || []
                     })),
                     address_id: typeof selectedAddressId !== 'undefined' ? selectedAddressId : null,
+                    use_wallet: useWallet,
                     ...Object.fromEntries(formData.entries())
                 })
             })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    openRazorpayCheckout(data.razorpay_order_id, data.order_id, data.amount);
+                    if (data.remaining_payable <= 0) {
+                        // Wallet covers the full amount — verify directly
+                        verifyWalletOnlyOrder(data.order_id);
+                    } else {
+                        openRazorpayCheckout(data.razorpay_order_id, data.order_id, data.amount);
+                    }
                 } else {
                     alert('Error creating payment order: ' + (data.error || 'Unknown error'));
                 }
@@ -634,6 +692,33 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
     
+    function verifyWalletOnlyOrder(orderId) {
+        const headers = {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        };
+        @auth
+        const token = '{{ auth()->user()->createToken("checkout")->plainTextToken }}';
+        headers['Authorization'] = `Bearer ${token}`;
+        @endauth
+        fetch('/api/checkout/verify-wallet-order', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({ order_id: orderId })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                localStorage.removeItem('cart');
+                updateCartCount();
+                window.location.href = '/order/success/' + encodeURIComponent(data.order_number);
+            } else {
+                alert('Order failed: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(() => alert('An error occurred. Please try again.'));
+    }
+
     function verifyRazorpayPayment(paymentId, orderId, razorpayOrderId) {
         const headers = {
             'Content-Type': 'application/json',

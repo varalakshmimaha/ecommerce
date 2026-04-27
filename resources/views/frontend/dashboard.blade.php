@@ -4,6 +4,13 @@
 
 @section('content')
 
+@php
+    $perms           = auth()->user()->permissions ?? [];
+    $isAffiliate     = auth()->user()->role === 'affiliate';
+    $canSeeOrders    = !$isAffiliate || ($perms['show_orders']    ?? true) !== false;
+    $canSeeReferrals = !$isAffiliate || ($perms['show_referrals'] ?? true) !== false;
+@endphp
+
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-white">
     <div class="container mx-auto px-4 py-12">
         <!-- Welcome Header -->
@@ -11,6 +18,31 @@
             <h1 class="text-4xl font-bold text-text-heading mb-2">Welcome back, <span class="text-brand-gold">{{ $user->name ?? 'User' }}</span></h1>
             <p class="text-text-muted">Manage your profile, orders, addresses, and queries from your dashboard</p>
         </div>
+
+        {{-- KYC incomplete banner for self-registered affiliates --}}
+        @if(in_array($user->role ?? '', ['affiliate','rm','manager']) && $user->affiliate_status === 'pending')
+            @php $kycProfile = $user->affiliateProfile; @endphp
+            @if(!$kycProfile || !$kycProfile->pan_number)
+                <div class="mb-6 flex items-start gap-4 bg-amber-50 border border-amber-300 rounded-2xl p-5">
+                    <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0 mt-0.5">
+                        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-bold text-amber-800 text-sm mb-1">Action Required: Complete Your KYC</div>
+                        <p class="text-amber-700 text-sm leading-relaxed">
+                            Your affiliate account is created but <strong>pending KYC verification</strong>. Please submit your KYC and bank details so the admin can approve your account and start crediting commissions.
+                        </p>
+                    </div>
+                    <a href="{{ route('become.affiliate.apply.create') }}"
+                       class="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white text-sm font-bold rounded-xl hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                        Complete KYC
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </a>
+                </div>
+            @endif
+        @endif
 
         <!-- Tabs Navigation -->
         <div class="mb-8 overflow-x-auto">
@@ -23,6 +55,7 @@
                         Profile
                     </span>
                 </button>
+                @if($canSeeOrders)
                 <button onclick="switchTab('orders')" id="tab-orders" class="tab-btn px-6 py-3 rounded-lg font-semibold transition-all duration-300 text-text-muted hover:text-brand-gold hover:bg-gray-50">
                     <span class="flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,6 +64,7 @@
                         My Orders
                     </span>
                 </button>
+                @endif
                 <button onclick="switchTab('addresses')" id="tab-addresses" class="tab-btn px-6 py-3 rounded-lg font-semibold transition-all duration-300 text-text-muted hover:text-brand-gold hover:bg-gray-50">
                     <span class="flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -47,16 +81,7 @@
                         My Queries
                     </span>
                 </button>
-                @if(in_array($user->role ?? '', ['affiliate','rm','manager']))
-                <button onclick="switchTab('wallet')" id="tab-wallet" class="tab-btn px-6 py-3 rounded-lg font-semibold transition-all duration-300 text-text-muted hover:text-brand-gold hover:bg-gray-50">
-                    <span class="flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
-                        </svg>
-                        Wallet
-                    </span>
-                </button>
-                @endif
+                @if($canSeeReferrals)
                 <button onclick="switchTab('referrals')" id="tab-referrals" class="tab-btn px-6 py-3 rounded-lg font-semibold transition-all duration-300 text-text-muted hover:text-brand-gold hover:bg-gray-50">
                     <span class="flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,6 +90,7 @@
                         My Referrals / Earnings
                     </span>
                 </button>
+                @endif
             </nav>
         </div>
 
@@ -128,6 +154,7 @@
             </div>
         </div>
         <!-- Orders Tab -->
+        @if($canSeeOrders)
         <div id="content-orders" class="tab-content hidden">
             <div class="grid gap-6">
                 @forelse($user->orders ?? [] as $order)
@@ -146,6 +173,9 @@
                             </div>
                             <div class="text-left lg:text-right">
                                 <p class="text-3xl font-bold text-brand-gold">₹{{ number_format($order->total_amount, 2) }}</p>
+                                @if((float)$order->wallet_used > 0)
+                                <p class="text-sm text-green-700 font-medium mt-1">Wallet: -₹{{ number_format($order->wallet_used, 2) }} &nbsp; Pay: ₹{{ number_format($order->remaining_payable, 2) }}</p>
+                                @endif
                                 <span class="inline-block px-4 py-1 text-sm rounded-full mt-2 {{ $order->order_status === 'delivered' ? 'bg-green-50 text-green-600 border border-green-200' : ($order->order_status === 'cancelled' ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-yellow-50 text-yellow-600 border border-yellow-200') }}">
                                     {{ ucfirst($order->order_status) }}
                                 </span>
@@ -179,6 +209,7 @@
                 @endforelse
             </div>
         </div>
+        @endif
         <!-- Addresses Tab -->
         <div id="content-addresses" class="tab-content hidden">
             <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 animate-fade-in">
@@ -332,180 +363,11 @@
             </div>
         </div>
 
-        <!-- Wallet Tab -->
-        @if(in_array($user->role ?? '', ['affiliate','rm','manager']))
-        <div id="content-wallet" class="tab-content hidden">
-            <div class="space-y-6">
-
-                {{-- Wallet KPI Cards – single horizontal row --}}
-                <div style="display:flex;gap:1rem;">
-                    <div style="flex:1;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:1rem;padding:1.25rem;display:flex;align-items:center;gap:1rem;box-shadow:0 1px 3px rgba(0,0,0,.06);">
-                        <div style="width:48px;height:48px;border-radius:.75rem;background:#dcfce7;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <svg style="width:24px;height:24px;color:#16a34a;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
-                        </div>
-                        <div>
-                            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#15803d;margin-bottom:4px;">Total Added</div>
-                            <div style="font-size:1.5rem;font-weight:800;color:#16a34a;font-variant-numeric:tabular-nums;">&#8377;{{ number_format($totalAdded, 2) }}</div>
-                        </div>
-                    </div>
-                    <div style="flex:1;background:#fff1f2;border:1px solid #fecdd3;border-radius:1rem;padding:1.25rem;display:flex;align-items:center;gap:1rem;box-shadow:0 1px 3px rgba(0,0,0,.06);">
-                        <div style="width:48px;height:48px;border-radius:.75rem;background:#fee2e2;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <svg style="width:24px;height:24px;color:#dc2626;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
-                        </div>
-                        <div>
-                            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#b91c1c;margin-bottom:4px;">Total Removed</div>
-                            <div style="font-size:1.5rem;font-weight:800;color:#dc2626;font-variant-numeric:tabular-nums;">&#8377;{{ number_format($totalRemoved, 2) }}</div>
-                        </div>
-                    </div>
-                    <div style="flex:1;background:#eff6ff;border:1px solid #bfdbfe;border-radius:1rem;padding:1.25rem;display:flex;align-items:center;gap:1rem;box-shadow:0 1px 3px rgba(0,0,0,.06);">
-                        <div style="width:48px;height:48px;border-radius:.75rem;background:#dbeafe;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <svg style="width:24px;height:24px;color:#2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                        </div>
-                        <div>
-                            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#1d4ed8;margin-bottom:4px;">Wallet Balance</div>
-                            <div style="font-size:1.5rem;font-weight:800;color:#2563eb;font-variant-numeric:tabular-nums;">&#8377;{{ number_format($walletBalance, 2) }}</div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Wallet Transaction Form --}}
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                    <h3 class="font-bold text-text-heading flex items-center gap-2 mb-5">
-                        <svg class="w-4 h-4 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                        Wallet Transaction
-                    </h3>
-                    <form method="POST" action="{{ route('affiliate.wallet-request.store') }}" style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px;">
-                        @csrf
-                        {{-- Type --}}
-                        <div style="display:flex;flex-direction:column;gap:6px;">
-                            <label style="font-size:12px;font-weight:600;color:#6b7280;">Type *</label>
-                            <select name="direction" style="min-width:180px;height:42px;padding:0 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;background:#fff;color:#111827;cursor:pointer;">
-                                <option value="credit">+ Add (Credit)</option>
-                                <option value="debit">− Remove (Debit)</option>
-                                <option value="withdrawal">⇩ Request Withdrawal</option>
-                            </select>
-                        </div>
-                        {{-- Amount --}}
-                        <div style="display:flex;flex-direction:column;gap:6px;">
-                            <label style="font-size:12px;font-weight:600;color:#6b7280;">Amount (&#8377;) *</label>
-                            <input type="number" name="amount" min="1" step="0.01" required placeholder="0.00"
-                                   style="width:160px;height:42px;padding:0 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;box-sizing:border-box;">
-                        </div>
-                        {{-- Remark --}}
-                        <div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:6px;">
-                            <label style="font-size:12px;font-weight:600;color:#6b7280;">Remark</label>
-                            <input type="text" name="remark" placeholder="Reason for this transaction (optional)" maxlength="500"
-                                   style="width:100%;height:42px;padding:0 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;box-sizing:border-box;">
-                        </div>
-                        {{-- Submit --}}
-                        <button type="submit"
-                                style="height:42px;padding:0 28px;border-radius:8px;font-weight:700;font-size:14px;color:#fff;border:none;cursor:pointer;white-space:nowrap;background:linear-gradient(135deg,#f59e0b,#dc2626);">
-                            Apply
-                        </button>
-                    </form>
-                </div>
-
-                {{-- Transaction History --}}
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                        <h3 class="font-bold text-text-heading flex items-center gap-2">
-                            <svg class="w-4 h-4 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                            Transaction History
-                        </h3>
-                        <span class="text-xs font-semibold text-text-muted bg-gray-100 px-3 py-1 rounded-full">{{ $walletTransactions->count() + $withdrawalRequests->count() }} transaction(s)</span>
-                    </div>
-
-                    @php
-                        $hasAnyHistory = $walletTransactions->count() || $withdrawalRequests->count();
-                    @endphp
-                    @if($hasAnyHistory)
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm">
-                            <thead style="background:#f9fafb;border-bottom:1px solid #f3f4f6;">
-                                <tr style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#9ca3af;">
-                                    <th style="text-align:left;padding:12px 20px;">Type</th>
-                                    <th style="text-align:right;padding:12px 20px;">Amount</th>
-                                    <th style="text-align:left;padding:12px 20px;">Status</th>
-                                    <th style="text-align:left;padding:12px 20px;">Remark</th>
-                                    <th style="text-align:left;padding:12px 20px;">By</th>
-                                    <th style="text-align:right;padding:12px 20px;">Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {{-- Admin-applied wallet transactions (approved) --}}
-                                @foreach($walletTransactions as $tx)
-                                    <tr style="border-bottom:1px solid #f3f4f6;">
-                                        <td style="padding:14px 20px;">
-                                            @if($tx->type === 'credit')
-                                                <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:#dcfce7;color:#15803d;">
-                                                    ↑ CREDIT
-                                                </span>
-                                            @else
-                                                <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:#fee2e2;color:#dc2626;">
-                                                    ↓ DEBIT
-                                                </span>
-                                            @endif
-                                        </td>
-                                        <td style="padding:14px 20px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums;color:{{ $tx->type === 'credit' ? '#16a34a' : '#dc2626' }};">
-                                            {{ $tx->type === 'credit' ? '+' : '-' }}&#8377;{{ number_format($tx->amount, 2) }}
-                                        </td>
-                                        <td style="padding:14px 20px;">
-                                            <span style="padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700;background:#dcfce7;color:#15803d;">APPROVED</span>
-                                        </td>
-                                        <td style="padding:14px 20px;color:#6b7280;">{{ $tx->remark ?: '—' }}</td>
-                                        <td style="padding:14px 20px;color:#6b7280;">{{ $tx->creator?->name ?? 'Admin' }}</td>
-                                        <td style="padding:14px 20px;text-align:right;color:#9ca3af;white-space:nowrap;">{{ $tx->created_at?->format('d M Y, h:i A') }}</td>
-                                    </tr>
-                                @endforeach
-                                {{-- Withdrawal requests (pending admin approval) --}}
-                                @foreach($withdrawalRequests as $req)
-                                    @php
-                                        $statusBg    = match($req->status) {
-                                            'approved' => '#dcfce7', 'rejected' => '#fee2e2', default => '#fef9c3',
-                                        };
-                                        $statusColor = match($req->status) {
-                                            'approved' => '#15803d', 'rejected' => '#dc2626', default => '#854d0e',
-                                        };
-                                    @endphp
-                                    <tr style="border-bottom:1px solid #f3f4f6;background:#fafafa;">
-                                        <td style="padding:14px 20px;">
-                                            <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:#eff6ff;color:#1d4ed8;">
-                                                ⇩ WITHDRAWAL REQUEST
-                                            </span>
-                                        </td>
-                                        <td style="padding:14px 20px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums;color:#374151;">
-                                            &#8377;{{ number_format($req->amount, 2) }}
-                                        </td>
-                                        <td style="padding:14px 20px;">
-                                            <span style="padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700;background:{{ $statusBg }};color:{{ $statusColor }};">{{ strtoupper($req->status) }}</span>
-                                        </td>
-                                        <td style="padding:14px 20px;color:#6b7280;">{{ $req->notes ?: '—' }}</td>
-                                        <td style="padding:14px 20px;color:#6b7280;">You</td>
-                                        <td style="padding:14px 20px;text-align:right;color:#9ca3af;white-space:nowrap;">{{ $req->created_at?->format('d M Y, h:i A') }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    @else
-                    <div class="text-center py-14">
-                        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                        </div>
-                        <p class="text-sm font-semibold text-gray-500">No wallet transactions yet.</p>
-                        <p class="text-xs text-gray-400 mt-1">Transactions added by admin will appear here.</p>
-                    </div>
-                    @endif
-                </div>
-
-            </div>
-        </div>
-        @endif
-
         <!-- Referrals & Earnings Tab -->
+        @if($canSeeReferrals)
         <div id="content-referrals" class="tab-content hidden">
             <div class="space-y-6">
-                {{-- Referral code card (shown at the top) --}}
+                {{-- Referral code card (always at top) --}}
                 @if($referralLink)
                     <div class="bg-gradient-to-br from-brand-gold via-brand-amber to-brand-crimson rounded-2xl shadow-lg p-6 text-white">
                         <div class="flex flex-wrap items-center justify-between gap-4">
@@ -524,6 +386,8 @@
                 @endif
 
                 @if(in_array($user->role, ['affiliate','rm','manager']))
+                    @php $myRate = ['affiliate' => 5, 'rm' => 3, 'manager' => 2][$user->role] ?? 0; @endphp
+
                     {{-- Commission KPI strip --}}
                     <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
                         <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden flex-1" style="min-width:140px;">
@@ -535,6 +399,7 @@
                                 <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#9a3412;">Lifetime Earnings</div>
                             </div>
                             <div class="text-xl font-bold text-text-heading tabular-nums">&#8377;{{ number_format($commissionTotals['lifetime'], 2) }}</div>
+                            <div style="font-size:10px;color:#6b7280;margin-top:3px;">Total commissions earned</div>
                         </div>
                         <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden flex-1" style="min-width:140px;">
                             <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#10b981;"></div>
@@ -542,9 +407,10 @@
                                 <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background:#d1fae5;">
                                     <svg class="w-4 h-4" style="color:#059669;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                                 </div>
-                                <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#047857;">Total Wallet</div>
+                                <div class="text-[11px] font-bold uppercase tracking-wider" style="color:#047857;">Wallet Balance</div>
                             </div>
                             <div class="text-xl font-bold tabular-nums" style="color:#059669;">&#8377;{{ number_format($walletBalance, 2) }}</div>
+                            <div style="font-size:10px;color:#6b7280;margin-top:3px;">Available to withdraw</div>
                         </div>
                         <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 overflow-hidden flex-1" style="min-width:140px;">
                             <div style="position:absolute;top:0;left:0;right:0;height:3px;background:#8b5cf6;"></div>
@@ -558,87 +424,241 @@
                         </div>
                     </div>
 
-                    @php
-                        $myRate = ['affiliate' => 5, 'rm' => 3, 'manager' => 2][$user->role] ?? 0;
-                    @endphp
-
-                    {{-- My Referrals --}}
-                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                        <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between flex-wrap gap-3">
-                            <div class="flex items-center gap-3">
-                                <div class="p-2.5 bg-gradient-to-br from-brand-gold via-brand-amber to-brand-crimson rounded-xl shadow-sm">
-                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                                </div>
-                                <div>
-                                    <h2 class="text-xl font-bold text-text-heading leading-tight">My Referrals</h2>
-                                    <p class="text-xs text-text-muted">Direct referrals earning you {{ $myRate }}% commission</p>
-                                </div>
-                            </div>
-                            <span class="text-xs font-semibold text-text-muted bg-gray-100 px-3 py-1 rounded-full">{{ $referrals->count() }} referral(s)</span>
-                        </div>
-                        @if($referrals->count())
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm">
-                                <thead class="bg-gray-50 text-text-muted text-xs uppercase tracking-wider">
-                                    <tr>
-                                        <th class="text-left px-5 py-3 font-semibold">Name</th>
-                                        <th class="text-left px-5 py-3 font-semibold">Date</th>
-                                        <th class="text-left px-5 py-3 font-semibold">Role</th>
-                                        <th class="text-right px-5 py-3 font-semibold">Base</th>
-                                        <th class="text-right px-5 py-3 font-semibold">Rate</th>
-                                        <th class="text-right px-5 py-3 font-semibold">Orders</th>
-                                        <th class="text-right px-5 py-3 font-semibold">My Earnings</th>
-                                        <th class="text-center px-5 py-3 font-semibold">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-100">
-                                    @foreach($referrals as $r)
-                                        @php
-                                            $base = (float) ($baseByReferral[$r->id] ?? 0);
-                                            $comm = (float) ($commByReferral[$r->id] ?? 0);
-                                            $ordCount = $r->orders_count ?? 0;
-                                            $initial = strtoupper(mb_substr($r->name ?? 'U', 0, 1));
-                                        @endphp
-                                        <tr class="hover:bg-gray-50/70 align-middle">
-                                            <td class="px-5 py-3">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="w-9 h-9 rounded-full bg-brand-gold/10 text-brand-gold flex items-center justify-center text-sm font-bold shrink-0">{{ $initial }}</div>
-                                                    <div class="min-w-0">
-                                                        <div class="font-semibold text-text-heading">{{ $r->name ?? 'User #'.$r->id }}</div>
-                                                        @if($r->referral_code)<div class="text-xs text-text-muted font-mono">{{ $r->referral_code }}</div>@endif
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="px-5 py-3 text-text-muted text-xs">{{ $r->created_at?->format('d M Y') }}</td>
-                                            <td class="px-5 py-3"><span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-gray-100 text-gray-600">{{ $r->role }}</span></td>
-                                            <td class="px-5 py-3 text-right tabular-nums {{ $base > 0 ? 'text-text-heading' : 'text-gray-400' }}">&#8377;{{ number_format($base, 2) }}</td>
-                                            <td class="px-5 py-3 text-right tabular-nums text-xs text-text-muted">{{ $myRate }}%</td>
-                                            <td class="px-5 py-3 text-right tabular-nums">{{ $ordCount }}</td>
-                                            <td class="px-5 py-3 text-right tabular-nums {{ $comm > 0 ? 'text-brand-gold font-bold' : 'text-gray-400' }}">&#8377;{{ number_format($comm, 2) }}</td>
-                                            <td class="px-5 py-3 text-center">
-                                                <a href="{{ route('user.dashboard.referral.show', $r) }}" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-brand-gold/10 text-brand-gold hover:bg-brand-gold/20 text-xs font-semibold transition">
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                                    View
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                        @else
-                        <div class="text-center py-12">
-                            <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-gray-100 flex items-center justify-center">
-                                <svg class="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                            </div>
-                            <p class="text-sm font-semibold text-text-muted">No referrals yet.</p>
-                            <p class="text-xs text-text-muted mt-1 opacity-60">Share your referral link to start earning commission.</p>
-                        </div>
-                        @endif
+                    {{-- Sub-tab Navigation: My Referrals | Wallet --}}
+                    <div class="flex gap-2 bg-white p-1.5 rounded-xl border border-gray-100 shadow-sm w-fit">
+                        <button onclick="switchSubTab('my-referrals')" id="referrals-subtab-my-referrals"
+                                class="referrals-sub-btn px-5 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md">
+                            <span class="flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                                My Referrals
+                            </span>
+                        </button>
+                        <button onclick="switchSubTab('wallet')" id="referrals-subtab-wallet"
+                                class="referrals-sub-btn px-5 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 text-text-muted hover:text-brand-gold hover:bg-gray-50">
+                            <span class="flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                Wallet
+                            </span>
+                        </button>
                     </div>
 
+                    {{-- My Referrals Sub-content --}}
+                    <div id="referrals-sub-my-referrals" class="referrals-sub-content">
+                        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                            <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between flex-wrap gap-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2.5 bg-gradient-to-br from-brand-gold via-brand-amber to-brand-crimson rounded-xl shadow-sm">
+                                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                                    </div>
+                                    <div>
+                                        <h2 class="text-xl font-bold text-text-heading leading-tight">My Referrals</h2>
+                                        <p class="text-xs text-text-muted">Direct referrals earning you {{ $myRate }}% commission</p>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-semibold text-text-muted bg-gray-100 px-3 py-1 rounded-full">{{ $referrals->count() }} referral(s)</span>
+                            </div>
+                            @if($referrals->count())
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm">
+                                    <thead class="bg-gray-50 text-text-muted text-xs uppercase tracking-wider">
+                                        <tr>
+                                            <th class="text-left px-5 py-3 font-semibold">Name</th>
+                                            <th class="text-left px-5 py-3 font-semibold">Date</th>
+                                            <th class="text-left px-5 py-3 font-semibold">Role</th>
+                                            <th class="text-right px-5 py-3 font-semibold">Base</th>
+                                            <th class="text-right px-5 py-3 font-semibold">Rate</th>
+                                            <th class="text-right px-5 py-3 font-semibold">Orders</th>
+                                            <th class="text-right px-5 py-3 font-semibold">My Earnings</th>
+                                            <th class="text-center px-5 py-3 font-semibold">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        @foreach($referrals as $r)
+                                            @php
+                                                $base = (float) ($baseByReferral[$r->id] ?? 0);
+                                                $comm = (float) ($commByReferral[$r->id] ?? 0);
+                                                $ordCount = $r->orders_count ?? 0;
+                                                $initial = strtoupper(mb_substr($r->name ?? 'U', 0, 1));
+                                            @endphp
+                                            <tr class="hover:bg-gray-50/70 align-middle">
+                                                <td class="px-5 py-3">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="w-9 h-9 rounded-full bg-brand-gold/10 text-brand-gold flex items-center justify-center text-sm font-bold shrink-0">{{ $initial }}</div>
+                                                        <div class="min-w-0">
+                                                            <div class="font-semibold text-text-heading">{{ $r->name ?? 'User #'.$r->id }}</div>
+                                                            @if($r->referral_code)<div class="text-xs text-text-muted font-mono">{{ $r->referral_code }}</div>@endif
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="px-5 py-3 text-text-muted text-xs">{{ $r->created_at?->format('d M Y') }}</td>
+                                                <td class="px-5 py-3"><span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-gray-100 text-gray-600">{{ $r->role }}</span></td>
+                                                <td class="px-5 py-3 text-right tabular-nums {{ $base > 0 ? 'text-text-heading' : 'text-gray-400' }}">&#8377;{{ number_format($base, 2) }}</td>
+                                                <td class="px-5 py-3 text-right tabular-nums text-xs text-text-muted">{{ $myRate }}%</td>
+                                                <td class="px-5 py-3 text-right tabular-nums">{{ $ordCount }}</td>
+                                                <td class="px-5 py-3 text-right tabular-nums {{ $comm > 0 ? 'text-brand-gold font-bold' : 'text-gray-400' }}">&#8377;{{ number_format($comm, 2) }}</td>
+                                                <td class="px-5 py-3 text-center">
+                                                    <a href="{{ route('user.dashboard.referral.show', $r) }}" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-brand-gold/10 text-brand-gold hover:bg-brand-gold/20 text-xs font-semibold transition">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                        View
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            @else
+                            <div class="text-center py-12">
+                                <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-gray-100 flex items-center justify-center">
+                                    <svg class="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                                </div>
+                                <p class="text-sm font-semibold text-text-muted">No referrals yet.</p>
+                                <p class="text-xs text-text-muted mt-1 opacity-60">Share your referral link to start earning commission.</p>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Wallet Sub-content --}}
+                    <div id="referrals-sub-wallet" class="referrals-sub-content hidden space-y-6">
+
+                        {{-- Wallet KPI Cards --}}
+                        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+                            <div style="flex:1;min-width:200px;background:#fffbeb;border:1px solid #fde68a;border-radius:1rem;padding:1.25rem;display:flex;align-items:center;gap:1rem;box-shadow:0 1px 3px rgba(0,0,0,.06);">
+                                <div style="width:48px;height:48px;border-radius:.75rem;background:#fef3c7;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    <svg style="width:24px;height:24px;color:#d97706;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                                </div>
+                                <div>
+                                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#92400e;margin-bottom:4px;">Lifetime Earnings</div>
+                                    <div style="font-size:1.5rem;font-weight:800;color:#d97706;font-variant-numeric:tabular-nums;">&#8377;{{ number_format($commissionTotals['lifetime'], 2) }}</div>
+                                    <div style="font-size:10px;color:#6b7280;margin-top:2px;">Total commissions earned</div>
+                                </div>
+                            </div>
+                            <div style="flex:1;min-width:200px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:1rem;padding:1.25rem;display:flex;align-items:center;gap:1rem;box-shadow:0 1px 3px rgba(0,0,0,.06);">
+                                <div style="width:48px;height:48px;border-radius:.75rem;background:#dcfce7;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                    <svg style="width:24px;height:24px;color:#16a34a;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                </div>
+                                <div style="flex:1;">
+                                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#15803d;margin-bottom:4px;">Valid Balance</div>
+                                    <div style="font-size:1.5rem;font-weight:800;color:#16a34a;font-variant-numeric:tabular-nums;">&#8377;{{ number_format($walletBalance, 2) }}</div>
+                                    <div style="font-size:10px;color:#6b7280;margin-top:2px;">Available to request</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Withdrawal Request Form --}}
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                            <h3 class="font-bold text-text-heading flex items-center gap-2 mb-5">
+                                <svg class="w-4 h-4 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+                                Request Withdrawal
+                            </h3>
+                            <form method="POST" action="{{ route('affiliate.wallet-request.store') }}" style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px;">
+                                @csrf
+                                <div style="display:flex;flex-direction:column;gap:6px;">
+                                    <label style="font-size:12px;font-weight:600;color:#6b7280;">Amount (&#8377;) *</label>
+                                    <input type="number" name="amount" min="1" step="0.01" required placeholder="0.00"
+                                           max="{{ $walletBalance }}"
+                                           style="width:180px;height:42px;padding:0 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;box-sizing:border-box;">
+                                </div>
+                                <div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:6px;">
+                                    <label style="font-size:12px;font-weight:600;color:#6b7280;">Remark (optional)</label>
+                                    <input type="text" name="remark" placeholder="e.g. Bank transfer request" maxlength="500"
+                                           style="width:100%;height:42px;padding:0 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;box-sizing:border-box;">
+                                </div>
+                                <button type="submit"
+                                        style="height:42px;padding:0 28px;border-radius:8px;font-weight:700;font-size:14px;color:#fff;border:none;cursor:pointer;white-space:nowrap;background:linear-gradient(135deg,#f59e0b,#dc2626);">
+                                    Request
+                                </button>
+                            </form>
+                            @if($walletBalance <= 0)
+                                <p style="margin-top:10px;font-size:12px;color:#9ca3af;">No valid balance available to request. Earn commissions from delivered orders.</p>
+                            @endif
+                        </div>
+
+                        {{-- Transaction History --}}
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                                <h3 class="font-bold text-text-heading flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                                    Transaction History
+                                </h3>
+                                <span class="text-xs font-semibold text-text-muted bg-gray-100 px-3 py-1 rounded-full">{{ $walletTransactions->count() + $withdrawalRequests->count() }} transaction(s)</span>
+                            </div>
+                            @php $hasAnyHistory = $walletTransactions->count() || $withdrawalRequests->count(); @endphp
+                            @if($hasAnyHistory)
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm">
+                                    <thead style="background:#f9fafb;border-bottom:1px solid #f3f4f6;">
+                                        <tr style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#9ca3af;">
+                                            <th style="text-align:left;padding:12px 20px;">Type</th>
+                                            <th style="text-align:right;padding:12px 20px;">Amount</th>
+                                            <th style="text-align:left;padding:12px 20px;">Status</th>
+                                            <th style="text-align:left;padding:12px 20px;">Remark</th>
+                                            <th style="text-align:left;padding:12px 20px;">By</th>
+                                            <th style="text-align:right;padding:12px 20px;">Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($walletTransactions as $tx)
+                                            @php
+                                                $isCommission = $tx->type === 'credit' && str_starts_with($tx->remark ?? '', 'Commission from order');
+                                                $isReversed   = $tx->type === 'debit'  && str_starts_with($tx->remark ?? '', 'Commission reversed');
+                                            @endphp
+                                            <tr style="border-bottom:1px solid #f3f4f6;">
+                                                <td style="padding:14px 20px;">
+                                                    @if($isCommission)
+                                                        <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:#fef3c7;color:#92400e;">★ COMMISSION</span>
+                                                    @elseif($isReversed)
+                                                        <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:#f3f4f6;color:#6b7280;">↺ REVERSED</span>
+                                                    @elseif($tx->type === 'credit')
+                                                        <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:#dcfce7;color:#15803d;">↑ CREDIT</span>
+                                                    @else
+                                                        <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:#fee2e2;color:#dc2626;">↓ DEBIT</span>
+                                                    @endif
+                                                </td>
+                                                <td style="padding:14px 20px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums;color:{{ $tx->type === 'credit' ? '#16a34a' : '#dc2626' }};">
+                                                    {{ $tx->type === 'credit' ? '+' : '-' }}&#8377;{{ number_format($tx->amount, 2) }}
+                                                </td>
+                                                <td style="padding:14px 20px;"><span style="padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700;background:#dcfce7;color:#15803d;">APPROVED</span></td>
+                                                <td style="padding:14px 20px;color:#6b7280;">{{ $tx->remark ?: '—' }}</td>
+                                                <td style="padding:14px 20px;color:#6b7280;">{{ $tx->creator?->name ?? 'Admin' }}</td>
+                                                <td style="padding:14px 20px;text-align:right;color:#9ca3af;white-space:nowrap;">{{ $tx->created_at?->format('d M Y, h:i A') }}</td>
+                                            </tr>
+                                        @endforeach
+                                        @foreach($withdrawalRequests as $req)
+                                            @php
+                                                $statusBg    = match($req->status) { 'approved' => '#dcfce7', 'rejected' => '#fee2e2', default => '#fef9c3' };
+                                                $statusColor = match($req->status) { 'approved' => '#15803d', 'rejected' => '#dc2626', default => '#854d0e' };
+                                            @endphp
+                                            <tr style="border-bottom:1px solid #f3f4f6;background:#fafafa;">
+                                                <td style="padding:14px 20px;">
+                                                    <span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;background:#eff6ff;color:#1d4ed8;">⇩ WITHDRAWAL REQUEST</span>
+                                                </td>
+                                                <td style="padding:14px 20px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums;color:#374151;">&#8377;{{ number_format($req->amount, 2) }}</td>
+                                                <td style="padding:14px 20px;"><span style="padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700;background:{{ $statusBg }};color:{{ $statusColor }};">{{ strtoupper($req->status) }}</span></td>
+                                                <td style="padding:14px 20px;color:#6b7280;">{{ $req->notes ?: '—' }}</td>
+                                                <td style="padding:14px 20px;color:#6b7280;">You</td>
+                                                <td style="padding:14px 20px;text-align:right;color:#9ca3af;white-space:nowrap;">{{ $req->created_at?->format('d M Y, h:i A') }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            @else
+                            <div class="text-center py-14">
+                                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                                </div>
+                                <p class="text-sm font-semibold text-gray-500">No wallet transactions yet.</p>
+                                <p class="text-xs text-gray-400 mt-1">Transactions will appear here once added.</p>
+                            </div>
+                            @endif
+                        </div>
+
+                    </div>{{-- end wallet sub-content --}}
+
                 @else
-                    {{-- "Referred by" note + Become an Affiliate CTA for customers --}}
+                    {{-- Customer: "Referred by" note + Become Affiliate CTA --}}
                     @if(!empty($upline))
                         @php $referrer = $upline[0]; @endphp
                         <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-100">
@@ -657,8 +677,6 @@
                             </div>
                         </div>
                     @endif
-
-                    {{-- Become an Affiliate CTA --}}
                     <div class="bg-gradient-to-br from-brand-gold via-brand-amber to-brand-crimson rounded-2xl shadow-lg p-6 text-white">
                         <div class="flex flex-wrap items-center justify-between gap-4">
                             <div class="flex items-start gap-4 flex-1 min-w-0">
@@ -680,6 +698,7 @@
                 @endif
             </div>
         </div>
+        @endif
     </div>
 </div>
 
@@ -687,12 +706,36 @@
 
 @section('scripts')
 <script>
+    // Sub-tab switching inside Referrals & Earnings
+    function switchSubTab(subTab) {
+        document.querySelectorAll('.referrals-sub-content').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.referrals-sub-btn').forEach(btn => {
+            btn.classList.remove('bg-gradient-to-r', 'from-brand-gold', 'via-brand-amber', 'to-brand-crimson', 'text-white', 'shadow-md');
+            btn.classList.add('text-text-muted');
+        });
+        const subContent = document.getElementById('referrals-sub-' + subTab);
+        if (subContent) subContent.classList.remove('hidden');
+        const activeBtn = document.getElementById('referrals-subtab-' + subTab);
+        if (activeBtn) {
+            activeBtn.classList.add('bg-gradient-to-r', 'from-brand-gold', 'via-brand-amber', 'to-brand-crimson', 'text-white', 'shadow-md');
+            activeBtn.classList.remove('text-text-muted');
+        }
+    }
+    window.switchSubTab = switchSubTab;
+
     // Main script for dashboard functionality
     document.addEventListener('DOMContentLoaded', function() {
-        // Auto-switch to tab from URL query param (e.g. ?tab=wallet)
-        const urlTab = new URLSearchParams(window.location.search).get('tab');
-        if (urlTab && document.getElementById('content-' + urlTab)) {
+        // Auto-switch to tab from URL query param (e.g. ?tab=referrals&sub=wallet)
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlTab = urlParams.get('tab');
+        // Legacy ?tab=wallet redirects into referrals > wallet sub-tab
+        if (urlTab === 'wallet') {
+            switchTab('referrals');
+            switchSubTab('wallet');
+        } else if (urlTab && document.getElementById('content-' + urlTab)) {
             switchTab(urlTab);
+            const urlSub = urlParams.get('sub');
+            if (urlSub) switchSubTab(urlSub);
         }
 
         if (document.getElementById('content-addresses')) {
@@ -842,6 +885,7 @@
 
     // Tab Switching functionality
     function switchTab(tab) {
+        if (!document.getElementById('content-' + tab)) { tab = 'profile'; }
         document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.classList.remove('bg-gradient-to-r', 'from-brand-gold', 'via-brand-amber', 'to-brand-crimson', 'text-white', 'shadow-lg');
