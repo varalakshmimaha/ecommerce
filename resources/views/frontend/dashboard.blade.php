@@ -80,7 +80,15 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                         </svg>
-                        My Earnings
+                        Monthly Earnings
+                    </span>
+                </button>
+                <button onclick="switchTab('referrals')" id="tab-referrals" class="tab-btn px-6 py-3 rounded-lg font-semibold transition-all duration-300 text-text-muted hover:text-brand-gold hover:bg-gray-50">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        My Referrals
                     </span>
                 </button>
                 <button onclick="switchTab('wallet')" id="tab-wallet" class="tab-btn px-6 py-3 rounded-lg font-semibold transition-all duration-300 text-text-muted hover:text-brand-gold hover:bg-gray-50">
@@ -397,7 +405,7 @@
             </div>
         </div>
 
-        <!-- My Earnings Tab -->
+        <!-- Monthly Earnings Tab -->
         @if($canSeeReferrals)
         <div id="content-earnings" class="tab-content hidden">
             <div class="space-y-6">
@@ -513,7 +521,15 @@
                         @endif
                     </div>
 
-                    {{-- Customer Referrals --}}
+                @endif
+            </div>
+        </div>
+
+        <!-- My Referrals Tab -->
+        <div id="content-referrals" class="tab-content hidden">
+            <div class="space-y-6">
+                @if(in_array($user->role, ['affiliate','rm','manager']))
+                    @php $customerReferrals = $referrals->where('role', 'customer'); @endphp
                     <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
                         <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between flex-wrap gap-3">
                             <div class="flex items-center gap-3">
