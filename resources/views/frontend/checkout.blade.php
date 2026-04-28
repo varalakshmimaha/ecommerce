@@ -36,9 +36,12 @@
                         <span id="total-amount" class="text-brand-gold">₹0.00</span>
                     </div>
                     <div id="wallet-row" class="hidden">
-                        <div class="flex justify-between mb-1 text-green-700 font-medium">
-                            <span>Wallet Applied:</span>
-                            <span id="wallet-used-display">-₹0.00</span>
+                        <div class="flex justify-between mb-1 font-medium" style="color:#16a34a;">
+                            <span class="flex items-center gap-1">
+                                <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/></svg>
+                                Wallet Points Applied:
+                            </span>
+                            <span id="wallet-used-display" class="font-bold">-₹0.00</span>
                         </div>
                         <div class="flex justify-between font-bold text-base border-t pt-2 mt-1">
                             <span>Amount to Pay:</span>
@@ -166,13 +169,37 @@
                     </div>
 
                     @auth
-                    <!-- Wallet toggle — only shown when the user has a wallet balance -->
-                    <div id="wallet-toggle-section" class="hidden mb-6 p-4 border border-green-200 rounded-lg bg-green-50">
-                        <label class="flex items-center gap-3 cursor-pointer select-none">
-                            <input type="checkbox" id="use-wallet-checkbox" class="accent-brand-gold w-5 h-5">
-                            <div>
-                                <div class="font-semibold text-green-900">Use Available Balance</div>
-                                <div class="text-sm text-green-700">Available: <span id="wallet-available-display">₹0.00</span></div>
+                    <!-- Wallet Points — only shown when the user has wallet balance -->
+                    <div id="wallet-toggle-section" class="hidden mb-6 rounded-xl overflow-hidden" style="border:1px solid #fcd34d;background:#fffbeb;">
+                        <div style="padding:14px 16px 0 16px;">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                                <div style="display:flex;align-items:center;gap:8px;">
+                                    <div style="width:32px;height:32px;border-radius:8px;background:#fef3c7;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                        <svg style="width:18px;height:18px;color:#d97706;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/></svg>
+                                    </div>
+                                    <span style="font-weight:700;font-size:15px;color:#92400e;">Wallet Points</span>
+                                </div>
+                                <span style="font-size:11px;font-weight:700;background:#fde68a;color:#92400e;padding:3px 10px;border-radius:999px;">Max 50% of order value</span>
+                            </div>
+
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                                <span style="font-size:13px;color:#78350f;">Your Wallet Balance</span>
+                                <span style="font-size:14px;font-weight:700;color:#92400e;" id="wallet-available-display">₹0.00</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                                <span style="font-size:13px;color:#78350f;">Max Applicable <span style="font-size:11px;opacity:.7;">(50% of order total)</span></span>
+                                <span style="font-size:14px;font-weight:700;color:#b45309;" id="wallet-max-applicable">₹0.00</span>
+                            </div>
+                        </div>
+
+                        <label style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:12px 16px;background:#fef9c3;border-top:1px solid #fde68a;">
+                            <input type="checkbox" id="use-wallet-checkbox" class="accent-brand-gold" style="width:18px;height:18px;flex-shrink:0;">
+                            <div style="flex:1;">
+                                <div style="font-weight:600;font-size:14px;color:#1f2937;">Apply Wallet Points to this order</div>
+                                <div style="font-size:12px;color:#6b7280;margin-top:2px;">
+                                    Saves <span id="wallet-will-apply" style="font-weight:700;color:#16a34a;">₹0.00</span>
+                                    &nbsp;·&nbsp; You pay <span id="wallet-remaining-after" style="font-weight:700;color:#dc2626;">₹0.00</span> more
+                                </div>
                             </div>
                         </label>
                     </div>
@@ -461,16 +488,23 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('shipping').textContent = `₹${parseFloat(data.shipping_charge).toFixed(2)}`;
             document.getElementById('total-amount').textContent = `₹${parseFloat(data.total_amount).toFixed(2)}`;
 
-            // Show/hide wallet toggle based on available balance
+            // Show/hide wallet toggle and populate wallet info
             @auth
             const walletToggleSection = document.getElementById('wallet-toggle-section');
             if (data.wallet_balance > 0 && walletToggleSection) {
                 walletToggleSection.classList.remove('hidden');
+                const maxApplicable = parseFloat(data.max_wallet_applicable || 0);
+                const willApply    = Math.min(parseFloat(data.wallet_balance), maxApplicable);
                 document.getElementById('wallet-available-display').textContent = `₹${parseFloat(data.wallet_balance).toFixed(2)}`;
+                document.getElementById('wallet-max-applicable').textContent    = `₹${maxApplicable.toFixed(2)}`;
+                document.getElementById('wallet-will-apply').textContent        = `₹${willApply.toFixed(2)}`;
+                document.getElementById('wallet-remaining-after').textContent   = `₹${(parseFloat(data.total_amount) - willApply).toFixed(2)}`;
+            } else if (walletToggleSection) {
+                walletToggleSection.classList.add('hidden');
             }
             @endauth
 
-            // Wallet breakdown
+            // Wallet breakdown in order summary
             if (data.wallet_used > 0) {
                 document.getElementById('wallet-row').classList.remove('hidden');
                 document.getElementById('wallet-used-display').textContent = `-₹${parseFloat(data.wallet_used).toFixed(2)}`;

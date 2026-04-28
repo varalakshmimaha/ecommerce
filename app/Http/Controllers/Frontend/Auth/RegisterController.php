@@ -3,14 +3,12 @@
 namespace App\Http\Controllers\Frontend\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\AffiliateProfile;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 
 class RegisterController extends Controller
@@ -45,34 +43,20 @@ class RegisterController extends Controller
                 ->first();
         }
 
-        $user = DB::transaction(function () use ($request, $validated, $referrer) {
-            $isAffiliate = $referrer !== null;
-
-            $newReferralCode = null;
-            if ($isAffiliate) {
-                $base = strtoupper(substr(preg_replace('/[^a-z]/', '', strtolower($request->name ?? 'usr')), 0, 3));
-                $base = str_pad($base, 3, 'X');
-                do {
-                    $newReferralCode = $base . strtoupper(Str::random(5));
-                } while (User::where('referral_code', $newReferralCode)->exists());
-            }
-
+        $user = DB::transaction(function () use ($request, $referrer) {
             $user = User::create([
                 'name'             => $request->name,
                 'mobile'           => $request->mobile,
                 'email'            => $request->email,
                 'password'         => Hash::make($request->password),
                 'parent_id'        => $referrer?->id,
-                'role'             => $isAffiliate ? 'affiliate' : 'customer',
-                'affiliate_status' => $isAffiliate ? 'pending' : 'none',
-                'referral_code'    => $newReferralCode,
+                'role'             => 'customer',
+                'affiliate_status' => 'none',
+                'referral_code'    => null,
                 'is_verified'      => true,
             ]);
 
-            if ($isAffiliate) {
-                AffiliateProfile::create(['user_id' => $user->id]);
-            }
-
+            // Record the referral link so the affiliate earns commission on this customer's orders
             if ($referrer) {
                 DB::table('referrals')->insert([
                     'referrer_user_id' => $referrer->id,
@@ -93,12 +77,11 @@ class RegisterController extends Controller
 
         Auth::login($user);
 
-        if ($referrer) {
-            return redirect()->route('become.affiliate.apply.create')
-                ->with('success', 'Account created! Please complete your KYC and bank details to activate your affiliate account.');
-        }
+        $message = $referrer
+            ? 'Registration successful! Welcome. You can join our affiliate program anytime from the footer.'
+            : 'Registration successful! Welcome to your dashboard.';
 
-        return redirect()->route('user.dashboard')->with('success', 'Registration successful! Welcome to your dashboard.');
+        return redirect()->route('user.dashboard')->with('success', $message);
     }
 
     private function generateReferralCode(string $name): string

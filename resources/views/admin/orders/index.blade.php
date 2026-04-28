@@ -21,11 +21,10 @@
                     <th>Customer</th>
                     <th>Mobile</th>
                     @endif
-                    <th>Amount</th>
-                    @if(isset($isNonAdmin) && $isNonAdmin)
+                    <th>Order Total</th>
                     <th>Wallet Used</th>
-                    <th>Payment Type</th>
-                    @endif
+                    <th>Collected / Pending</th>
+                    <th>Payment Method</th>
                     <th>Payment Status</th>
                     <th>Order Status</th>
                     <th>Date</th>
@@ -34,19 +33,36 @@
             </thead>
             <tbody>
                 @forelse($orders as $order)
+                @php
+                    $walletUsed      = (float) $order->wallet_used;
+                    $remaining       = (float) ($order->remaining_payable ?? $order->total_amount);
+                    $isVerified      = $order->payment_status === 'verified';
+                @endphp
                 <tr>
                     <td class="font-medium">{{ $order->order_number }}</td>
                     @if(!isset($isNonAdmin) || !$isNonAdmin)
                     <td>{{ $order->name }}</td>
                     <td>{{ $order->mobile }}</td>
                     @endif
-                    <td>&#8377;{{ number_format($order->total_amount, 2) }}</td>
-                    @if(isset($isNonAdmin) && $isNonAdmin)
+                    <td class="font-semibold">&#8377;{{ number_format($order->total_amount, 2) }}</td>
                     <td>
-                        @if((float)$order->wallet_used > 0)
-                            <span class="text-green-700 font-semibold">&#8377;{{ number_format($order->wallet_used, 2) }}</span>
+                        @if($walletUsed > 0)
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-amber-100 text-amber-800">
+                                -&#8377;{{ number_format($walletUsed, 2) }}
+                            </span>
                         @else
-                            <span class="text-gray-400">&#8212;</span>
+                            <span class="text-gray-400 text-xs">&#8212;</span>
+                        @endif
+                    </td>
+                    <td>
+                        @if($isVerified)
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                Collected &#8377;{{ number_format($remaining, 2) }}
+                            </span>
+                        @else
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                Pending &#8377;{{ number_format($remaining, 2) }}
+                            </span>
                         @endif
                     </td>
                     <td>
@@ -55,7 +71,6 @@
                             {{ strtoupper($order->payment_method) }}
                         </span>
                     </td>
-                    @endif
                     <td>
                         <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $order->payment_status === 'verified' ? 'bg-green-100 text-green-800' : ($order->payment_status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800') }}">
                             {{ ucfirst($order->payment_status) }}
@@ -73,7 +88,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" class="text-center py-8 text-gray-500">No orders found</td>
+                    <td colspan="11" class="text-center py-8 text-gray-500">No orders found</td>
                 </tr>
                 @endforelse
             </tbody>

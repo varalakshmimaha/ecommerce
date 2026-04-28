@@ -192,10 +192,16 @@
                 </div>
             </div>
 
-            <!-- Totals -->
+            <!-- Totals + Order Summary -->
+            @php
+                $invWalletUsed  = (float) $order->wallet_used;
+                $invRemaining   = (float) ($order->remaining_payable ?? $order->total_amount);
+                $invPayVerified = $order->payment_status === 'verified';
+                $invPayRejected = $order->payment_status === 'rejected';
+            @endphp
             <div class="flex justify-end mb-8">
                 <div class="w-96">
-                    <div class="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-lg p-6 border-2 border-brand-gold/40">
+                    <div class="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-lg p-6 border-2 border-[#D4AF37]/40">
                         <div class="space-y-3">
                             <div class="flex justify-between text-gray-700">
                                 <span class="font-medium">Subtotal:</span>
@@ -207,24 +213,54 @@
                                 <span class="font-semibold text-brand-gold">₹{{ number_format($totalGST, 2) }}</span>
                             </div>
 
-                            @if($order->shipping_cost > 0)
+                            @if(($order->shipping_charge ?? $order->shipping_cost ?? 0) > 0)
                                 <div class="flex justify-between text-gray-700">
                                     <span class="font-medium">Shipping:</span>
-                                    <span class="font-semibold">₹{{ number_format($order->shipping_cost, 2) }}</span>
+                                    <span class="font-semibold">₹{{ number_format($order->shipping_charge ?? $order->shipping_cost, 2) }}</span>
                                 </div>
                             @endif
 
-                            @if($order->discount > 0)
+                            @if(($order->discount ?? 0) > 0)
                                 <div class="flex justify-between text-green-600">
                                     <span class="font-medium">Discount:</span>
                                     <span class="font-semibold">-₹{{ number_format($order->discount, 2) }}</span>
                                 </div>
                             @endif
 
-                            <div class="border-t-2 border-brand-gold/50 pt-3 mt-3">
+                            @if($invWalletUsed > 0)
+                                <div class="flex justify-between text-green-700 font-medium">
+                                    <span>Wallet Applied:</span>
+                                    <span>-₹{{ number_format($invWalletUsed, 2) }}</span>
+                                </div>
+                            @endif
+
+                            <div class="border-t-2 border-[#D4AF37]/50 pt-3 mt-3">
                                 <div class="flex justify-between items-center">
                                     <span class="text-xl font-bold text-gray-900">Grand Total:</span>
                                     <span class="text-2xl font-bold text-brand-gold">₹{{ number_format($order->total_amount, 2) }}</span>
+                                </div>
+                                @if($invWalletUsed > 0)
+                                <div class="flex justify-between items-center mt-2">
+                                    <span class="text-base font-semibold text-gray-700">Amount Payable:</span>
+                                    <span class="text-lg font-bold text-red-600">₹{{ number_format($invRemaining, 2) }}</span>
+                                </div>
+                                @endif
+                            </div>
+
+                            <div class="border-t border-[#D4AF37]/30 pt-3 mt-1 space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm font-medium text-gray-600">Payment Method:</span>
+                                    <span style="display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700;
+                                        {{ $order->payment_method === 'razorpay' ? 'background:#dbeafe;color:#1d4ed8;' : ($order->payment_method === 'cod' ? 'background:#dcfce7;color:#15803d;' : 'background:#ede9fe;color:#6d28d9;') }}">
+                                        {{ strtoupper($order->payment_method) }}
+                                    </span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm font-medium text-gray-600">Order Status:</span>
+                                    <span style="display:inline-block;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700;
+                                        {{ $order->order_status === 'delivered' ? 'background:#dcfce7;color:#15803d;' : ($order->order_status === 'cancelled' ? 'background:#fee2e2;color:#dc2626;' : ($order->order_status === 'shipped' ? 'background:#dbeafe;color:#1d4ed8;' : 'background:#fef9c3;color:#854d0e;')) }}">
+                                        {{ ucfirst($order->order_status) }}
+                                    </span>
                                 </div>
                             </div>
                         </div>

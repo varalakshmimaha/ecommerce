@@ -295,6 +295,10 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::get('/commission-settings', [\App\Http\Controllers\Admin\CommissionSettingController::class, 'index'])->name('commission-settings.index');
     Route::put('/commission-settings', [\App\Http\Controllers\Admin\CommissionSettingController::class, 'update'])->name('commission-settings.update');
 
+    // Lifetime Earnings Paid
+    Route::get('/paid-earnings', [\App\Http\Controllers\Admin\PaidEarningsController::class, 'index'])->name('paid-earnings.index');
+    Route::post('/paid-earnings/mark-paid', [\App\Http\Controllers\Admin\PaidEarningsController::class, 'markPaid'])->name('paid-earnings.mark-paid');
+
     // Commissions ledger
     Route::get('/commissions', [\App\Http\Controllers\Admin\CommissionController::class, 'index'])->name('commissions.index');
     Route::get('/commissions/export', [\App\Http\Controllers\Admin\CommissionController::class, 'export'])->name('commissions.export');

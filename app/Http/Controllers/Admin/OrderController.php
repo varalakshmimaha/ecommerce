@@ -46,8 +46,18 @@ class OrderController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        // Block status change if payment is rejected
+        if ($order->payment_status === 'rejected') {
+            return redirect()->back()->with('error', 'Cannot update order status — payment has been rejected.');
+        }
+
         $previousStatus = $order->order_status;
         $order->update($validated);
+
+        // Block marking as delivered if payment not verified
+        if ($validated['order_status'] === 'delivered' && $order->payment_status !== 'verified') {
+            return redirect()->back()->with('error', 'Cannot mark order as Delivered — please verify the payment first.');
+        }
 
         if ($validated['order_status'] === 'delivered' && $previousStatus !== 'delivered') {
             $commissions->approveForOrder($order);

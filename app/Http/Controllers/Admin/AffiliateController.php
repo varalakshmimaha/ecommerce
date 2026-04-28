@@ -213,11 +213,37 @@ class AffiliateController extends Controller
             }
         }
 
+        $monthlyEarnings = \App\Models\Commission::where('beneficiary_user_id', $user->id)
+            ->whereNotIn('status', ['reversed'])
+            ->selectRaw("
+                YEAR(created_at) AS year, MONTH(created_at) AS month,
+                SUM(amount) AS total_amount,
+                COUNT(DISTINCT order_id) AS orders_count,
+                CASE
+                    WHEN SUM(CASE WHEN status = 'paid'    THEN 1 ELSE 0 END) = COUNT(*) THEN 'paid'
+                    WHEN SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) > 0        THEN 'pending'
+                    ELSE 'approved'
+                END AS month_status
+            ")
+            ->groupByRaw('YEAR(created_at), MONTH(created_at)')
+            ->orderByRaw('YEAR(created_at) DESC, MONTH(created_at) DESC')
+            ->get();
+
+        $showRefTab = true;
+
+        $monthlyCommissionDetails = \App\Models\Commission::where('beneficiary_user_id', $user->id)
+            ->whereNotNull('order_id')
+            ->whereNotIn('status', ['reversed'])
+            ->with('order:id,order_number,created_at')
+            ->get(['id', 'order_id', 'base_amount', 'percentage', 'amount', 'status', 'created_at'])
+            ->groupBy(fn($c) => $c->created_at->year . '-' . $c->created_at->month);
+
         return view('admin.hierarchy.affiliate-show', compact(
             'user', 'totals', 'walletTransactions',
             'referredUsers', 'referredUsersCount',
             'rm', 'manager',
-            'orderHistory', 'orderCommissionMap'
+            'orderHistory', 'orderCommissionMap',
+            'monthlyEarnings', 'monthlyCommissionDetails', 'showRefTab'
         ));
     }
 

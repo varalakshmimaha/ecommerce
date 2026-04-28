@@ -76,13 +76,15 @@
                         Dashboard
                     </a>
 
-                    {{-- Orders: always visible --}}
+                    {{-- Orders: admin only --}}
+                    @if(auth()->user()->is_admin)
                     <a href="{{ route('admin.orders.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.orders.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                         </svg>
                         Orders
                     </a>
+                    @endif
 
                     {{-- Profile: visible to non-admins in main nav --}}
                     @if($isNonAdmin)
@@ -276,14 +278,12 @@
                             Commissions
                         </a>
                         @endif
-                        @if($canSee('withdrawal_requests'))
-                        <a href="{{ route('admin.withdrawal-requests.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.withdrawal-requests.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
+                        <a href="{{ route('admin.paid-earnings.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.paid-earnings.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">
                             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
                             </svg>
-                            Withdrawal Requests
+                            Lifetime Earnings Paid
                         </a>
-                        @endif
 
                         @if($canSee('commission_settings'))
                         <a href="{{ route('admin.commission-settings.index') }}" class="flex items-center px-4 py-3 text-text-heading rounded-lg hover:bg-gradient-to-r hover:from-brand-gold hover:via-brand-amber hover:to-brand-crimson hover:text-white transition-all duration-300 {{ request()->routeIs('admin.commission-settings.*') ? 'bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white shadow-md' : '' }}">

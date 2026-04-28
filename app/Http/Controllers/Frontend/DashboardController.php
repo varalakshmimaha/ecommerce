@@ -80,11 +80,29 @@ class DashboardController extends Controller
         ];
         $commissionTotals['lifetime'] = $commissionTotals['pending'] + $commissionTotals['approved'] + $commissionTotals['paid'];
 
-        $recentCommissions = Commission::with('order:id,order_number,total_amount,order_status,created_at')
-            ->where('beneficiary_user_id', $user->id)
-            ->orderByDesc('created_at')
-            ->limit(15)
+        $monthlyEarnings = Commission::where('beneficiary_user_id', $user->id)
+            ->whereNotIn('status', ['reversed'])
+            ->selectRaw("
+                YEAR(created_at) as year,
+                MONTH(created_at) as month,
+                SUM(amount) as total_amount,
+                COUNT(DISTINCT order_id) as orders_count,
+                CASE
+                    WHEN SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) > 0 THEN 'pending'
+                    WHEN SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) > 0 THEN 'approved'
+                    ELSE 'paid'
+                END as payment_status
+            ")
+            ->groupByRaw('YEAR(created_at), MONTH(created_at)')
+            ->orderByRaw('YEAR(created_at) DESC, MONTH(created_at) DESC')
             ->get();
+
+        $monthlyCommissionDetails = Commission::with('order:id,order_number,total_amount,order_status,created_at')
+            ->where('beneficiary_user_id', $user->id)
+            ->whereNotIn('status', ['reversed'])
+            ->orderByDesc('created_at')
+            ->get()
+            ->groupBy(fn($c) => $c->created_at->format('Y-m'));
 
         $walletBalance      = WalletTransaction::balanceFor($user->id);
         $totalAdded         = (float) WalletTransaction::where('user_id', $user->id)->where('type', 'credit')->where('status', 'approved')->sum('amount');
@@ -95,12 +113,55 @@ class DashboardController extends Controller
         $walletTransactions = WalletTransaction::with('creator:id,name')->where('user_id', $user->id)->where('status', 'approved')->orderByDesc('created_at')->limit(15)->get();
         $referralsCount     = $referrals->count();
 
+        // Wallet Points = only admin-direct credits (excludes commission credits/reversals).
+        // NULL remark must be treated as non-commission (MySQL NULL NOT LIKE = NULL, not TRUE).
+        $walletPointsTransactions = WalletTransaction::with('creator:id,name')
+            ->where('user_id', $user->id)
+            ->where('status', 'approved')
+            ->where(function ($q) {
+                $q->where(function ($q2) {
+                    $q2->where('type', 'credit')
+                       ->where(function ($q3) {
+                           $q3->whereNull('remark')
+                              ->orWhere('remark', 'not like', 'Commission from order%');
+                       });
+                })->orWhere(function ($q2) {
+                    $q2->where('type', 'debit')
+                       ->where(function ($q3) {
+                           $q3->whereNull('remark')
+                              ->orWhere('remark', 'not like', 'Commission reversed%');
+                       });
+                });
+            })
+            ->orderByDesc('created_at')
+            ->limit(20)
+            ->get();
+
+        // Balance via SQL SUM over the full dataset (not limited to 20 display rows)
+        $walletPointsBalance = (float) WalletTransaction::where('user_id', $user->id)
+            ->where('status', 'approved')
+            ->where('type', 'credit')
+            ->where(function ($q) {
+                $q->whereNull('remark')
+                  ->orWhere('remark', 'not like', 'Commission from order%');
+            })
+            ->sum('amount')
+            - (float) WalletTransaction::where('user_id', $user->id)
+            ->where('status', 'approved')
+            ->where('type', 'debit')
+            ->where(function ($q) {
+                $q->whereNull('remark')
+                  ->orWhere('remark', 'not like', 'Commission reversed%');
+            })
+            ->sum('amount');
+
         return view('frontend.dashboard', compact(
             'user', 'upline', 'referrals', 'referralLink', 'commissionTotals',
-            'recentCommissions', 'baseByReferral', 'commByReferral',
+            'monthlyEarnings', 'monthlyCommissionDetails', 'baseByReferral', 'commByReferral',
             'walletBalance', 'totalAdded', 'totalRemoved',
             'hasPendingRequest', 'withdrawalRequests', 'totalRequested',
-            'walletTransactions', 'referralsCount'
+            'walletTransactions', 'referralsCount',
+            'walletPointsBalance', 'walletPointsTransactions'
         ));
     }
 

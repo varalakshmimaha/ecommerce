@@ -168,12 +168,14 @@ class CheckoutController extends Controller
                 }
             }
 
-            // Compute wallet contribution for eligible roles (only if user explicitly opted in)
+            // Compute wallet contribution for any logged-in user (only if explicitly opted in)
+            // Cap: max wallet discount = 50% of order total
             $useWallet = filter_var($request->input('use_wallet', false), FILTER_VALIDATE_BOOLEAN);
             $userModel = \App\Models\User::find($userId);
-            if ($useWallet && $userModel && in_array($userModel->role, ['affiliate', 'rm', 'manager'])) {
+            if ($useWallet && $userModel) {
                 $walletBalance = WalletTransaction::balanceFor($userId);
-                $walletUsed = min($walletBalance, $totalAmount);
+                $maxWalletAllowed = round($totalAmount * 0.50, 2);
+                $walletUsed = min($walletBalance, $maxWalletAllowed);
                 $remainingPayable = $totalAmount - $walletUsed;
             }
 
@@ -351,6 +353,7 @@ class CheckoutController extends Controller
         $walletBalance = 0.0;
         $walletUsed = 0.0;
         $remainingPayable = $totalAmount;
+        $maxWalletApplicable = round($totalAmount * 0.50, 2);
 
         $useWallet = filter_var($request->input('use_wallet', false), FILTER_VALIDATE_BOOLEAN);
 
@@ -359,10 +362,10 @@ class CheckoutController extends Controller
             $sanctumToken = \Laravel\Sanctum\PersonalAccessToken::findToken($token);
             if ($sanctumToken) {
                 $authUser = \App\Models\User::find($sanctumToken->tokenable_id);
-                if ($authUser && in_array($authUser->role, ['affiliate', 'rm', 'manager'])) {
+                if ($authUser) {
                     $walletBalance = WalletTransaction::balanceFor($authUser->id);
                     if ($useWallet && $walletBalance > 0) {
-                        $walletUsed = min($walletBalance, $totalAmount);
+                        $walletUsed = min($walletBalance, $maxWalletApplicable);
                         $remainingPayable = $totalAmount - $walletUsed;
                     }
                 }
@@ -370,14 +373,15 @@ class CheckoutController extends Controller
         }
 
         return response()->json([
-            'subtotal'        => $subtotal,
-            'gst_amount'      => $gstAmount,
-            'shipping_charge' => $shippingCharge,
-            'total_amount'    => $totalAmount,
-            'wallet_balance'  => $walletBalance,
-            'wallet_used'     => $walletUsed,
-            'remaining_payable' => $remainingPayable,
-            'items'           => $items,
+            'subtotal'               => $subtotal,
+            'gst_amount'             => $gstAmount,
+            'shipping_charge'        => $shippingCharge,
+            'total_amount'           => $totalAmount,
+            'wallet_balance'         => $walletBalance,
+            'max_wallet_applicable'  => $maxWalletApplicable,
+            'wallet_used'            => $walletUsed,
+            'remaining_payable'      => $remainingPayable,
+            'items'                  => $items,
         ]);
     }
 
@@ -450,17 +454,16 @@ class CheckoutController extends Controller
             $totalAmount = $subtotal + $gstAmount + $shippingCharge;
 
             // Wallet contribution for Razorpay orders (only if user explicitly opted in)
+            // Cap: max wallet discount = 50% of order total
             $useWallet = filter_var($request->input('use_wallet', false), FILTER_VALIDATE_BOOLEAN);
             $walletUsed = 0.0;
             $remainingPayable = $totalAmount;
             $userId = auth()->id();
             if ($useWallet && $userId) {
-                $userModel = \App\Models\User::find($userId);
-                if ($userModel && in_array($userModel->role, ['affiliate', 'rm', 'manager'])) {
-                    $walletBalance = WalletTransaction::balanceFor($userId);
-                    $walletUsed = min($walletBalance, $totalAmount);
-                    $remainingPayable = $totalAmount - $walletUsed;
-                }
+                $walletBalance = WalletTransaction::balanceFor($userId);
+                $maxWalletAllowed = round($totalAmount * 0.50, 2);
+                $walletUsed = min($walletBalance, $maxWalletAllowed);
+                $remainingPayable = $totalAmount - $walletUsed;
             }
 
             // Get Razorpay settings
@@ -483,24 +486,35 @@ class CheckoutController extends Controller
                 'payment_capture' => 1
             ]);
 
+            // Resolve name/mobile/address from address_id if provided
+            $addr = null;
+            if ($request->address_id) {
+                $addr = \App\Models\Address::find($request->address_id);
+            }
+            $orderName    = $addr ? $addr->name    : $request->name;
+            $orderMobile  = $addr ? $addr->phone   : $request->mobile;
+            $orderAddress = $addr ? ($addr->address . ', ' . $addr->city . ', ' . $addr->state . ' - ' . $addr->pincode . ', ' . ($addr->country ?? '')) : $request->address;
+            $orderPincode = $addr ? $addr->pincode  : $request->pincode;
+
             // Create order in database with pending status
             $order = Order::create([
-                'user_id' => $userId,
+                'user_id'           => $userId,
+                'address_id'        => $addr ? $addr->id : null,
                 'razorpay_order_id' => $razorpayOrder['id'],
-                'name' => $request->name,
-                'mobile' => $request->mobile,
-                'email' => $request->email,
-                'address' => $request->address,
-                'pincode' => $request->pincode,
-                'subtotal' => $subtotal,
-                'gst_amount' => $gstAmount,
-                'shipping_charge' => $shippingCharge,
-                'total_amount' => $totalAmount,
-                'wallet_used' => $walletUsed,
+                'name'              => $orderName,
+                'mobile'            => $orderMobile,
+                'email'             => $request->email ?? ($addr ? null : null),
+                'address'           => $orderAddress,
+                'pincode'           => $orderPincode,
+                'subtotal'          => $subtotal,
+                'gst_amount'        => $gstAmount,
+                'shipping_charge'   => $shippingCharge,
+                'total_amount'      => $totalAmount,
+                'wallet_used'       => $walletUsed,
                 'remaining_payable' => $remainingPayable,
-                'payment_status' => 'pending',
-                'order_status' => 'pending',
-                'payment_method' => 'razorpay',
+                'payment_status'    => 'pending',
+                'order_status'      => 'pending',
+                'payment_method'    => 'razorpay',
             ]);
 
             // Create order items

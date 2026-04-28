@@ -115,37 +115,6 @@
         @endif
     </div>
 
-    {{-- Wallet request --}}
-    @if($walletBalance > 0)
-    <div class="admin-card">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Request Withdrawal</h3>
-        @if(session('success'))
-            <div class="mb-4 bg-green-50 border border-green-300 text-green-700 px-4 py-3 rounded-lg text-sm">{{ session('success') }}</div>
-        @endif
-        @if(session('error'))
-            <div class="mb-4 bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-lg text-sm">{{ session('error') }}</div>
-        @endif
-        <form method="POST" action="{{ route('affiliate.wallet-request.store') }}" class="flex flex-wrap gap-3 items-end">
-            @csrf
-            <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">Amount (max &#8377;{{ number_format($walletBalance, 2) }})</label>
-                <input type="number" name="amount" min="1" step="0.01" max="{{ $walletBalance }}" required
-                    placeholder="0.00"
-                    class="px-3 py-2 border border-gray-300 rounded-lg text-sm w-44 focus:ring-2 focus:ring-brand-gold focus:border-brand-gold">
-            </div>
-            <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">Remark (optional)</label>
-                <input type="text" name="remark" placeholder="e.g. Bank transfer"
-                    class="px-3 py-2 border border-gray-300 rounded-lg text-sm w-64 focus:ring-2 focus:ring-brand-gold focus:border-brand-gold">
-            </div>
-            <button type="submit"
-                class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-5 py-2 rounded-lg font-semibold text-sm hover:shadow-lg transition-all duration-300">
-                Request
-            </button>
-        </form>
-        <p class="text-xs text-gray-400 mt-2">You can only request up to your available wallet balance. Admin will approve your request.</p>
-    </div>
-    @endif
 
 </div>
 @endsection

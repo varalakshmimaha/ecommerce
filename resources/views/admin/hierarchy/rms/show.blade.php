@@ -137,7 +137,7 @@
                 <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             </div>
             <div class="min-w-0">
-                <div class="text-[10px] text-text-muted uppercase font-bold tracking-wider">Available Balance</div>
+                <div class="text-[10px] text-text-muted uppercase font-bold tracking-wider">Wallet Points</div>
                 <div class="text-xl font-bold text-green-600 leading-tight">&#8377;{{ number_format($rmTotals['wallet'], 2) }}</div>
             </div>
         </div>
@@ -160,6 +160,11 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                 Order History
                 <span class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-gray-100 text-text-muted text-[10px] font-bold">{{ $summary['orders_count'] }}</span>
+            </button>
+            <button type="button" data-tab="lifetime" class="rm-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-text-muted hover:text-text-heading inline-flex items-center gap-2 whitespace-nowrap">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Lifetime Earnings
+                <span class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-gray-100 text-text-muted text-[10px] font-bold">{{ $monthlyEarnings->count() }}</span>
             </button>
         </nav>
     </div>
@@ -290,7 +295,9 @@
                                 <th class="text-left px-4 py-3 font-semibold">Remark</th>
                                 <th class="text-left px-4 py-3 font-semibold">By</th>
                                 <th class="text-left px-4 py-3 font-semibold">Date</th>
+                                @if(auth()->user()->is_admin)
                                 <th class="text-left px-4 py-3 font-semibold">Action</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -322,6 +329,7 @@
                                     <td class="px-4 py-3 text-text-muted">{{ $tx->remark ?: '—' }}</td>
                                     <td class="px-4 py-3 text-text-muted text-xs">{{ optional($tx->creator)->name ?? 'Admin' }}</td>
                                     <td class="px-4 py-3 text-text-muted text-xs">{{ $tx->created_at?->format('d M Y, h:i A') }}</td>
+                                    @if(auth()->user()->is_admin)
                                     <td class="px-4 py-3">
                                         @if($tx->status === 'pending')
                                             <div class="flex items-center gap-1">
@@ -338,6 +346,7 @@
                                             <span class="text-text-muted text-xs">—</span>
                                         @endif
                                     </td>
+                                    @endif
                                 </tr>
                             @endforeach
                         </tbody>
@@ -428,9 +437,113 @@
         </div>
     </div>
 
+    {{-- Tab panel: Lifetime Earnings --}}
+    <div data-panel="lifetime" class="rm-tab-panel hidden">
+        <div class="bg-white rounded-xl shadow-sm border border-ui-border overflow-hidden">
+            <div class="px-5 py-4 border-b border-ui-border">
+                <h3 class="font-semibold text-text-heading">Monthly Lifetime Earnings</h3>
+                <p class="text-xs text-text-muted mt-0.5">Commission earned through affiliate referral orders, grouped by month</p>
+            </div>
+            @if($monthlyEarnings->count())
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50 text-text-muted text-[10px] uppercase tracking-wider">
+                            <tr>
+                                <th class="text-left px-4 py-3 font-semibold">Month</th>
+                                <th class="text-right px-4 py-3 font-semibold">Total Earnings</th>
+                                <th class="text-center px-4 py-3 font-semibold">Orders</th>
+                                <th class="text-center px-4 py-3 font-semibold">Status</th>
+                                <th class="text-center px-4 py-3 font-semibold">Details</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @foreach($monthlyEarnings as $m)
+                            @php
+                                $mKey     = $m->year . '-' . $m->month;
+                                $mLabel   = \Carbon\Carbon::createFromDate($m->year, $m->month, 1)->format('F Y');
+                                $mDetails = $monthlyCommissionDetails->get($mKey, collect());
+                            @endphp
+                            <tr class="hover:bg-gray-50/80">
+                                <td class="px-4 py-3 font-medium text-text-heading">{{ $mLabel }}</td>
+                                <td class="px-4 py-3 text-right font-bold text-brand-gold">&#8377;{{ number_format($m->total_amount, 2) }}</td>
+                                <td class="px-4 py-3 text-center text-text-muted">{{ $m->orders_count }}</td>
+                                <td class="px-4 py-3 text-center">
+                                    @if($m->month_status === 'paid')
+                                        <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-green-100 text-green-800">&#10003; Paid</span>
+                                    @elseif($m->month_status === 'approved')
+                                        <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-blue-100 text-blue-800">Approved</span>
+                                    @else
+                                        <span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3 text-center">
+                                    <button type="button" onclick="toggleMonthDetail('rm-{{ $mKey }}')" title="View commission details"
+                                        class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 hover:bg-brand-gold/10 text-text-muted hover:text-brand-gold transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr id="rm-{{ $mKey }}" class="hidden bg-amber-50/40">
+                                <td colspan="5" class="px-4 py-3">
+                                    <div class="text-[10px] font-bold text-text-muted uppercase tracking-wider mb-2">Commission Details — {{ $mLabel }}</div>
+                                    @if($mDetails->count())
+                                    <div class="overflow-x-auto rounded-lg border border-amber-100">
+                                        <table class="w-full text-xs">
+                                            <thead class="bg-amber-100/60 text-[10px] uppercase tracking-wider text-amber-800">
+                                                <tr>
+                                                    <th class="text-left px-3 py-2 font-semibold">Order #</th>
+                                                    <th class="text-left px-3 py-2 font-semibold">Date</th>
+                                                    <th class="text-right px-3 py-2 font-semibold">Base Amount</th>
+                                                    <th class="text-center px-3 py-2 font-semibold">Rate</th>
+                                                    <th class="text-right px-3 py-2 font-semibold">Commission</th>
+                                                    <th class="text-center px-3 py-2 font-semibold">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-amber-100">
+                                                @foreach($mDetails as $cd)
+                                                <tr class="hover:bg-amber-50">
+                                                    <td class="px-3 py-2 font-mono text-text-heading">{{ $cd->order?->order_number ?? '—' }}</td>
+                                                    <td class="px-3 py-2 text-text-muted">{{ $cd->created_at->format('d M Y') }}</td>
+                                                    <td class="px-3 py-2 text-right text-text-heading">&#8377;{{ number_format($cd->base_amount, 2) }}</td>
+                                                    <td class="px-3 py-2 text-center text-text-muted">{{ number_format($cd->percentage, 1) }}%</td>
+                                                    <td class="px-3 py-2 text-right font-semibold text-brand-gold">&#8377;{{ number_format($cd->amount, 2) }}</td>
+                                                    <td class="px-3 py-2 text-center">
+                                                        @if($cd->status === 'paid')
+                                                            <span class="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-green-100 text-green-800">Paid</span>
+                                                        @elseif($cd->status === 'approved')
+                                                            <span class="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-blue-100 text-blue-800">Approved</span>
+                                                        @else
+                                                            <span class="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    @else
+                                        <p class="text-xs text-text-muted">No order-level details available.</p>
+                                    @endif
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <div class="px-5 py-10 text-center text-sm text-text-muted">No commission earnings yet.</div>
+            @endif
+        </div>
+    </div>
+
 </div>
 
 <script>
+function toggleMonthDetail(id) {
+    const row = document.getElementById(id);
+    if (row) row.classList.toggle('hidden');
+}
+
 (function(){
     const btns = document.querySelectorAll('.rm-tab-btn');
     const panels = document.querySelectorAll('.rm-tab-panel');
