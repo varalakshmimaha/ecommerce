@@ -299,7 +299,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
 
                             <!-- Add to Cart Button -->
-                            <button onclick="addToCart(${product.id})" class="w-full bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-brand-gold/50 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-3">
+                            <button id="add-to-cart-btn" onclick="addToCart(${product.id})" class="w-full bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-brand-gold/50 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-3">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                                 </svg>
@@ -705,6 +705,20 @@ window.selectVariation = function(variationId) {
         }
     }
 
+    // Disable/enable Add to Cart button based on stock
+    const cartBtn = document.getElementById('add-to-cart-btn');
+    if (cartBtn) {
+        if (variation.is_in_stock) {
+            cartBtn.disabled = false;
+            cartBtn.className = 'w-full bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-brand-gold/50 transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-3';
+            cartBtn.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg> Add to Cart`;
+        } else {
+            cartBtn.disabled = true;
+            cartBtn.className = 'w-full bg-gray-300 text-gray-500 py-4 rounded-xl font-bold text-lg cursor-not-allowed flex items-center justify-center gap-3';
+            cartBtn.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg> Out of Stock`;
+        }
+    }
+
     // Update main image if variation has image
     if (variation.image) {
         changeMainImage('/storage/' + variation.image);
@@ -805,6 +819,16 @@ window.addToCart = function(productId) {
             window.showModal('Error', 'Selected variation is out of stock', 'error');
         } else {
             alert('Selected variation is out of stock');
+        }
+        return;
+    }
+
+    // Check stock for non-variation products
+    if (!currentVariation && currentProduct && currentProduct.stock_quantity <= 0) {
+        if (typeof window.showModal === 'function') {
+            window.showModal('Error', 'This product is out of stock', 'error');
+        } else {
+            alert('This product is out of stock');
         }
         return;
     }
