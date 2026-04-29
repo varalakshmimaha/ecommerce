@@ -180,7 +180,7 @@
                         <img src="{{ asset('storage/' . $product->main_image) }}" alt="{{ $product->name }}" class="w-16 h-16 object-cover rounded-lg">
                     </td>
                     <td class="font-medium">{{ $product->name }}</td>
-                    <td>{{ $product->category->name }}</td>
+                    <td>{{ $product->category?->name ?? '—' }}</td>
                     <td>₹{{ number_format($product->selling_price, 2) }}</td>
                     <td>{{ $product->stock_quantity }}</td>
                     <td>
