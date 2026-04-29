@@ -38,14 +38,14 @@
             
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Category *</label>
-                <select name="category_id" required class="input-field">
+                <select name="category_id" id="category_id" required class="input-field">
                     <option value="">Select Category</option>
                     @foreach($categories as $category)
                         <option value="{{ $category->id }}" {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                     @endforeach
                 </select>
             </div>
-            
+
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Brand</label>
                 <select name="brand_id" class="input-field">
@@ -55,13 +55,13 @@
                     @endforeach
                 </select>
             </div>
-            
+
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Sub Category</label>
-                <select name="sub_category_id" class="input-field">
+                <select name="sub_category_id" id="sub_category_id" class="input-field">
                     <option value="">Select Sub Category</option>
                     @foreach($subCategories as $subCategory)
-                        <option value="{{ $subCategory->id }}" {{ old('sub_category_id', $product->sub_category_id) == $subCategory->id ? 'selected' : '' }}>{{ $subCategory->name }}</option>
+                        <option value="{{ $subCategory->id }}" data-category-id="{{ $subCategory->category_id }}" {{ old('sub_category_id', $product->sub_category_id) == $subCategory->id ? 'selected' : '' }}>{{ $subCategory->name }}</option>
                     @endforeach
                 </select>
             </div>
@@ -823,6 +823,26 @@
             closeSuveeRelatedProductsModal();
         }
     });
+
+    // Filter subcategories based on selected category
+    const categorySelect = document.getElementById('category_id');
+    const subCategorySelect = document.getElementById('sub_category_id');
+    const allSubOptions = Array.from(subCategorySelect.querySelectorAll('option[data-category-id]'));
+
+    function filterSubCategories() {
+        const selectedCategoryId = categorySelect.value;
+        allSubOptions.forEach(opt => {
+            if (!selectedCategoryId || opt.dataset.categoryId === selectedCategoryId) {
+                opt.style.display = '';
+            } else {
+                opt.style.display = 'none';
+                if (opt.selected) opt.selected = false;
+            }
+        });
+    }
+
+    categorySelect.addEventListener('change', filterSubCategories);
+    filterSubCategories();
 </script>
 
 <style>
