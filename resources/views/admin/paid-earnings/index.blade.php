@@ -2,6 +2,7 @@
 @section('title', 'Lifetime Earnings Paid')
 
 @section('content')
+@php $activeTab = request('tab', 'pending'); @endphp
 <div class="space-y-6">
 
     {{-- Header KPIs --}}
@@ -33,6 +34,7 @@
     {{-- Filters --}}
     <div class="admin-card">
         <form method="GET" action="{{ route('admin.paid-earnings.index') }}" class="flex flex-wrap gap-3 items-end">
+            <input type="hidden" name="tab" value="{{ $activeTab }}">
             <div>
                 <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Role</label>
                 <select name="role" class="input-field py-2 text-sm">
@@ -46,24 +48,35 @@
                 <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Month</label>
                 <input type="month" name="month" value="{{ $filterMonth }}" class="input-field py-2 text-sm">
             </div>
-            <div>
-                <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Status</label>
-                <select name="status" class="input-field py-2 text-sm">
-                    <option value="">All Status</option>
-                    <option value="paid"     {{ $filterStatus === 'paid'     ? 'selected' : '' }}>Paid</option>
-                    <option value="approved" {{ $filterStatus === 'approved' ? 'selected' : '' }}>Approved</option>
-                    <option value="pending"  {{ $filterStatus === 'pending'  ? 'selected' : '' }}>Pending</option>
-                </select>
-            </div>
             <button type="submit" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-5 py-2 rounded-lg text-sm font-semibold">Filter</button>
-            <a href="{{ route('admin.paid-earnings.index') }}" class="bg-gray-100 text-gray-700 px-5 py-2 rounded-lg text-sm font-semibold hover:bg-gray-200">Reset</a>
+            <a href="{{ route('admin.paid-earnings.index', ['tab' => $activeTab]) }}" class="bg-gray-100 text-gray-700 px-5 py-2 rounded-lg text-sm font-semibold hover:bg-gray-200">Reset</a>
         </form>
     </div>
 
-    {{-- Monthly Earnings Table --}}
-    <div class="admin-card">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">Monthly Lifetime Earnings</h2>
+    {{-- Tabs (below filters) --}}
+    <div class="flex gap-1 border-b border-ui-border">
+        <a href="{{ route('admin.paid-earnings.index', array_merge(request()->only(['role','month']), ['tab' => 'pending'])) }}"
+           class="px-6 py-3 text-sm font-semibold border-b-2 transition-colors
+               {{ $activeTab === 'pending' ? 'border-brand-gold text-brand-gold' : 'border-transparent text-gray-500 hover:text-gray-800' }}">
+            Pending
+            <span class="ml-1.5 inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-bold
+                {{ $activeTab === 'pending' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-500' }}">
+                {{ $pendingCount }}
+            </span>
+        </a>
+        <a href="{{ route('admin.paid-earnings.index', array_merge(request()->only(['role','month']), ['tab' => 'paid'])) }}"
+           class="px-6 py-3 text-sm font-semibold border-b-2 transition-colors
+               {{ $activeTab === 'paid' ? 'border-green-600 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-800' }}">
+            Paid
+            <span class="ml-1.5 inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-bold
+                {{ $activeTab === 'paid' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
+                {{ $paidCount }}
+            </span>
+        </a>
+    </div>
 
+    {{-- Table --}}
+    <div class="admin-card">
         @if(session('success'))
             <div class="mb-4 px-4 py-3 rounded-lg bg-green-50 border border-green-200 text-green-800 text-sm font-medium">
                 {{ session('success') }}
@@ -80,7 +93,9 @@
                         <th class="text-right">Total Earnings</th>
                         <th class="text-center">Commissions</th>
                         <th class="text-center">Status</th>
+                        @if($activeTab === 'pending')
                         <th class="text-center">Action</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -88,6 +103,7 @@
                     @php
                         $monthLabel = \Carbon\Carbon::createFromDate($row->year, $row->month, 1)->format('F Y');
                         $userName   = $userNames[$row->beneficiary_user_id] ?? 'Unknown';
+                        $isPaid     = $row->month_status === 'paid';
                     @endphp
                     <tr>
                         <td class="font-medium text-gray-900">{{ $userName }}</td>
@@ -101,16 +117,14 @@
                         <td class="text-right font-bold text-gray-900">&#8377;{{ number_format($row->total_amount, 2) }}</td>
                         <td class="text-center text-gray-600">{{ $row->commission_count }}</td>
                         <td class="text-center">
-                            @if($row->month_status === 'paid')
+                            @if($isPaid)
                                 <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">&#10003; Paid</span>
-                            @elseif($row->month_status === 'approved')
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">Approved</span>
                             @else
                                 <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Pending</span>
                             @endif
                         </td>
+                        @if($activeTab === 'pending')
                         <td class="text-center">
-                            @if($row->month_status !== 'paid')
                             <form action="{{ route('admin.paid-earnings.mark-paid') }}" method="POST"
                                   onsubmit="return confirm('Mark {{ $userName }}\'s {{ $monthLabel }} earnings (₹{{ number_format($row->total_amount,2) }}) as paid?')">
                                 @csrf
@@ -122,14 +136,14 @@
                                     Mark Paid
                                 </button>
                             </form>
-                            @else
-                                <span class="text-xs text-gray-400">—</span>
-                            @endif
                         </td>
+                        @endif
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="7" class="text-center py-10 text-gray-400">No earnings records found.</td>
+                        <td colspan="{{ $activeTab === 'pending' ? 7 : 6 }}" class="text-center py-10 text-gray-400">
+                            No {{ $activeTab }} earnings found.
+                        </td>
                     </tr>
                     @endforelse
                 </tbody>

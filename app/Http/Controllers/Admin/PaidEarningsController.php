@@ -39,26 +39,32 @@ class PaidEarningsController extends Controller
         // Apply filters
         $filterRole  = $request->get('role');
         $filterMonth = $request->get('month'); // format: YYYY-MM
-        $filterStatus = $request->get('status');
+        $activeTab   = $request->get('tab', 'pending');
 
-        $filtered = $rows->filter(function ($r) use ($filterRole, $filterMonth, $filterStatus, $userNames) {
+        // Base filter: role + month only (shared across both tabs for counts)
+        $baseFiltered = $rows->filter(function ($r) use ($filterRole, $filterMonth) {
             if ($filterRole && $r->beneficiary_role !== $filterRole) return false;
             if ($filterMonth) {
                 $ym = $r->year . '-' . str_pad($r->month, 2, '0', STR_PAD_LEFT);
                 if ($ym !== $filterMonth) return false;
             }
-            if ($filterStatus && $r->month_status !== $filterStatus) return false;
             return true;
         });
 
+        $pendingRows = $baseFiltered->filter(fn($r) => $r->month_status !== 'paid');
+        $paidRows    = $baseFiltered->filter(fn($r) => $r->month_status === 'paid');
+
+        $filtered = $activeTab === 'paid' ? $paidRows : $pendingRows;
+
         return view('admin.paid-earnings.index', [
-            'rows'        => $filtered,
-            'userNames'   => $userNames,
-            'filterRole'  => $filterRole,
-            'filterMonth' => $filterMonth,
-            'filterStatus'=> $filterStatus,
-            'totalPaid'   => $rows->where('month_status', 'paid')->sum('total_amount'),
-            'totalPending'=> $rows->where('month_status', '!=', 'paid')->sum('total_amount'),
+            'rows'         => $filtered,
+            'userNames'    => $userNames,
+            'filterRole'   => $filterRole,
+            'filterMonth'  => $filterMonth,
+            'totalPaid'    => $rows->where('month_status', 'paid')->sum('total_amount'),
+            'totalPending' => $rows->where('month_status', '!=', 'paid')->sum('total_amount'),
+            'paidCount'    => $paidRows->count(),
+            'pendingCount' => $pendingRows->count(),
         ]);
     }
 
@@ -79,6 +85,6 @@ class PaidEarningsController extends Controller
                 'paid_at' => now(),
             ]);
 
-        return redirect()->back()->with('success', 'Earnings marked as paid.');
+        return redirect()->route('admin.paid-earnings.index', ['tab' => 'pending'])->with('success', 'Earnings marked as paid.');
     }
 }

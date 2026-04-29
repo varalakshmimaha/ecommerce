@@ -74,25 +74,24 @@
     {{-- Feature Access Toggles (admin only) --}}
     @if(auth()->user()->is_admin)
     @php
-        $perms       = $manager->permissions ?? [];
-        $referralsOn = ($perms['show_referrals'] ?? true) !== false;
+        $perms          = $manager->permissions ?? [];
+        $earningsRefOn  = ($perms['show_earnings_referrals'] ?? true) !== false;
     @endphp
     <div class="bg-white rounded-xl shadow-sm border border-ui-border px-5 py-4 flex flex-wrap items-center gap-4">
         <span class="text-xs font-bold text-text-muted uppercase tracking-wider">Feature Access</span>
-        {{-- Earnings & Referrals toggle --}}
-        <div class="flex items-center gap-3 flex-1 min-w-[200px] justify-between p-3 rounded-lg border {{ $referralsOn ? 'border-orange-200 bg-orange-50' : 'border-gray-200 bg-gray-50' }}">
+        <div class="flex items-center gap-3 flex-1 min-w-[200px] justify-between p-3 rounded-lg border {{ $earningsRefOn ? 'border-orange-200 bg-orange-50' : 'border-gray-200 bg-gray-50' }}">
             <div>
-                <div class="text-sm font-semibold text-text-heading">Earnings &amp; Referrals</div>
-                <div class="text-xs text-text-muted">Show KPI cards, wallet &amp; referrals on frontend</div>
+                <div class="text-sm font-semibold text-text-heading">Monthly Earnings &amp; My Referrals</div>
+                <div class="text-xs text-text-muted">Show earnings &amp; referrals content on frontend</div>
             </div>
             <button type="button"
-                id="toggle-referrals"
+                id="toggle-earnings-referrals"
                 data-manager="{{ $manager->id }}"
-                data-section="show_referrals"
-                data-state="{{ $referralsOn ? 'on' : 'off' }}"
+                data-section="show_earnings_referrals"
+                data-state="{{ $earningsRefOn ? 'on' : 'off' }}"
                 onclick="toggleSection(this)"
-                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {{ $referralsOn ? 'bg-brand-gold' : 'bg-gray-300' }}">
-                <span class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $referralsOn ? 'translate-x-5' : 'translate-x-0' }}"></span>
+                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {{ $earningsRefOn ? 'bg-brand-gold' : 'bg-gray-300' }}">
+                <span class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $earningsRefOn ? 'translate-x-5' : 'translate-x-0' }}"></span>
             </button>
         </div>
     </div>
@@ -584,7 +583,7 @@ async function toggleSection(btn) {
     const section   = btn.dataset.section;
     const isOn      = btn.dataset.state === 'on';
     const newState  = !isOn;
-    const isRms     = section === 'show_rms';
+    const colors = { btn: 'bg-brand-gold', border: 'border-orange-200', bg: 'bg-orange-50' };
 
     btn.disabled = true;
     try {
@@ -603,9 +602,9 @@ async function toggleSection(btn) {
             // Button color
             if (newState) {
                 btn.classList.remove('bg-gray-300');
-                btn.classList.add('bg-brand-gold');
+                btn.classList.add(colors.btn);
             } else {
-                btn.classList.remove('bg-brand-gold');
+                btn.classList.remove(colors.btn);
                 btn.classList.add('bg-gray-300');
             }
 
@@ -621,9 +620,9 @@ async function toggleSection(btn) {
             if (card) {
                 if (newState) {
                     card.classList.remove('border-gray-200', 'bg-gray-50');
-                    card.classList.add('border-orange-200', 'bg-orange-50');
+                    card.classList.add(colors.border, colors.bg);
                 } else {
-                    card.classList.remove('border-orange-200', 'bg-orange-50');
+                    card.classList.remove(colors.border, colors.bg);
                     card.classList.add('border-gray-200', 'bg-gray-50');
                 }
             }

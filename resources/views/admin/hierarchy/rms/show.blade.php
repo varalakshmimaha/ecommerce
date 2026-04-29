@@ -90,23 +90,20 @@
     @if(session('error'))<div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">{{ session('error') }}</div>@endif
 
     @if(auth()->user()->is_admin)
-    @php
-        $referralsOn = ($rPerms['show_referrals'] ?? true) !== false;
-    @endphp
+    @php $earningsRefOn = ($rPerms['show_earnings_referrals'] ?? true) !== false; @endphp
     <div class="bg-white rounded-xl shadow-sm border border-ui-border px-5 py-4 flex flex-wrap items-center gap-4">
         <span class="text-xs font-bold text-text-muted uppercase tracking-wider">Feature Access</span>
-        {{-- Earnings & Referrals toggle --}}
-        <div class="flex items-center gap-3 flex-1 min-w-[200px] justify-between p-3 rounded-lg border {{ $referralsOn ? 'border-orange-200 bg-orange-50' : 'border-gray-200 bg-gray-50' }}" id="rm-referrals-card">
+        <div class="flex items-center gap-3 flex-1 min-w-[200px] justify-between p-3 rounded-lg border {{ $earningsRefOn ? 'border-orange-200 bg-orange-50' : 'border-gray-200 bg-gray-50' }}" id="rm-earnings-ref-card">
             <div class="flex items-center gap-2">
-                <svg class="w-4 h-4 {{ $referralsOn ? 'text-brand-gold' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                <svg class="w-4 h-4 {{ $earningsRefOn ? 'text-brand-gold' : 'text-gray-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
                 <div>
-                    <div class="text-xs font-semibold text-text-heading">Earnings &amp; Referrals</div>
-                    <div class="text-[10px] text-text-muted">Show KPI cards, wallet &amp; referrals on frontend</div>
+                    <div class="text-xs font-semibold text-text-heading">Monthly Earnings &amp; My Referrals</div>
+                    <div class="text-[10px] text-text-muted">Show earnings &amp; referrals content on frontend</div>
                 </div>
             </div>
-            <button type="button" id="toggle-rm-referrals" data-rm="{{ $rm->id }}" data-section="show_referrals" data-state="{{ $referralsOn ? 'on' : 'off' }}" onclick="toggleRmSection(this)"
-                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {{ $referralsOn ? 'bg-brand-gold' : 'bg-gray-300' }}">
-                <span class="inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $referralsOn ? 'translate-x-5' : 'translate-x-0' }}"></span>
+            <button type="button" id="toggle-rm-earnings-ref" data-rm="{{ $rm->id }}" data-section="show_earnings_referrals" data-state="{{ $earningsRefOn ? 'on' : 'off' }}" onclick="toggleRmSection(this)"
+                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none {{ $earningsRefOn ? 'bg-brand-gold' : 'bg-gray-300' }}">
+                <span class="inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $earningsRefOn ? 'translate-x-5' : 'translate-x-0' }}"></span>
             </button>
         </div>
     </div>
@@ -573,6 +570,7 @@ async function toggleRmSection(btn) {
     const section = btn.dataset.section;
     const isOn    = btn.dataset.state === 'on';
     const newState = !isOn;
+    const colors = { btn: 'bg-brand-gold', border: 'border-orange-200', bg: 'bg-orange-50', icon: 'text-brand-gold' };
     btn.disabled = true;
     try {
         const res = await fetch(`/admin/rms/${rmId}/toggle-section`, {
@@ -588,8 +586,8 @@ async function toggleRmSection(btn) {
             btn.dataset.state = newState ? 'on' : 'off';
 
             // Button color
-            if (newState) { btn.classList.remove('bg-gray-300'); btn.classList.add('bg-brand-gold'); }
-            else          { btn.classList.remove('bg-brand-gold'); btn.classList.add('bg-gray-300'); }
+            if (newState) { btn.classList.remove('bg-gray-300'); btn.classList.add(colors.btn); }
+            else          { btn.classList.remove(colors.btn); btn.classList.add('bg-gray-300'); }
 
             // Thumb position
             const thumb = btn.querySelector('span');
@@ -603,15 +601,15 @@ async function toggleRmSection(btn) {
             if (card) {
                 if (newState) {
                     card.classList.remove('border-gray-200', 'bg-gray-50');
-                    card.classList.add('border-orange-200', 'bg-orange-50');
+                    card.classList.add(colors.border, colors.bg);
                 } else {
-                    card.classList.remove('border-orange-200', 'bg-orange-50');
+                    card.classList.remove(colors.border, colors.bg);
                     card.classList.add('border-gray-200', 'bg-gray-50');
                 }
                 const icon = card.querySelector('svg');
                 if (icon) {
-                    if (newState) { icon.classList.remove('text-gray-400'); icon.classList.add('text-brand-gold'); }
-                    else          { icon.classList.remove('text-brand-gold'); icon.classList.add('text-gray-400'); }
+                    if (newState) { icon.classList.remove('text-gray-400'); icon.classList.add(colors.icon); }
+                    else          { icon.classList.remove(colors.icon); icon.classList.add('text-gray-400'); }
                 }
             }
         }

@@ -5,10 +5,13 @@
 @section('content')
 
 @php
-    $perms           = auth()->user()->permissions ?? [];
-    $isAffiliate     = auth()->user()->role === 'affiliate';
-    $isEarner        = in_array(auth()->user()->role, ['affiliate', 'rm', 'manager']);
-    $canSeeReferrals = $isEarner && ($perms['show_referrals'] ?? true) !== false;
+    $perms                  = auth()->user()->permissions ?? [];
+    $isAffiliate            = auth()->user()->role === 'affiliate';
+    $isEarner               = in_array(auth()->user()->role, ['affiliate', 'rm', 'manager']);
+    $canSeeReferrals        = $isEarner && ($perms['show_referrals'] ?? true) !== false;
+    $canSeeEarningsReferrals = ($perms['show_earnings_referrals'] ?? true) !== false;
+    $canSeeMonthlyEarnings   = $canSeeEarningsReferrals;
+    $canSeeMyReferrals       = $canSeeEarningsReferrals;
 @endphp
 
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-white">
@@ -415,6 +418,7 @@
                         $customerReferrals = $referrals->where('role', 'customer');
                     @endphp
 
+                    @if($canSeeMonthlyEarnings)
                     {{-- Lifetime Earnings KPI --}}
                     <div class="relative bg-white rounded-2xl shadow-sm border border-gray-100 p-6 overflow-hidden">
                         <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(to right,#f59e0b,#ea580c);"></div>
@@ -520,6 +524,9 @@
                         <div class="text-center py-12 text-text-muted text-sm">No commissions yet. Share your referral link to start earning.</div>
                         @endif
                     </div>
+                    @else
+                    <div class="text-center py-12 text-text-muted text-sm">Monthly Earnings access is currently disabled by your admin.</div>
+                    @endif
 
                 @endif
             </div>
@@ -530,6 +537,7 @@
             <div class="space-y-6">
                 @if(in_array($user->role, ['affiliate','rm','manager']))
                     @php $customerReferrals = $referrals->where('role', 'customer'); @endphp
+                    @if($canSeeMyReferrals)
                     <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
                         <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between flex-wrap gap-3">
                             <div class="flex items-center gap-3">
@@ -582,6 +590,9 @@
                         </div>
                         @endif
                     </div>
+                    @else
+                    <div class="text-center py-12 text-text-muted text-sm">Referrals access is currently disabled by your admin.</div>
+                    @endif
 
                 @else
                     {{-- Customer: "Referred by" note + Become Affiliate CTA --}}
