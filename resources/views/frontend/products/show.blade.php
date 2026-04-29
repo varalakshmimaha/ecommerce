@@ -396,9 +396,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 fetchProductVariations(product.id);
             } else {
                 // Set initial stock state for non-variation products
+                // null means unlimited stock; only treat as out of stock when explicitly 0
                 const stockDisplay = document.getElementById('stock-display');
                 const cartBtn = document.getElementById('add-to-cart-btn');
-                if (product.stock_quantity <= 0) {
+                const isOutOfStock = product.stock_quantity !== null && product.stock_quantity !== undefined && product.stock_quantity <= 0;
+                if (isOutOfStock) {
                     if (stockDisplay) {
                         stockDisplay.innerHTML = `<span class="text-red-600">✗ Out of Stock</span>`;
                     }
@@ -407,7 +409,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         cartBtn.className = 'w-full bg-gray-300 text-gray-500 py-4 rounded-xl font-bold text-lg cursor-not-allowed flex items-center justify-center gap-3';
                         cartBtn.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg> Out of Stock`;
                     }
-                } else {
+                } else if (product.stock_quantity > 0) {
                     if (stockDisplay) {
                         stockDisplay.innerHTML = `<span class="text-green-600">✓ In Stock (${product.stock_quantity} available)</span>`;
                     }
