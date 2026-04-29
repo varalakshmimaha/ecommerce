@@ -64,7 +64,14 @@ class UserController extends Controller
             return response()->json(['error' => 'Unauthenticated'], 401);
         }
 
-        $orders = $user->orders()->with('items')->orderBy('created_at', 'desc')->get();
+        $query = $user->orders()->with(['items.product:id,name,slug', 'items.product.images']);
+
+        if ($status = $request->query('status')) {
+            $query->where('order_status', $status);
+        }
+
+        $perPage = (int) $request->query('per_page', 15);
+        $orders  = $query->orderByDesc('created_at')->paginate(min(max($perPage, 1), 50));
 
         return response()->json(['success' => true, 'data' => $orders]);
     }
@@ -73,11 +80,40 @@ class UserController extends Controller
     {
         $order = $request->user()
             ->orders()
-            ->with('items.product')
+            ->with(['items.product.images', 'addresses'])
             ->where('order_number', $orderNumber)
             ->firstOrFail();
 
-        return response()->json(['data' => $order]);
+        return response()->json(['success' => true, 'data' => $order]);
+    }
+
+    public function cancelOrder(Request $request, $orderNumber)
+    {
+        $validator = Validator::make($request->all(), [
+            'cancellation_remark' => 'required|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $order = $request->user()->orders()->where('order_number', $orderNumber)->first();
+        if (!$order) {
+            return response()->json(['success' => false, 'message' => 'Order not found'], 404);
+        }
+
+        if (!in_array($order->order_status, ['pending', 'processing'], true)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Order cannot be cancelled at this stage.',
+            ], 422);
+        }
+
+        $order->order_status        = 'cancelled';
+        $order->cancellation_remark = $request->cancellation_remark;
+        $order->save();
+
+        return response()->json(['success' => true, 'message' => 'Order cancelled', 'data' => $order]);
     }
 
     public function downloadInvoice(Request $request, $orderNumber)
