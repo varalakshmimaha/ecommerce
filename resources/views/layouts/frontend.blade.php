@@ -106,6 +106,10 @@
                         Products
                         <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson group-hover:w-full transition-all duration-300"></span>
                     </a>
+                    <a href="{{ route('frontend.services') }}" class="text-text-heading hover:text-ui-hover transition-all duration-300 font-medium relative group">
+                        Services
+                        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson group-hover:w-full transition-all duration-300"></span>
+                    </a>
                     <a href="{{ route('track.order') }}" class="text-text-heading hover:text-ui-hover transition-all duration-300 font-medium relative group">
                       Track Order
                       <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson group-hover:w-full transition-all duration-300"></span>
@@ -241,6 +245,8 @@
 
                     <a href="{{ route('home') }}" class="text-text-heading hover:text-ui-hover transition-all duration-300 font-medium py-2">Home</a>
                     <a href="{{ route('products.index') }}" class="text-text-heading hover:text-ui-hover transition-all duration-300 font-medium py-2">Products</a>
+                    <a href="{{ route('frontend.services') }}" class="text-text-heading hover:text-ui-hover transition-all duration-300 font-medium py-2">Services</a>
+                    <a href="{{ route('track.order') }}" class="text-text-heading hover:text-ui-hover transition-all duration-300 font-medium py-2">Track Order</a>
                     @foreach(\App\Models\Page::where('show_in_navbar', true)->where('is_active', true)->orderBy('sort_order')->get() as $mobileNavPage)
                         <a href="{{ route('page.show', $mobileNavPage) }}" class="text-text-heading hover:text-ui-hover transition-all duration-300 font-medium py-2">{{ $mobileNavPage->title }}</a>
                     @endforeach

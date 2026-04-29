@@ -32,6 +32,10 @@ Route::get('/', function () {
     return view('frontend.home');
 })->name('home');
 
+Route::get('/services', function () {
+    return view('frontend.services');
+})->name('frontend.services');
+
 use App\Http\Controllers\Api\FavouriteController;
 use App\Http\Controllers\Api\CompareController;
 
