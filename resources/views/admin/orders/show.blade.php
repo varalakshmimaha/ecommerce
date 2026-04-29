@@ -8,7 +8,7 @@
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold text-gray-900">Order #{{ $order->order_number }}</h2>
             <a href="{{ route('admin.orders.invoice', $order) }}" target="_blank" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-all duration-300">
-                View Invoice
+                Yesb Confident
             </a>
         </div>
         

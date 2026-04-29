@@ -122,7 +122,7 @@
                 <svg class="w-5 h-5 text-brand-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/></svg>
             </div>
             <div class="min-w-0">
-                <div class="text-[10px] text-text-muted uppercase font-bold tracking-wider">Lifetime Earnings</div>
+                <div class="text-[10px] text-text-muted uppercase font-bold tracking-wider">Earnings</div>
                 <div class="text-xl font-bold text-brand-gold leading-tight">&#8377;{{ number_format($managerTotals['lifetime'], 2) }}</div>
             </div>
         </div>
@@ -152,7 +152,7 @@
             </button>
             <button type="button" data-tab="lifetime" class="mgr-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-text-muted hover:text-text-heading inline-flex items-center gap-2 whitespace-nowrap">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                Lifetime Earnings
+                Earnings
                 <span class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-gray-100 text-text-muted text-[10px] font-bold">{{ $monthlyEarnings->count() }}</span>
             </button>
             <button type="button" data-tab="orders" class="mgr-tab-btn px-4 py-2.5 text-sm font-semibold border-b-2 border-transparent text-text-muted hover:text-text-heading inline-flex items-center gap-2 whitespace-nowrap">
@@ -181,7 +181,7 @@
                                 <th class="text-left px-4 py-3 font-semibold">RM</th>
                                 <th class="text-left px-4 py-3 font-semibold">Mobile</th>
                                 <th class="text-right px-4 py-3 font-semibold">Affiliates</th>
-                                <th class="text-right px-4 py-3 font-semibold">Lifetime Earnings</th>
+                                <th class="text-right px-4 py-3 font-semibold">Earnings</th>
                                 <th class="px-4 py-3"></th>
                             </tr>
                         </thead>
@@ -235,7 +235,7 @@
         {{-- Current balance summary --}}
         <div style="display:flex;gap:1rem;flex-wrap:wrap;">
             <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center flex-1" style="min-width:150px;">
-                <div class="text-xs text-amber-700 font-bold uppercase tracking-wider mb-1">Lifetime Earnings</div>
+                <div class="text-xs text-amber-700 font-bold uppercase tracking-wider mb-1">Earnings</div>
                 <div class="text-2xl font-bold text-amber-700 tabular-nums">&#8377;{{ number_format($managerTotals['lifetime'] ?? 0, 2) }}</div>
                 <div class="text-[10px] text-amber-600 mt-1">Total commissions earned</div>
             </div>
@@ -446,11 +446,11 @@
         </div>
     </div>
 
-    {{-- Tab panel: Lifetime Earnings --}}
+    {{-- Tab panel: Earnings --}}
     <div data-panel="lifetime" class="mgr-tab-panel hidden">
         <div class="bg-white rounded-xl shadow-sm border border-ui-border overflow-hidden">
             <div class="px-5 py-4 border-b border-ui-border">
-                <h3 class="font-semibold text-text-heading">Monthly Lifetime Earnings</h3>
+                <h3 class="font-semibold text-text-heading">Monthly Earnings</h3>
                 <p class="text-xs text-text-muted mt-0.5">Commission earned through RM/affiliate referral orders, grouped by month</p>
             </div>
             @if($monthlyEarnings->count())

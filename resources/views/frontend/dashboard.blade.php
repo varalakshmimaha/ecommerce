@@ -238,7 +238,7 @@
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                                 </svg>
-                                Download Invoice
+                                Download Yesb Confident
                             </a>
                         </div>
                     </div>
@@ -419,7 +419,7 @@
                     @endphp
 
                     @if($canSeeMonthlyEarnings)
-                    {{-- Lifetime Earnings KPI --}}
+                    {{-- Earnings KPI --}}
                     <div class="relative bg-white rounded-2xl shadow-sm border border-gray-100 p-6 overflow-hidden">
                         <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(to right,#f59e0b,#ea580c);"></div>
                         <div class="flex items-center gap-4">
@@ -427,7 +427,7 @@
                                 <svg class="w-7 h-7" style="color:#c2410c;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
                             </div>
                             <div>
-                                <div class="text-xs font-bold uppercase tracking-wider mb-1" style="color:#9a3412;">Lifetime Earnings</div>
+                                <div class="text-xs font-bold uppercase tracking-wider mb-1" style="color:#9a3412;">Earnings</div>
                                 <div class="text-3xl font-bold text-text-heading tabular-nums">&#8377;{{ number_format($commissionTotals['lifetime'], 2) }}</div>
                                 <div class="text-xs mt-1" style="color:#6b7280;">Total commissions earned (all time)</div>
                             </div>

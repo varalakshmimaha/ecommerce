@@ -1,5 +1,5 @@
 @extends('layouts.admin')
-@section('title', 'Lifetime Earnings Paid')
+@section('title', 'Earnings Paid')
 
 @section('content')
 @php $activeTab = request('tab', 'pending'); @endphp

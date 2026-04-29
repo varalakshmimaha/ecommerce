@@ -31,7 +31,7 @@
             </div>
         </div>
 
-        {{-- Lifetime Earnings --}}
+        {{-- Earnings --}}
         <div class="admin-card flex items-center gap-4" style="flex:1;min-width:180px;">
             <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
                 <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -40,7 +40,7 @@
             </div>
             <div>
                 <div class="text-2xl font-bold text-amber-600">&#8377;{{ number_format($lifetimeEarnings, 2) }}</div>
-                <div class="text-xs text-gray-500 uppercase font-semibold tracking-wide">Lifetime Earnings</div>
+                <div class="text-xs text-gray-500 uppercase font-semibold tracking-wide">Earnings</div>
             </div>
         </div>
 

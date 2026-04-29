@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice - {{ $order->order_number }}</title>
+    <title>Yesb Confident - {{ $order->order_number }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     @php
     $activeTheme = \App\Models\ThemeColor::getActive();
@@ -50,7 +50,7 @@
         <div class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson px-8 py-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <h1 class="text-3xl font-bold text-white">INVOICE</h1>
+                    <h1 class="text-3xl font-bold text-white">Yesb Confident</h1>
                     <p class="text-white/90 mt-1">{{ \App\Models\Setting::get('company_name', 'Suwish') }}</p>
                 </div>
                 <div class="text-right">
@@ -257,7 +257,7 @@
         <div class="bg-gray-50 px-8 py-4 border-t border-gray-200 no-print">
             <div class="flex gap-4 justify-center">
                 <button onclick="window.print()" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:shadow-brand-gold/50 transition-all duration-300">
-                    Print Invoice
+                    Print Yesb Confident
                 </button>
                 <button onclick="window.close()" class="bg-gray-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-700 transition-all duration-300">
                     Close
