@@ -38,6 +38,7 @@ class Order extends Model
         'notes',
         'wallet_used',
         'remaining_payable',
+        'cancellation_remark',
     ];
 
     public function addresses()

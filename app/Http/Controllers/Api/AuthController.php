@@ -122,5 +122,109 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Logged out successfully']);
     }
+
+    public function sendOtp(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'mobile'  => 'required|string',
+            'purpose' => 'nullable|in:register,login,reset',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $user = User::firstOrCreate(
+            ['mobile' => $request->mobile],
+            [
+                'password'    => Hash::make(Str::random(12)),
+                'is_verified' => false,
+            ]
+        );
+
+        $otp = (string) random_int(1000, 9999);
+        $user->update([
+            'otp'            => $otp,
+            'otp_expires_at' => now()->addMinutes(10),
+        ]);
+
+        // TODO: dispatch SMS gateway. For dev, the OTP is returned only when APP_DEBUG is on.
+        return response()->json([
+            'success' => true,
+            'message' => 'OTP sent to your mobile.',
+            'data'    => [
+                'mobile'     => $user->mobile,
+                'expires_in' => 600,
+                'debug_otp'  => config('app.debug') ? $otp : null,
+            ],
+        ]);
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'mobile' => 'required|string|exists:users,mobile',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $user = User::where('mobile', $request->mobile)->first();
+        $otp  = (string) random_int(1000, 9999);
+        $user->update([
+            'otp'            => $otp,
+            'otp_expires_at' => now()->addMinutes(10),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'OTP sent. Use it to reset your password.',
+            'data'    => [
+                'mobile'     => $user->mobile,
+                'expires_in' => 600,
+                'debug_otp'  => config('app.debug') ? $otp : null,
+            ],
+        ]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'mobile'       => 'required|string|exists:users,mobile',
+            'otp'          => 'required|string|size:4',
+            'new_password' => 'required|string|min:6|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $user = User::where('mobile', $request->mobile)->first();
+
+        if ($user->otp !== $request->otp) {
+            return response()->json(['success' => false, 'message' => 'Invalid OTP'], 400);
+        }
+
+        if (!$user->otp_expires_at || $user->otp_expires_at < now()) {
+            return response()->json(['success' => false, 'message' => 'OTP expired'], 400);
+        }
+
+        $user->update([
+            'password'       => Hash::make($request->new_password),
+            'otp'            => null,
+            'otp_expires_at' => null,
+            'is_verified'    => true,
+        ]);
+
+        $user->tokens()->delete();
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password reset successfully.',
+            'data'    => ['token' => $token, 'user' => $user],
+        ]);
+    }
 }
 

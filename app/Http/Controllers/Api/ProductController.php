@@ -135,5 +135,49 @@ class ProductController extends Controller
 
         return response()->json($banners);
     }
+
+    /**
+     * Filter facets for the product-listing UI: brands, categories, price range.
+     * Optional ?category_id scopes brands & price range to that category.
+     */
+    public function filters(Request $request)
+    {
+        $base = Product::query()->where('status', 'published');
+        if ($request->filled('category_id')) {
+            $base->where('category_id', $request->category_id);
+        }
+        if ($request->filled('sub_category_id')) {
+            $base->where('sub_category_id', $request->sub_category_id);
+        }
+
+        $priceRange = (clone $base)
+            ->selectRaw('MIN(COALESCE(discounted_price, selling_price)) as min_price,
+                          MAX(COALESCE(discounted_price, selling_price)) as max_price')
+            ->first();
+
+        $brandIds = (clone $base)->whereNotNull('brand_id')->distinct()->pluck('brand_id');
+        $brands   = \App\Models\Brand::whereIn('id', $brandIds)->where('is_active', true)
+            ->orderBy('sort_order')->get(['id', 'name', 'slug']);
+
+        $categories = Category::where('is_active', true)
+            ->orderBy('sort_order')->get(['id', 'name', 'slug']);
+
+        return response()->json([
+            'success' => true,
+            'data'    => [
+                'price_range' => [
+                    'min' => (float) ($priceRange->min_price ?? 0),
+                    'max' => (float) ($priceRange->max_price ?? 0),
+                ],
+                'brands'      => $brands,
+                'categories'  => $categories,
+                'sort_options' => [
+                    ['key' => 'latest',     'label' => 'Latest'],
+                    ['key' => 'price-low',  'label' => 'Price: Low to High'],
+                    ['key' => 'price-high', 'label' => 'Price: High to Low'],
+                ],
+            ],
+        ]);
+    }
 }
 
