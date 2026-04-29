@@ -81,10 +81,8 @@ body.features-enabled-compare .product-card .relative:hover .action-buttons {
 <!-- Categories Section -->
 <section class="container mx-auto px-4 py-6">
     <h2 class="text-3xl font-bold text-text-heading mb-8 text-center">Shop by Category</h2>
-    <div class="w-full flex justify-center">
-        <div id="categories" class="grid gap-6 text-center" style="grid-auto-flow: column; grid-auto-columns: minmax(0,1fr);"></div>
-    </div>
-        <!-- Categories will be loaded here -->
+    <div class="w-full overflow-x-auto" style="-webkit-overflow-scrolling:touch;scrollbar-width:none;">
+        <div id="categories" class="flex gap-6 text-center pb-2" style="min-width:max-content;"></div>
     </div>
 </section>
 
@@ -204,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             container.innerHTML = data.data.map(cat => `
-                <a href="/category/${cat.slug}" class="flex flex-col items-center group p-2">
+                <a href="/category/${cat.slug}" class="flex flex-col items-center group p-2 flex-shrink-0 w-28">
                     <div class="w-24 h-24 mb-3 rounded-full overflow-hidden border-4 border-surface-light group-hover:border-brand-gold bg-gradient-to-tr from-surface-light to-surface-medium flex items-center justify-center shadow-md transition-all duration-300">
                         ${cat.image ? `<img src="/storage/${cat.image}" alt="${cat.name}" class="w-full h-full object-cover scale-100 group-hover:scale-110 transition-transform duration-300">` : '<div class="text-4xl">📦</div>'}
                     </div>
