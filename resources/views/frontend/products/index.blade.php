@@ -140,7 +140,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <span class="text-lg font-bold text-brand-gold">₹${parseFloat(product.discounted_price || product.selling_price).toFixed(2)}</span>
                                     ${product.discounted_price ? `<span class="text-sm text-gray-500 line-through">₹${parseFloat(product.selling_price).toFixed(2)}</span>` : ''}
                                 </div>
-                                <button onclick="addToCart(${product.id}, 1); event.preventDefault();" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 w-full mt-4">Add to Cart</button>
+                                ${(!product.has_variations && product.stock_quantity !== null && product.stock_quantity !== undefined && product.stock_quantity <= 0)
+                                    ? `<button disabled class="bg-gray-300 text-gray-500 px-6 py-3 rounded-lg font-semibold w-full mt-4 cursor-not-allowed">Out of Stock</button>`
+                                    : `<button onclick="addToCart(${product.id}, 1); event.preventDefault();" class="bg-gradient-to-r from-brand-gold via-brand-amber to-brand-crimson text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 w-full mt-4">Add to Cart</button>`
+                                }
                             </div>
                         </a>
                     </div>
